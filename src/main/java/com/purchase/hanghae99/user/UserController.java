@@ -6,6 +6,7 @@ import com.purchase.hanghae99.user.dto.delete.ReqUserDeleteDto;
 import com.purchase.hanghae99.user.dto.read.ResUserInfoDto;
 import com.purchase.hanghae99.user.dto.update.ReqUserInfoUpdateDto;
 import com.purchase.hanghae99.user.dto.update.ReqUserPasswordUpdateDto;
+import com.purchase.hanghae99.user.dto.update.ResUserPwUpdateDto;
 import com.purchase.hanghae99.user.dto.update.ResUserUpdateDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class UserController {
     }
 
     @PutMapping("/{userId}/password")
-    public ResponseEntity<ResUserUpdateDto> updateUserPassword(
+    public ResponseEntity<ResUserPwUpdateDto> updateUserPassword(
             @PathVariable Long userId, @Valid @RequestBody ReqUserPasswordUpdateDto reqDto
     ) {
         return ResponseEntity.ok(userService.updateUserPassword(userId, reqDto));

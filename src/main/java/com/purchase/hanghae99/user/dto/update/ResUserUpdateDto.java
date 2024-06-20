@@ -9,14 +9,14 @@ import lombok.*;
 @Builder
 public class ResUserUpdateDto {
     private Long id;
-    private String name;
-    private String email;
+    private String address;
+    private String phoneNumber;
 
     public static ResUserUpdateDto fromEntity(User user) {
         return ResUserUpdateDto.builder()
                 .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
+                .address(user.getAddress())
+                .phoneNumber(user.getPhoneNumber())
                 .build();
     }
 }
