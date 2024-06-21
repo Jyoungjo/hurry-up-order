@@ -105,6 +105,21 @@ public class UserRepositoryTest {
         assertThat(updatedUser.getPassword()).isNotEqualTo(originalPassword);
     }
 
+    // UPDATE EMAIL VERIFICATION
+    @DisplayName("유저 이메일 인증 정보 수정")
+    @Test
+    void updateEmailInfo() {
+        // given
+        User savedUser = userRepository.save(user());
+
+        // when
+        savedUser.updateEmailVerification();
+        User updatedUser = userRepository.save(savedUser);
+
+        // then
+        assertThat(updatedUser.getEmailVerifiedAt()).isNotNull();
+    }
+
     // DELETE
     @DisplayName("유저 회원 탈퇴")
     @Test

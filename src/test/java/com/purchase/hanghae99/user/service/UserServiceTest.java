@@ -1,5 +1,6 @@
 package com.purchase.hanghae99.user.service;
 
+import com.purchase.hanghae99.email.EmailService;
 import com.purchase.hanghae99.user.*;
 import com.purchase.hanghae99.user.dto.create.ReqUserCreateDto;
 import com.purchase.hanghae99.user.dto.create.ResUserCreateDto;
@@ -7,7 +8,6 @@ import com.purchase.hanghae99.user.dto.delete.ReqUserDeleteDto;
 import com.purchase.hanghae99.user.dto.read.ResUserInfoDto;
 import com.purchase.hanghae99.user.dto.update.ReqUserInfoUpdateDto;
 import com.purchase.hanghae99.user.dto.update.ReqUserPasswordUpdateDto;
-import com.purchase.hanghae99.user.dto.update.ResUserPwUpdateDto;
 import com.purchase.hanghae99.user.dto.update.ResUserUpdateDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,6 +31,9 @@ public class UserServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private EmailService emailService;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -133,10 +136,29 @@ public class UserServiceTest {
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
 
         // when
-        ResUserPwUpdateDto res = userService.updateUserPassword(userId, updateReq);
+        userService.updateUserPassword(userId, updateReq);
 
         // then
         assertThat(user.getPassword()).isNotEqualTo(originalPassword);
+    }
+
+    // UPDATE EMIL VERIFICATION
+    @DisplayName("회원 이메일 인증 정보 수정 기능 성공")
+    @Test
+    void updateEmailInfo() {
+        // given
+        ReqUserCreateDto req = saveUser();
+        userService.createUser(req);
+
+        when(userRepository.findById(any())).thenReturn(Optional.of(user));
+        when(emailService.checkVerificationStr(any(), any())).thenReturn(true);
+        user.updateEmailVerification();
+
+        // when
+        userService.updateEmailVerification(1L, "1234");
+
+        // then
+        assertThat(user.getEmailVerifiedAt()).isNotNull();
     }
 
     // DELETE
