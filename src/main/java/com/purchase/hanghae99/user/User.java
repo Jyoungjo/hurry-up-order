@@ -39,4 +39,9 @@ public class User extends BaseEntity {
     public void updatePassword(String encodedPassword) {
         this.password = encodedPassword;
     }
+
+    public void updateEmailVerification() {
+        this.role = UserRole.CERTIFIED_USER;
+        this.emailVerifiedAt = LocalDateTime.now();
+    }
 }

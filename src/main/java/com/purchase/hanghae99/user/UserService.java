@@ -1,5 +1,6 @@
 package com.purchase.hanghae99.user;
 
+import com.purchase.hanghae99.email.ResEmailDto;
 import com.purchase.hanghae99.user.dto.create.ReqUserCreateDto;
 import com.purchase.hanghae99.user.dto.create.ResUserCreateDto;
 import com.purchase.hanghae99.user.dto.delete.ReqUserDeleteDto;
@@ -14,5 +15,6 @@ public interface UserService {
     ResUserInfoDto readUser(Long userId);
     ResUserUpdateDto updateUserInfo(Long userId, ReqUserInfoUpdateDto reqDto);
     ResUserPwUpdateDto updateUserPassword(Long userId, ReqUserPasswordUpdateDto reqDto);
+    ResEmailDto updateEmailVerification(Long userId, String userStr);
     void deleteUser(Long userId, ReqUserDeleteDto reqDto);
 }

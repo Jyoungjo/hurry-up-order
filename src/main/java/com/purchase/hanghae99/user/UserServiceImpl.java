@@ -1,5 +1,8 @@
 package com.purchase.hanghae99.user;
 
+import com.purchase.hanghae99.email.EmailDtoFactory;
+import com.purchase.hanghae99.email.EmailService;
+import com.purchase.hanghae99.email.ResEmailDto;
 import com.purchase.hanghae99.user.dto.create.ReqUserCreateDto;
 import com.purchase.hanghae99.user.dto.create.ResUserCreateDto;
 import com.purchase.hanghae99.user.dto.delete.ReqUserDeleteDto;
@@ -21,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @Override
     @Transactional
@@ -30,7 +34,7 @@ public class UserServiceImpl implements UserService{
 
         User user = reqDto.toEntity(passwordEncoder);
 
-        // TODO: 이메일 인증 발송 로직
+        emailService.sendMail(reqDto.getEmail());
 
         return ResUserCreateDto.fromEntity(userRepository.save(user));
     }
@@ -63,6 +67,21 @@ public class UserServiceImpl implements UserService{
 
         savedUser.updatePassword(passwordEncoder.encode(reqDto.getNewPassword()));
         return ResUserPwUpdateDto.fromEntity(userRepository.save(savedUser));
+    }
+
+    @Override
+    @Transactional
+    public ResEmailDto updateEmailVerification(Long userId, String userStr) {
+        User savedUser = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        if (!emailService.checkVerificationStr(savedUser.getEmail(), userStr)) {
+            return EmailDtoFactory.fail();
+        }
+
+        savedUser.updateEmailVerification();
+        userRepository.save(savedUser);
+        return EmailDtoFactory.succeed();
     }
 
     @Override
