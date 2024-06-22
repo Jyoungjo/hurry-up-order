@@ -4,11 +4,15 @@ import com.purchase.hanghae99.email.ResEmailDto;
 import com.purchase.hanghae99.user.dto.create.ReqUserCreateDto;
 import com.purchase.hanghae99.user.dto.create.ResUserCreateDto;
 import com.purchase.hanghae99.user.dto.delete.ReqUserDeleteDto;
+import com.purchase.hanghae99.user.dto.login.ReqLoginDto;
+import com.purchase.hanghae99.user.dto.login.ResLoginDto;
 import com.purchase.hanghae99.user.dto.read.ResUserInfoDto;
 import com.purchase.hanghae99.user.dto.update.ReqUserInfoUpdateDto;
 import com.purchase.hanghae99.user.dto.update.ReqUserPasswordUpdateDto;
 import com.purchase.hanghae99.user.dto.update.ResUserPwUpdateDto;
 import com.purchase.hanghae99.user.dto.update.ResUserUpdateDto;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -58,6 +62,21 @@ public class UserController {
             @PathVariable("userId") Long userId, @Valid @RequestBody ReqUserDeleteDto reqDto
     ) {
         userService.deleteUser(userId, reqDto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ResLoginDto> login(
+            HttpServletResponse response, @Valid @RequestBody ReqLoginDto reqLoginDto
+    ) {
+        return ResponseEntity.ok(userService.login(response, reqLoginDto));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        userService.logout(request, response);
         return ResponseEntity.noContent().build();
     }
 }
