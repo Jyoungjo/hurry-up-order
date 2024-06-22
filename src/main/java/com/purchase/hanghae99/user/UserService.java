@@ -13,14 +13,15 @@ import com.purchase.hanghae99.user.dto.update.ResUserPwUpdateDto;
 import com.purchase.hanghae99.user.dto.update.ResUserUpdateDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.Authentication;
 
 public interface UserService {
-    ResUserCreateDto createUser(ReqUserCreateDto reqDto);
+    ResUserCreateDto createUser(ReqUserCreateDto reqDto) throws Exception;
     ResUserInfoDto readUser(Long userId);
-    ResUserUpdateDto updateUserInfo(Long userId, ReqUserInfoUpdateDto reqDto);
+    ResUserUpdateDto updateUserInfo(Long userId, ReqUserInfoUpdateDto reqDto) throws Exception;
     ResUserPwUpdateDto updateUserPassword(Long userId, ReqUserPasswordUpdateDto reqDto);
-    ResEmailDto updateEmailVerification(Long userId, String userStr);
-    void deleteUser(Long userId, ReqUserDeleteDto reqDto);
-    ResLoginDto login(HttpServletResponse response, ReqLoginDto reqDto);
+    ResEmailDto updateEmailVerification(Long userId, String userStr) throws Exception;
+    void deleteUser(Authentication authentication, Long userId, ReqUserDeleteDto reqDto) throws Exception;
+    ResLoginDto login(HttpServletResponse response, ReqLoginDto reqDto) throws Exception;
     void logout(HttpServletRequest request, HttpServletResponse response);
 }

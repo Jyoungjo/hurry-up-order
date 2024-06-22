@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import static com.purchase.hanghae99.common.AesUtils.*;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -29,13 +31,13 @@ public class ReqUserCreateDto {
     @Pattern(regexp = "^01(?:0|1|[6-9])[.-]?(\\d{3}|\\d{4})[.-]?(\\d{4})$", message = "올바른 전화번호 형식으로 입력해 주세요. (예: 01012345678)")
     private String phoneNumber;
 
-    public User toEntity(PasswordEncoder passwordEncoder) {
+    public User toEntity(PasswordEncoder passwordEncoder) throws Exception {
         return User.builder()
-                .name(getName())
-                .email(getEmail())
+                .name(aesCBCEncode(name))
+                .email(aesCBCEncode(email))
                 .password(passwordEncoder.encode(getPassword()))
-                .address(getAddress())
-                .phoneNumber(getPhoneNumber())
+                .address(aesCBCEncode(address))
+                .phoneNumber(aesCBCEncode(phoneNumber))
                 .role(UserRole.UNCERTIFIED_USER)
                 .build();
     }

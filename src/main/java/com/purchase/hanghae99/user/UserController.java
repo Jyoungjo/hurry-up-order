@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.*;
@@ -27,7 +28,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<ResUserCreateDto> register(@Valid @RequestBody ReqUserCreateDto reqDto) {
+    public ResponseEntity<ResUserCreateDto> register(@Valid @RequestBody ReqUserCreateDto reqDto) throws Exception {
         return ResponseEntity.status(CREATED).body(userService.createUser(reqDto));
     }
 
@@ -39,7 +40,7 @@ public class UserController {
     @PutMapping("/{userId}/info")
     public ResponseEntity<ResUserUpdateDto> updateUserInfo(
             @PathVariable("userId") Long userId, @Valid @RequestBody ReqUserInfoUpdateDto reqDto
-    ) {
+    ) throws Exception {
         return ResponseEntity.ok(userService.updateUserInfo(userId, reqDto));
     }
 
@@ -53,22 +54,22 @@ public class UserController {
     @PutMapping("/{userId}/email-verification")
     public ResponseEntity<ResEmailDto> updateUserEmailVerification(
             @PathVariable("userId") Long userId, @RequestParam("userStr") String userStr
-    ) {
+    ) throws Exception {
         return ResponseEntity.ok(userService.updateEmailVerification(userId, userStr));
     }
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(
-            @PathVariable("userId") Long userId, @Valid @RequestBody ReqUserDeleteDto reqDto
-    ) {
-        userService.deleteUser(userId, reqDto);
+            Authentication authentication, @PathVariable("userId") Long userId, @Valid @RequestBody ReqUserDeleteDto reqDto
+    ) throws Exception {
+        userService.deleteUser(authentication, userId, reqDto);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/login")
     public ResponseEntity<ResLoginDto> login(
             HttpServletResponse response, @Valid @RequestBody ReqLoginDto reqLoginDto
-    ) {
+    ) throws Exception {
         return ResponseEntity.ok(userService.login(response, reqLoginDto));
     }
 

@@ -15,6 +15,8 @@ public enum ExceptionCode {
     INVALID_TYPE_VALUE(BAD_REQUEST.value(), "유효성이 일치하지 않음."),
     BAD_CREDENTIALS(BAD_REQUEST.value(), "bad credentials"),
     INVALID_INPUT_VALUE(BAD_REQUEST.value(), "invalid input type"),
+    ENCODING_ERROR(BAD_REQUEST.value(), "encoding error"),
+    DECODING_ERROR(BAD_REQUEST.value(), "decoding error"),
 
     /*
      * 401
