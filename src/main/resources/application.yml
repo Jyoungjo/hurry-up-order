@@ -5,7 +5,7 @@ spring:
     include: secret
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     database: postgresql
     show-sql: true
   devtools:
@@ -23,11 +23,10 @@ spring:
           timeout: 5000
           starttls:
             enable: true
-#custom:
-#  jwt:
-#    access:
-#      expiration: 1800000 # 30?
-#      header: Authorization
-#    refresh:
-#      expiration: 604800000 #  ???
-#      header: Authorization-refresh
+jwt:
+  access:
+    expiration: 900000 # 15분
+    header: Authorization
+  refresh:
+    expiration: 86400000 #  1일
+    header: Authorization-refresh
