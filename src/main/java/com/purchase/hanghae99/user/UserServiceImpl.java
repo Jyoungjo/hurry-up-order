@@ -117,6 +117,8 @@ public class UserServiceImpl implements UserService{
         User savedUser = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
 
+        verifyAuthentication(authentication);
+
         String email = authentication.getName();
 
         verifyAccessedUser(email, savedUser.getEmail());
@@ -200,6 +202,12 @@ public class UserServiceImpl implements UserService{
     public void verifyPassword(String password, String password2) {
         if (!password.equals(password2)) {
             throw new BusinessException(INVALID_PASSWORD);
+        }
+    }
+
+    public void verifyAuthentication(Authentication authentication) {
+        if (authentication == null) {
+            throw new BusinessException(UNAUTHORIZED_ACCESS);
         }
     }
 
