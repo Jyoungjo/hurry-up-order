@@ -1,0 +1,20 @@
+spring:
+  mail:
+    username: <발송 이메일 주소>
+    password: <앱 비밀번호>
+  data:
+    redis:
+      host: <호스트>
+      port: <포트>
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: <DB URL>
+    username: <DB username>
+    password: <DB password>
+
+jwt:
+  secretKey: <jwt secret key>
+
+aes:
+  privateKey: <암호화, 복호화 키>
