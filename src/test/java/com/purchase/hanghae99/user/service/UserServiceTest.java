@@ -16,6 +16,9 @@ import com.purchase.hanghae99.user.dto.read.ResUserInfoDto;
 import com.purchase.hanghae99.user.dto.update.ReqUserInfoUpdateDto;
 import com.purchase.hanghae99.user.dto.update.ReqUserPasswordUpdateDto;
 import com.purchase.hanghae99.user.dto.update.ResUserUpdateDto;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,16 +26,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.purchase.hanghae99.common.CustomCookieManager.ACCESS_TOKEN;
+import static com.purchase.hanghae99.common.CustomCookieManager.REFRESH_TOKEN;
 import static com.purchase.hanghae99.common.exception.ExceptionCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -65,11 +74,11 @@ public class UserServiceTest {
     private User user;
 
     @BeforeEach
-    void init() {
+    void init() throws Exception {
         user = User.builder()
                 .id(1L)
                 .name("이름1")
-                .email("test@gmail.com")
+                .email("A3ACFA0A0267531DDD493EAD683A99AE")
                 .password(passwordEncoder.encode("a12345678"))
                 .role(UserRole.UNCERTIFIED_USER)
                 .deletedAt(null)
@@ -496,8 +505,6 @@ public class UserServiceTest {
         when(passwordEncoder.matches(any(), any())).thenReturn(true);
 
         String email = user.getEmail();
-        // TODO 테스트 다시 작성 -> 암호화, 복호화 테스트 부분 해결이 안 된다...
-        when(AesUtils.aesCBCDecode(any())).thenReturn(email);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put(JwtProvider.EMAIL_CLAIM, email);
@@ -507,7 +514,24 @@ public class UserServiceTest {
         when(jwtProvider.createAccessToken(any())).thenReturn(accessToken);
         when(jwtProvider.createRefreshToken()).thenReturn(refreshToken);
 
+        when(jwtProvider.getAccessTokenExpirationPeriod()).thenReturn(900000L);
+        when(jwtProvider.getRefreshTokenExpirationPeriod()).thenReturn(86400000L);
+
         MockHttpServletResponse response = new MockHttpServletResponse();
+        doAnswer(invocation -> {
+            HttpServletResponse resp = invocation.getArgument(0);
+            String token = invocation.getArgument(1);
+            String name = invocation.getArgument(2);
+            long expiry = invocation.getArgument(3);
+
+            ResponseCookie responseCookie = ResponseCookie.from(name, token)
+                    .httpOnly(true)
+                    .path("/")
+                    .maxAge(expiry)
+                    .build();
+            resp.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
+            return null;
+        }).when(cookieManager).setCookie(any(HttpServletResponse.class), anyString(), anyString(), anyLong());
 
         doNothing().when(redisService).setValues(any(), any(), any(Duration.class));
 
@@ -517,10 +541,57 @@ public class UserServiceTest {
         // then
         assertThat(resDto.getEmail()).isEqualTo(email);
         assertThat(response.getCookies()).isNotEmpty();
-        // TODO Redis 내부에 값 들어있는지 확인하는 로직 작성
+        assertThat(Arrays.stream(response.getCookies()).anyMatch(cookie -> ACCESS_TOKEN.equals(cookie.getName()))).isTrue();
+        assertThat(Arrays.stream(response.getCookies()).anyMatch(cookie -> REFRESH_TOKEN.equals(cookie.getName()))).isTrue();
     }
 
-    // TODO 로그아웃 테스트 작성
+    // TODO 로그인 실패 상황 테스트
+
+    // LOGOUT
+    @DisplayName("로그아웃 기능 성공")
+    @Test
+    void logout() {
+        // given
+        MockHttpServletRequest req = new MockHttpServletRequest();
+        MockHttpServletResponse res = new MockHttpServletResponse();
+
+        String accessToken = "hdjkslafhjkljeklhajkwlhfjkldhsajklfhujelwhmrklejkl21h3jlk1h24jkl";
+        String refreshToken = "evfjklwhalrhjlkhnajklwrhfjkldhjakwlfhejkawlhfjklewajhklefhjklads";
+        when(cookieManager.getCookie(any(), anyString())).thenReturn(accessToken);
+
+        Claims claims = Jwts.claims();
+        claims.put("email", "test@email.com");
+        when(jwtProvider.getClaims(anyString())).thenReturn(claims);
+
+        when(redisService.getValues(anyString())).thenReturn(refreshToken);
+
+        doAnswer(invocation -> {
+            HttpServletResponse response = invocation.getArgument(0);
+            String name = invocation.getArgument(1);
+
+            ResponseCookie cookie = ResponseCookie.from(name, "")
+                    .maxAge(0)
+                    .path("/")
+                    .httpOnly(true)
+                    .build();
+            return null;
+        }).when(cookieManager).deleteCookie(any(HttpServletResponse.class), anyString());
+
+        when(redisService.checkExistsValue(anyString())).thenReturn(true);
+        doNothing().when(redisService).deleteValuesByKey(anyString());
+        when(jwtProvider.getAccessTokenExpirationPeriod()).thenReturn(900000L);
+        doNothing().when(redisService).setValues(anyString(), anyString(), any(Duration.class));
+
+        // when
+        userService.logout(req, res);
+
+        // then
+        assertThat(res.getCookies()).isEmpty();
+        assertThat(Arrays.stream(res.getCookies()).anyMatch(cookie -> ACCESS_TOKEN.equals(cookie.getName()))).isFalse();
+        assertThat(Arrays.stream(res.getCookies()).anyMatch(cookie -> REFRESH_TOKEN.equals(cookie.getName()))).isFalse();
+    }
+
+    // TODO 로그아웃 실패 상황 테스트
 
     private ReqUserCreateDto saveUser() {
         ReqUserCreateDto req = new ReqUserCreateDto(
