@@ -138,6 +138,10 @@ public class JwtProvider {
         String accessToken = cookieManager.getCookie(request, ACCESS_TOKEN);
         String refreshToken = cookieManager.getCookie(request, REFRESH_TOKEN);
 
+        if (!redisService.getValues(refreshToken).isEmpty()) {
+            throw new BusinessException(UNAUTHORIZED_ACCESS);
+        }
+
         String newRefreshToken = refreshToken;
 
         if (!isTokenValid(refreshToken)) {
