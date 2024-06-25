@@ -1,12 +1,14 @@
 package com.purchase.hanghae99.user;
 
 import com.purchase.hanghae99.common.BaseEntity;
+import com.purchase.hanghae99.order.Order;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "TB_USER")
@@ -30,6 +32,8 @@ public class User extends BaseEntity {
     private String phoneNumber;
     private UserRole role;
     private LocalDateTime deletedAt;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private List<Order> orderList;
 
     public void updateUserInfo(String phoneNumber, String address) {
         this.phoneNumber = phoneNumber;

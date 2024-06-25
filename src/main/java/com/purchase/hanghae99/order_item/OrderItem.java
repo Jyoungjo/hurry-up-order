@@ -1,13 +1,11 @@
-package com.purchase.hanghae99.order_items;
+package com.purchase.hanghae99.order_item;
 
 import com.purchase.hanghae99.common.BaseEntity;
 import com.purchase.hanghae99.item.Item;
 import com.purchase.hanghae99.order.Order;
+import com.purchase.hanghae99.order.dto.ReqOrderItemDto;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -20,6 +18,7 @@ import java.time.LocalDateTime;
 @Getter
 @SQLDelete(sql = "UPDATE TB_ORDER_ITEMS SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @SQLRestriction("deleted_at is NULL")
+@Builder
 public class OrderItem extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,4 +33,22 @@ public class OrderItem extends BaseEntity {
     private Integer unitPrice;
     private OrderStatus status;
     private LocalDateTime deletedAt;
+
+    public static OrderItem of(Order order, Item item, ReqOrderItemDto dto) {
+        return OrderItem.builder()
+                .order(order)
+                .item(item)
+                .quantity(dto.getItemCount())
+                .unitPrice(item.getPrice())
+                .status(OrderStatus.ACCEPTANCE)
+                .build();
+    }
+
+    public void updateQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public void updateStatus(OrderStatus orderStatus) {
+        this.status = orderStatus;
+    }
 }

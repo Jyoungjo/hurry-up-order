@@ -41,6 +41,7 @@ public enum ExceptionCode {
      */
     NOT_FOUND_USER(NOT_FOUND.value(), "존재하지 않는 회원입니다."),
     NOT_FOUND_ITEM(NOT_FOUND.value(), "존재하지 않는 물품입니다."),
+    NOT_FOUND_ORDER(NOT_FOUND.value(), "존재하지 않는 주문입니다."),
 
     /*
      * 405

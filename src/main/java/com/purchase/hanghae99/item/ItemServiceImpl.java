@@ -59,4 +59,10 @@ public class ItemServiceImpl implements ItemService {
 
         itemRepository.deleteById(itemId);
     }
+
+    @Override
+    public Item findItem(Long itemId) {
+        return itemRepository.findById(itemId)
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_ITEM));
+    }
 }
