@@ -1,5 +1,6 @@
 package com.purchase.hanghae99.item.service;
 
+import com.purchase.hanghae99.common.exception.BusinessException;
 import com.purchase.hanghae99.item.Item;
 import com.purchase.hanghae99.item.ItemRepository;
 import com.purchase.hanghae99.item.ItemServiceImpl;
@@ -24,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
+import static com.purchase.hanghae99.common.exception.ExceptionCode.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -118,6 +120,21 @@ public class ItemServiceTest {
         verify(itemRepository, times(1)).findById(1L);
     }
 
+    // READ ONE
+    @DisplayName("존재하지 않는 상품을 조회하면 실패한다.")
+    @Test
+    void failReadOneByNotFound() {
+        // given
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        // when
+
+        // then
+        assertThatThrownBy(() -> itemService.readItem(1L))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(NOT_FOUND_ITEM.getMessage());
+    }
+
     // UPDATE
     @DisplayName("상품 정보 수정 기능 성공")
     @Test
@@ -143,6 +160,24 @@ public class ItemServiceTest {
         verify(itemRepository, times(1)).save(any(Item.class));
     }
 
+    // UPDATE
+    @DisplayName("존재하지 않는 상품을 수정하려하면 실패한다.")
+    @Test
+    void failUpdateByNotFound() {
+        // given
+        ReqUpdateItemDto req = new ReqUpdateItemDto(
+                "상품명", "제품에 대한 설명 수정했습니다.", 123456
+        );
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        // when
+
+        // then
+        assertThatThrownBy(() -> itemService.updateItem(1L, req))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(NOT_FOUND_ITEM.getMessage());
+    }
+
     // DELETE
     @DisplayName("상품 삭제 기능 성공")
     @Test
@@ -159,5 +194,20 @@ public class ItemServiceTest {
         // verify
         verify(itemRepository, times(1)).existsById(1L);
         verify(itemRepository, times(1)).deleteById(1L);
+    }
+
+    // DELETE
+    @DisplayName("존재하지 않는 상품을 삭제하면 실패한다.")
+    @Test
+    void failDeleteByNotFound() {
+        // given
+        when(itemRepository.existsById(anyLong())).thenReturn(false);
+
+        // when
+
+        // then
+        assertThatThrownBy(() -> itemService.deleteItem(1L))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(NOT_FOUND_ITEM.getMessage());
     }
 }
