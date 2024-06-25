@@ -25,7 +25,7 @@ public class Stock extends BaseEntity {
     private Long id;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="item_id")
-    private Item itemId;
+    private Item item;
     private Integer quantity;
     private LocalDateTime deletedAt;
 }

@@ -25,7 +25,7 @@ public class Wishlist {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
-    private User userId;
+    private User user;
 
     private LocalDateTime createdAt;
 }

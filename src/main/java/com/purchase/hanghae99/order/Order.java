@@ -25,7 +25,7 @@ public class Order extends BaseEntity {
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
-    private User userId;
+    private User user;
     private LocalDateTime orderDate;
     private Integer totalSum;
     private LocalDateTime deletedAt;

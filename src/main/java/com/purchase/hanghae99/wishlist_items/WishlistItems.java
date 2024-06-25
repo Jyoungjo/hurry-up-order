@@ -26,9 +26,9 @@ public class WishlistItems extends BaseEntity {
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="wishlist_id")
-    private Wishlist wishlistId;
+    private Wishlist wishlist;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="item_id")
-    private Item itemId;
+    private Item item;
     private LocalDateTime deletedAt;
 }
