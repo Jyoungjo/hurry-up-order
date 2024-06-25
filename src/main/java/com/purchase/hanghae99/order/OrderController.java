@@ -48,6 +48,7 @@ public class OrderController {
     public ResponseEntity<Void> deleteOrder(
             Authentication authentication, @PathVariable("orderId") Long orderId
     ) {
+        orderService.deleteOrder(authentication, orderId);
         return ResponseEntity.noContent().build();
     }
 }
