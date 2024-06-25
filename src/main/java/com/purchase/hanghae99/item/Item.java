@@ -2,10 +2,7 @@ package com.purchase.hanghae99.item;
 
 import com.purchase.hanghae99.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -18,6 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @SQLDelete(sql = "UPDATE TB_ITEM SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @SQLRestriction("deleted_at is NULL")
+@Builder
 public class Item extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,4 +24,10 @@ public class Item extends BaseEntity {
     private String description;
     private Integer price;
     private LocalDateTime deletedAt;
+
+    public void updateInfo(String name, String description, Integer price) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+    }
 }
