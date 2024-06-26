@@ -44,6 +44,8 @@ public enum ExceptionCode {
     NOT_FOUND_ORDER(NOT_FOUND.value(), "존재하지 않는 주문입니다."),
     NOT_FOUND_WISHLIST(NOT_FOUND.value(), "존재하지 않는 위시 리스트입니다."),
     NOT_FOUND_WISHLIST_ITEM(NOT_FOUND.value(), "위시 리스트에 존재하지 않는 물품입니다."),
+    NOT_FOUND_CART(NOT_FOUND.value(), "존재하지 않는 장바구니입니다."),
+    NOT_FOUND_CART_ITEM(NOT_FOUND.value(), "장바구니에 존재하지 않는 물품입니다."),
 
     /*
      * 405
@@ -55,6 +57,7 @@ public enum ExceptionCode {
      */
     ALREADY_REGISTERED_EMAIL(CONFLICT.value(), "already registered email"),
     ALREADY_REGISTERED_PHONE_NUMBER(CONFLICT.value(), "already registered phone number"),
+    ALREADY_EXISTS_ITEM(CONFLICT.value(), "이미 등록된 아이템 입니다."),
 
     /*
      * 500
