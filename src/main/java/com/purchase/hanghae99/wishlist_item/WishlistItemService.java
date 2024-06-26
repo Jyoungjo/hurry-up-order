@@ -1,4 +1,4 @@
-package com.purchase.hanghae99.wishlist_items;
+package com.purchase.hanghae99.wishlist_item;
 
 import com.purchase.hanghae99.common.exception.BusinessException;
 import com.purchase.hanghae99.common.exception.ExceptionCode;
@@ -12,17 +12,26 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class WishListItemService {
-    private final WishListItemRepository wishListItemRepository;
+public class WishlistItemService {
+    private final WishlistItemRepository wishListItemRepository;
     private final ItemService itemService;
 
-    @Transactional
     public void createWishListItem(Wishlist wishlist, Long itemId) {
         Item item = itemService.findItem(itemId);
-        wishListItemRepository.save(WishlistItem.of(item, wishlist));
+
+        wishlist.getWishlistItems().stream()
+                .filter(wishlistItem -> wishlistItem.getItem().getId().equals(itemId))
+                .findFirst()
+                .ifPresentOrElse(
+                        wishlistItem -> {
+                            throw new BusinessException(ExceptionCode.ALREADY_EXISTS_ITEM);
+                        }, () -> {
+                            WishlistItem newWishlistItem = WishlistItem.of(item, wishlist);
+                            wishListItemRepository.save(newWishlistItem);
+                        }
+                );
     }
 
-    @Transactional
     public void deleteWishListItem(Wishlist wishlist, Long itemId) {
         WishlistItem wishlistItem = wishListItemRepository.findByWishListAndItemId(wishlist, itemId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.NOT_FOUND_WISHLIST_ITEM));

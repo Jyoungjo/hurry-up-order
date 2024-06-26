@@ -1,7 +1,6 @@
 package com.purchase.hanghae99.wishlist.dto;
 
 import com.purchase.hanghae99.wishlist.Wishlist;
-import com.purchase.hanghae99.wishlist_items.WishlistItem;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,12 +14,14 @@ import java.util.List;
 @Builder
 public class ResWishListDto {
     private Long wishListId;
-    private List<WishlistItem> wishlistItems;
+    private List<ResWishListItemDto> wishlistItems;
 
     public static ResWishListDto fromEntity(Wishlist wishlist) {
         return ResWishListDto.builder()
                 .wishListId(wishlist.getId())
-                .wishlistItems(wishlist.getWishlistItems())
+                .wishlistItems(wishlist.getWishlistItems().stream()
+                        .map(ResWishListItemDto::fromEntity)
+                        .toList())
                 .build();
     }
 }

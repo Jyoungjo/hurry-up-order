@@ -1,11 +1,9 @@
 package com.purchase.hanghae99.wishlist;
 
 import com.purchase.hanghae99.user.User;
-import com.purchase.hanghae99.wishlist_items.WishlistItem;
+import com.purchase.hanghae99.wishlist_item.WishlistItem;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,8 +13,6 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
-@SQLDelete(sql = "UPDATE TB_WISHLIST SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
-@SQLRestriction("deleted_at is NULL")
 @Builder
 public class Wishlist {
     @Id

@@ -1,4 +1,4 @@
-package com.purchase.hanghae99.wishlist_items;
+package com.purchase.hanghae99.wishlist_item;
 
 import com.purchase.hanghae99.common.BaseEntity;
 import com.purchase.hanghae99.item.Item;
