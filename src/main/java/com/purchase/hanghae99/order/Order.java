@@ -9,6 +9,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -30,13 +31,14 @@ public class Order extends BaseEntity {
     private Integer totalSum;
     private LocalDateTime deletedAt;
     @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<OrderItem> orderItemList;
+    private List<OrderItem> orderItemList = new ArrayList<>();
 
     public static Order of(User user) {
         return Order.builder()
                 .user(user)
                 .orderDate(LocalDateTime.now())
                 .totalSum(null)
+                .orderItemList(new ArrayList<>())
                 .build();
     }
 

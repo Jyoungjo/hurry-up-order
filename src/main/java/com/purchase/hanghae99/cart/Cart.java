@@ -6,6 +6,7 @@ import com.purchase.hanghae99.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -29,6 +30,7 @@ public class Cart extends BaseEntity {
     public static Cart of(User user) {
         return Cart.builder()
                 .user(user)
+                .cartItems(new ArrayList<>())
                 .build();
     }
 }

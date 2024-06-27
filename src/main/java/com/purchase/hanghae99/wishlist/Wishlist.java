@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -32,6 +33,7 @@ public class Wishlist {
         return Wishlist.builder()
                 .user(user)
                 .createdAt(LocalDateTime.now())
+                .wishlistItems(new ArrayList<>())
                 .build();
     }
 }
