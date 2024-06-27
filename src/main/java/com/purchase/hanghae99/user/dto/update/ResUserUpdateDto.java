@@ -4,7 +4,7 @@ import com.purchase.hanghae99.user.User;
 import lombok.*;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ResUserUpdateDto {

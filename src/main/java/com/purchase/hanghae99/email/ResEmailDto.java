@@ -3,7 +3,7 @@ package com.purchase.hanghae99.email;
 import lombok.*;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ResEmailDto {

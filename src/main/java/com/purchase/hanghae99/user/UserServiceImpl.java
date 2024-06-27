@@ -143,16 +143,7 @@ public class UserServiceImpl implements UserService{
 
         String decodedEmail = aesCBCDecode(user.getEmail());
 
-        Map<String, Object> claims = new HashMap<>();
-        claims.put(JwtProvider.EMAIL_CLAIM, decodedEmail);
-
-        String accessToken = jwtProvider.createAccessToken(claims);
-        String refreshToken = jwtProvider.createRefreshToken(claims);
-
-        cookieManager.setCookie(response, accessToken, ACCESS_TOKEN, jwtProvider.getAccessTokenExpirationPeriod());
-        cookieManager.setCookie(response, refreshToken, REFRESH_TOKEN, jwtProvider.getRefreshTokenExpirationPeriod());
-
-        redisService.setValues(decodedEmail, refreshToken, Duration.ofMillis(jwtProvider.getRefreshTokenExpirationPeriod()));
+        createTokenAndSet(response, decodedEmail);
 
         return ResLoginDto.fromEntity(user);
     }
@@ -167,6 +158,23 @@ public class UserServiceImpl implements UserService{
             throw new BusinessException(EXPIRED_JWT);
         }
 
+        deleteTokenAndAddBlacklist(response, claims);
+    }
+
+    private void createTokenAndSet(HttpServletResponse response, String decodedEmail) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put(JwtProvider.EMAIL_CLAIM, decodedEmail);
+
+        String accessToken = jwtProvider.createAccessToken(claims);
+        String refreshToken = jwtProvider.createRefreshToken(claims);
+
+        cookieManager.setCookie(response, accessToken, ACCESS_TOKEN, jwtProvider.getAccessTokenExpirationPeriod());
+        cookieManager.setCookie(response, refreshToken, REFRESH_TOKEN, jwtProvider.getRefreshTokenExpirationPeriod());
+
+        redisService.setValues(decodedEmail, refreshToken, Duration.ofMillis(jwtProvider.getRefreshTokenExpirationPeriod()));
+    }
+
+    private void deleteTokenAndAddBlacklist(HttpServletResponse response, Claims claims) {
         String email = claims.get("email", String.class);
         String redisRefreshToken = redisService.getValues(email);
 

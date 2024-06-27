@@ -545,7 +545,65 @@ public class UserServiceTest {
         assertThat(Arrays.stream(response.getCookies()).anyMatch(cookie -> REFRESH_TOKEN.equals(cookie.getName()))).isTrue();
     }
 
-    // TODO 로그인 실패 상황 테스트
+    // LOGIN
+    @DisplayName("등록된 이메일이 아니라면 로그인이 실패한다.")
+    @Test
+    void failLoginByNotExist() {
+        // given
+        ReqLoginDto reqDto = new ReqLoginDto("test@email.com", "a12345678!");
+
+        user.updateEmailVerification();
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        // when
+        when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
+
+        // then
+        assertThatThrownBy(() -> userService.login(response, reqDto))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(NOT_FOUND_USER.getMessage());
+    }
+
+    // LOGIN
+    @DisplayName("비밀번호가 일치하지 않으면 실패한다.")
+    @Test
+    void failLoginByNotMatchPassword() {
+        // given
+        ReqLoginDto reqDto = new ReqLoginDto("test@email.com", "a12345679!");
+
+        user.updateEmailVerification();
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        // when
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(any(), any())).thenReturn(false);
+
+        // then
+        assertThatThrownBy(() -> userService.login(response, reqDto))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(BAD_CREDENTIALS.getMessage());
+    }
+
+    // LOGIN
+    @DisplayName("이메일 인증을 하지 않을 경우 로그인에 실패한다.")
+    @Test
+    void failLoginByEmailVerification() {
+        // given
+        ReqLoginDto reqDto = new ReqLoginDto("test@email.com", "a12345678!");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        // when
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(any(), any())).thenReturn(true);
+
+        // then
+        assertThatThrownBy(() -> userService.login(response, reqDto))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(UNCERTIFIED_EMAIL.getMessage());
+    }
 
     // LOGOUT
     @DisplayName("로그아웃 기능 성공")
@@ -591,7 +649,25 @@ public class UserServiceTest {
         assertThat(Arrays.stream(res.getCookies()).anyMatch(cookie -> REFRESH_TOKEN.equals(cookie.getName()))).isFalse();
     }
 
-    // TODO 로그아웃 실패 상황 테스트
+    // LOGOUT
+    @DisplayName("Claims가 없다면 로그아웃에 실패한다.")
+    @Test
+    void failLogoutByNotFoundClaims() {
+        // given
+        MockHttpServletRequest req = new MockHttpServletRequest();
+        MockHttpServletResponse res = new MockHttpServletResponse();
+
+        String accessToken = "hdjkslafhjkljeklhajkwlhfjkldhsajklfhujelwhmrklejkl21h3jlk1h24jkl";
+
+        // when
+        when(cookieManager.getCookie(any(), anyString())).thenReturn(accessToken);
+        when(jwtProvider.getClaims(anyString())).thenReturn(null);
+
+        // then
+        assertThatThrownBy(() -> userService.logout(req, res))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(EXPIRED_JWT.getMessage());
+    }
 
     private ReqUserCreateDto saveUser() {
         ReqUserCreateDto req = new ReqUserCreateDto(
