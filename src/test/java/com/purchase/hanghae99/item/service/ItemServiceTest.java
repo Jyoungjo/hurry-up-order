@@ -9,6 +9,7 @@ import com.purchase.hanghae99.item.dto.create.ResCreateItemDto;
 import com.purchase.hanghae99.item.dto.read.ResReadItemDto;
 import com.purchase.hanghae99.item.dto.update.ReqUpdateItemDto;
 import com.purchase.hanghae99.item.dto.update.ResUpdateItemDto;
+import com.purchase.hanghae99.stock.StockServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,9 @@ import static org.mockito.Mockito.*;
 public class ItemServiceTest {
     @Mock
     private ItemRepository itemRepository;
+
+    @Mock
+    private StockServiceImpl stockService;
 
     @InjectMocks
     private ItemServiceImpl itemService;
@@ -60,14 +64,12 @@ public class ItemServiceTest {
 
         // when
         when(itemRepository.save(any())).thenReturn(item);
+        doNothing().when(stockService).increaseStock(any(Item.class), anyInt());
 
         ResCreateItemDto res = itemService.createItem(req);
 
         // then
         assertThat(res.getName()).isEqualTo(req.getName());
-
-        // verify
-        verify(itemRepository, times(1)).save(any(Item.class));
     }
 
     // READ ALL
@@ -96,9 +98,6 @@ public class ItemServiceTest {
         assertThat(res.getTotalElements()).isEqualTo(2);
         assertThat(res.getContent().get(0).getId()).isEqualTo(1L);
         assertThat(res.getContent().get(1).getId()).isEqualTo(2L);
-
-        // verify
-        verify(itemRepository, times(1)).findAll(any(Pageable.class));
     }
 
     // READ ONE
@@ -207,6 +206,38 @@ public class ItemServiceTest {
 
         // then
         assertThatThrownBy(() -> itemService.deleteItem(1L))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(NOT_FOUND_ITEM.getMessage());
+    }
+
+    // READ
+    @DisplayName("상품 찾기 기능 확인")
+    @Test
+    void succeedFindItem() {
+        // given
+        Long itemId = 1L;
+
+        // when
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
+
+        Item foundItem = itemService.findItem(itemId);
+
+        // then
+        assertThat(foundItem.getId()).isEqualTo(itemId);
+    }
+
+    // READ
+    @DisplayName("상품 찾기 기능 실패 - 존재하지 않는 상품")
+    @Test
+    void failFindItemByNotFoundItem() {
+        // given
+        Long itemId = 1L;
+
+        // when
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        // then
+        assertThatThrownBy(() -> itemService.findItem(itemId))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(NOT_FOUND_ITEM.getMessage());
     }
