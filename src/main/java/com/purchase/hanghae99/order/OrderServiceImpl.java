@@ -37,15 +37,11 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
 
         // Order 객체 생성
-        Order order = orderRepository.findByUser(user)
-                .orElseGet(() -> {
-                    Order newOrder = Order.of(user);
-                    return orderRepository.save(newOrder);
-                });
+        Order order = Order.of(user);
+        orderRepository.save(order);
 
         // OrderItem 객체 생성 및 저장 로직
         orderItemService.createOrderItem(order, req.getOrderItemList());
-        order.calTotalSum();
 
         // Order save
         return ResOrderDto.fromEntity(orderRepository.save(order));
@@ -72,10 +68,10 @@ public class OrderServiceImpl implements OrderService {
     public ResOrderDto readOrder(Authentication authentication, Long orderId) throws Exception {
         String emailOfConnectingUser = aesCBCEncode(authentication.getName());
 
-        checkUserExistence(emailOfConnectingUser);
-
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
+
+        checkMatchesUser(order.getUser().getEmail(), emailOfConnectingUser);
 
         return ResOrderDto.fromEntity(order);
     }
@@ -85,45 +81,43 @@ public class OrderServiceImpl implements OrderService {
     public void deleteOrder(Authentication authentication, Long orderId) throws Exception {
         String emailOfConnectingUser = aesCBCEncode(authentication.getName());
 
-        checkUserExistence(emailOfConnectingUser);
-
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
+
+        checkMatchesUser(order.getUser().getEmail(), emailOfConnectingUser);
 
         orderRepository.delete(order);
     }
 
     @Override
     @Transactional
-    public void cancelOrder(Authentication authentication, Long itemId) throws Exception {
+    public void cancelOrder(Authentication authentication, Long orderId, Long itemId) throws Exception {
         String emailOfConnectingUser = aesCBCEncode(authentication.getName());
 
-        User user = userRepository.findByEmail(emailOfConnectingUser)
-                .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
-
-        Order order = orderRepository.findByUser(user)
+        Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
+
+        checkMatchesUser(order.getUser().getEmail(), emailOfConnectingUser);
 
         orderItemService.cancelOrder(order, itemId);
     }
 
     @Override
     @Transactional
-    public void returnOrder(Authentication authentication, Long itemId) throws Exception {
+    public void returnOrder(Authentication authentication, Long orderId, Long itemId) throws Exception {
         String emailOfConnectingUser = aesCBCEncode(authentication.getName());
 
-        User user = userRepository.findByEmail(emailOfConnectingUser)
-                .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
-
-        Order order = orderRepository.findByUser(user)
+        Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
+
+        checkMatchesUser(order.getUser().getEmail(), emailOfConnectingUser);
 
         orderItemService.returnOrder(order, itemId);
     }
 
-    private void checkUserExistence(String emailOfConnectingUser) {
-        if (userRepository.findByEmail(emailOfConnectingUser).isEmpty()) {
-            throw new BusinessException(NOT_FOUND_USER);
+    private void checkMatchesUser(String userEmail, String emailOfConnectingUser) {
+        if (!userEmail.equals(emailOfConnectingUser)) {
+            throw new BusinessException(UNAUTHORIZED_ACCESS);
         }
     }
 }

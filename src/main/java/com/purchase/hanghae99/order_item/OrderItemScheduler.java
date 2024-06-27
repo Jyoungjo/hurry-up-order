@@ -18,6 +18,16 @@ public class OrderItemScheduler {
     public void updateOrderStatusWithScheduler() {
         LocalDateTime now = LocalDateTime.now();
 
+        // 주문 접수된 상태에서 1시간 지난 주문을 배송 준비로 변경
+        List<OrderItem> acceptanceOrders = orderItemRepository.findAllByStatus(OrderStatus.ACCEPTANCE);
+
+        acceptanceOrders.stream()
+                .filter(orderItem -> orderItem.getAcceptedAt().plusHours(1).isBefore(now))
+                .forEach(orderItem -> {
+                    orderItem.updateStatus(OrderStatus.READY);
+                    orderItemRepository.save(orderItem);
+                });
+
         // 배송 준비 상태에서 하루 지난 주문을 배송 중으로 변경
         List<OrderItem> readyOrders = orderItemRepository.findAllByStatus(OrderStatus.READY);
 

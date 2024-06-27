@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @SQLDelete(sql = "UPDATE TB_ORDER_ITEM SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
-@SQLRestriction("deleted_at is NULL")
+@SQLRestriction("deleted_at is NULL AND canceled_at is NULL AND returned_at is NULL")
 @Builder
 public class OrderItem {
     @Id
@@ -31,9 +31,11 @@ public class OrderItem {
     private Integer unitPrice;
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
+    private LocalDateTime acceptedAt;
     private LocalDateTime readyAt;
     private LocalDateTime shippingAt;
     private LocalDateTime deliveredAt;
+    private LocalDateTime canceledAt;
     private LocalDateTime requestReturnAt;
     private LocalDateTime returnedAt;
     private LocalDateTime deletedAt;
@@ -44,6 +46,7 @@ public class OrderItem {
                 .item(item)
                 .quantity(quantity)
                 .unitPrice(item.getPrice())
+                .acceptedAt(LocalDateTime.now())
                 .status(OrderStatus.ACCEPTANCE)
                 .build();
     }
@@ -58,6 +61,10 @@ public class OrderItem {
             this.readyAt = LocalDateTime.now();
         } else if (orderStatus.equals(OrderStatus.SHIPPING)) {
             this.shippingAt = LocalDateTime.now();
+        } else if (orderStatus.equals(OrderStatus.RETURNED)) {
+            this.returnedAt = LocalDateTime.now();
+        } else if (orderStatus.equals(OrderStatus.CANCELLED)) {
+            this.canceledAt = LocalDateTime.now();
         }
     }
 }

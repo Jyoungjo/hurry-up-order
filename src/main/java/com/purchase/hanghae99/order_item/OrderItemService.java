@@ -23,14 +23,18 @@ public class OrderItemService {
     private final StockService stockService;
 
     public void createOrderItem(Order order, List<ReqOrderItemDto> orderItemList) {
-        orderItemList.stream().map(orderItemDto -> {
-            Item foundItem = itemService.findItem(orderItemDto.getItemId());
-            return OrderItem.of(order, foundItem, orderItemDto.getItemCount());
-        }).forEach(orderItem -> {
-            orderItemRepository.save(orderItem);
-            // 재고 처리
-            stockService.decreaseStock(orderItem.getItem(), orderItem.getQuantity());
-        });
+        int total = orderItemList.stream()
+                .map(orderItemDto -> {
+                    Item foundItem = itemService.findItem(orderItemDto.getItemId());
+                    OrderItem orderItem = OrderItem.of(order, foundItem, orderItemDto.getItemCount());
+                    orderItemRepository.save(orderItem);
+                    // 재고 처리
+                    stockService.decreaseStock(orderItem.getItem(), orderItem.getQuantity());
+                    return orderItem;
+                }).mapToInt(orderItem -> orderItem.getQuantity() * orderItem.getUnitPrice())
+                .sum();
+
+        order.saveTotalSum(total);
     }
 
     public void cancelOrder(Order order, Long itemId) {

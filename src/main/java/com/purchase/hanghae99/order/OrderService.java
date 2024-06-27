@@ -10,6 +10,6 @@ public interface OrderService {
     Page<ResOrderDto> readAllOrder(Authentication authentication, Integer page, Integer size) throws Exception;
     ResOrderDto readOrder(Authentication authentication, Long orderId) throws Exception;
     void deleteOrder(Authentication authentication, Long orderId) throws Exception;
-    void cancelOrder(Authentication authentication, Long itemId) throws Exception;
-    void returnOrder(Authentication authentication, Long itemId) throws Exception;
+    void cancelOrder(Authentication authentication, Long orderId, Long itemId) throws Exception;
+    void returnOrder(Authentication authentication, Long orderId, Long itemId) throws Exception;
 }

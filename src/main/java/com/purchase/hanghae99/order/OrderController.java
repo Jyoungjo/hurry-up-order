@@ -37,27 +37,27 @@ public class OrderController {
         return ResponseEntity.ok(orderService.readOrder(authentication, orderId));
     }
 
+    @PutMapping("/{orderId}/cancel")
+    public ResponseEntity<Void> cancelOrder(
+            Authentication authentication, @RequestParam("itemId") Long itemId, @PathVariable("orderId") Long orderId
+    ) throws Exception {
+        orderService.cancelOrder(authentication, orderId, itemId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{orderId}/return")
+    public ResponseEntity<Void> returnOrder(
+            Authentication authentication, @RequestParam("itemId") Long itemId, @PathVariable("orderId") Long orderId
+    ) throws Exception {
+        orderService.returnOrder(authentication, orderId, itemId);
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/{orderId}")
     public ResponseEntity<Void> deleteOrder(
             Authentication authentication, @PathVariable("orderId") Long orderId
     ) throws Exception {
         orderService.deleteOrder(authentication, orderId);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PutMapping("/cancel")
-    public ResponseEntity<Void> cancelOrder(
-            Authentication authentication, @RequestParam("itemId") Long itemId
-    ) throws Exception {
-        orderService.cancelOrder(authentication, itemId);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PutMapping("/return")
-    public ResponseEntity<Void> returnOrder(
-            Authentication authentication, @RequestParam("itemId") Long itemId
-    ) throws Exception {
-        orderService.returnOrder(authentication, itemId);
         return ResponseEntity.noContent().build();
     }
 }

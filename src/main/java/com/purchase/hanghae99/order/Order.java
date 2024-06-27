@@ -31,21 +31,17 @@ public class Order extends BaseEntity {
     private Integer totalSum;
     private LocalDateTime deletedAt;
     @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<OrderItem> orderItemList = new ArrayList<>();
+    private List<OrderItem> orderItemList;
 
     public static Order of(User user) {
         return Order.builder()
                 .user(user)
                 .orderDate(LocalDateTime.now())
-                .totalSum(null)
                 .orderItemList(new ArrayList<>())
                 .build();
     }
 
-    public void calTotalSum() {
-        this.totalSum = orderItemList
-                .stream()
-                .mapToInt(orderItem -> orderItem.getQuantity() * orderItem.getUnitPrice())
-                .sum();
+    public void saveTotalSum(int totalSum) {
+        this.totalSum = totalSum;
     }
 }
