@@ -1,9 +1,6 @@
-package com.purchase.hanghae99.item.service;
+package com.purchase.hanghae99.item;
 
 import com.purchase.hanghae99.common.exception.BusinessException;
-import com.purchase.hanghae99.item.Item;
-import com.purchase.hanghae99.item.ItemRepository;
-import com.purchase.hanghae99.item.ItemServiceImpl;
 import com.purchase.hanghae99.item.dto.create.ReqCreateItemDto;
 import com.purchase.hanghae99.item.dto.create.ResCreateItemDto;
 import com.purchase.hanghae99.item.dto.read.ResReadItemDto;

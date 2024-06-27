@@ -1,11 +1,9 @@
-package com.purchase.hanghae99.user.controller;
+package com.purchase.hanghae99.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.purchase.hanghae99.common.exception.BusinessException;
 import com.purchase.hanghae99.common.security.JwtAuthFilter;
 import com.purchase.hanghae99.email.ResEmailDto;
-import com.purchase.hanghae99.user.UserController;
-import com.purchase.hanghae99.user.UserService;
 import com.purchase.hanghae99.user.dto.create.ReqUserCreateDto;
 import com.purchase.hanghae99.user.dto.create.ResUserCreateDto;
 import com.purchase.hanghae99.user.dto.delete.ReqUserDeleteDto;

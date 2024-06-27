@@ -1,10 +1,8 @@
-package com.purchase.hanghae99.item.controller;
+package com.purchase.hanghae99.item;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.purchase.hanghae99.common.exception.BusinessException;
 import com.purchase.hanghae99.common.security.JwtAuthFilter;
-import com.purchase.hanghae99.item.ItemController;
-import com.purchase.hanghae99.item.ItemService;
 import com.purchase.hanghae99.item.dto.create.ReqCreateItemDto;
 import com.purchase.hanghae99.item.dto.create.ResCreateItemDto;
 import com.purchase.hanghae99.item.dto.read.ResReadItemDto;

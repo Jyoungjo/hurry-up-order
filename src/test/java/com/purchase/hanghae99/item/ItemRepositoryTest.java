@@ -1,8 +1,6 @@
-package com.purchase.hanghae99.item.repository;
+package com.purchase.hanghae99.item;
 
 import com.purchase.hanghae99.config.JpaConfig;
-import com.purchase.hanghae99.item.Item;
-import com.purchase.hanghae99.item.ItemRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

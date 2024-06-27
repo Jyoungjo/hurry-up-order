@@ -1,4 +1,4 @@
-package com.purchase.hanghae99.user.service;
+package com.purchase.hanghae99.user;
 
 import com.purchase.hanghae99.common.AesUtils;
 import com.purchase.hanghae99.common.CustomCookieManager;
@@ -6,7 +6,6 @@ import com.purchase.hanghae99.common.RedisService;
 import com.purchase.hanghae99.common.exception.BusinessException;
 import com.purchase.hanghae99.common.security.JwtProvider;
 import com.purchase.hanghae99.email.EmailService;
-import com.purchase.hanghae99.user.*;
 import com.purchase.hanghae99.user.dto.create.ReqUserCreateDto;
 import com.purchase.hanghae99.user.dto.create.ResUserCreateDto;
 import com.purchase.hanghae99.user.dto.delete.ReqUserDeleteDto;
