@@ -45,7 +45,7 @@ public class OrderController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping
+    @PutMapping("/cancel")
     public ResponseEntity<Void> cancelOrder(
             Authentication authentication, @RequestParam("itemId") Long itemId
     ) {
@@ -53,7 +53,7 @@ public class OrderController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping
+    @PutMapping("/return")
     public ResponseEntity<Void> returnOrder(
             Authentication authentication, @RequestParam("itemId") Long itemId
     ) {

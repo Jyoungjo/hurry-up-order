@@ -26,7 +26,7 @@ public class CartController {
         return ResponseEntity.ok(cartService.readMyCart(authentication));
     }
 
-    @PutMapping("/{itemId}")
+    @PutMapping("/{itemId}/increase")
     public ResponseEntity<Void> incrementCartItemQuantity(
             Authentication authentication, @PathVariable("itemId") Long itemId
     ) {
@@ -34,7 +34,7 @@ public class CartController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{itemId}")
+    @PutMapping("/{itemId}/decrease")
     public ResponseEntity<Void> decrementCartItemQuantity(
             Authentication authentication, @PathVariable("itemId") Long itemId
     ) {
