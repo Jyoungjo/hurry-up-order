@@ -10,11 +10,11 @@ import org.hibernate.annotations.SQLRestriction;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "TB_ORDER_ITEMS")
+@Table(name = "TB_ORDER_ITEM")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
-@SQLDelete(sql = "UPDATE TB_ORDER_ITEMS SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLDelete(sql = "UPDATE TB_ORDER_ITEM SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @SQLRestriction("deleted_at is NULL")
 @Builder
 public class OrderItem {

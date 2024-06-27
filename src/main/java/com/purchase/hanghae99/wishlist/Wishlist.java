@@ -25,7 +25,7 @@ public class Wishlist {
 
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "wish_list", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToMany(mappedBy = "wishlist", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<WishlistItem> wishlistItems;
 
     public static Wishlist of(User user) {
