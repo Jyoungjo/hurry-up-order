@@ -7,11 +7,9 @@ import com.purchase.hanghae99.item.ItemService;
 import com.purchase.hanghae99.wishlist.Wishlist;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class WishlistItemService {
     private final WishlistItemRepository wishListItemRepository;
     private final ItemService itemService;

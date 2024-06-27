@@ -7,13 +7,11 @@ import com.purchase.hanghae99.item.Item;
 import com.purchase.hanghae99.item.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import static com.purchase.hanghae99.common.exception.ExceptionCode.NOT_FOUND_CART_ITEM;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class CartItemService {
     private final CartItemRepository cartItemRepository;
     private final ItemService itemService;
