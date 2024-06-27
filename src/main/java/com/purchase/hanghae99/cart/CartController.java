@@ -26,17 +26,17 @@ public class CartController {
         return ResponseEntity.ok(cartService.readMyCart(authentication));
     }
 
-    @PutMapping("/{itemId}/increase")
+    @PutMapping("/increase")
     public ResponseEntity<Void> incrementCartItemQuantity(
-            Authentication authentication, @PathVariable("itemId") Long itemId
+            Authentication authentication, @RequestParam("itemId") Long itemId
     ) throws Exception {
         cartService.incrementCartItemQuantity(authentication, itemId);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{itemId}/decrease")
+    @PutMapping("/decrease")
     public ResponseEntity<Void> decrementCartItemQuantity(
-            Authentication authentication, @PathVariable("itemId") Long itemId
+            Authentication authentication, @RequestParam("itemId") Long itemId
     ) throws Exception {
         cartService.decrementCartItemQuantity(authentication, itemId);
         return ResponseEntity.noContent().build();
