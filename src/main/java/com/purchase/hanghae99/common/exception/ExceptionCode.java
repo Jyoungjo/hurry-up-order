@@ -41,6 +41,13 @@ public enum ExceptionCode {
      */
     NOT_FOUND_USER(NOT_FOUND.value(), "존재하지 않는 회원입니다."),
     NOT_FOUND_ITEM(NOT_FOUND.value(), "존재하지 않는 물품입니다."),
+    NOT_FOUND_ORDER(NOT_FOUND.value(), "존재하지 않는 주문입니다."),
+    NOT_FOUND_ORDER_ITEM(NOT_FOUND.value(), "주문하신 상품이 없습니다."),
+    NOT_FOUND_WISHLIST(NOT_FOUND.value(), "존재하지 않는 위시 리스트입니다."),
+    NOT_FOUND_WISHLIST_ITEM(NOT_FOUND.value(), "위시 리스트에 존재하지 않는 물품입니다."),
+    NOT_FOUND_CART(NOT_FOUND.value(), "존재하지 않는 장바구니입니다."),
+    NOT_FOUND_CART_ITEM(NOT_FOUND.value(), "장바구니에 존재하지 않는 물품입니다."),
+    NOT_FOUND_STOCK(NOT_FOUND.value(), "재고가 존재하지 않습니다."),
 
     /*
      * 405
@@ -52,6 +59,10 @@ public enum ExceptionCode {
      */
     ALREADY_REGISTERED_EMAIL(CONFLICT.value(), "already registered email"),
     ALREADY_REGISTERED_PHONE_NUMBER(CONFLICT.value(), "already registered phone number"),
+    ALREADY_EXISTS_ITEM(CONFLICT.value(), "이미 등록된 아이템 입니다."),
+    ALREADY_SHIPPING(CONFLICT.value(), "이미 배송중인 물품은 취소할 수 없습니다."),
+    NO_RETURN(CONFLICT.value(), "이미 배송중인 물품은 취소할 수 없습니다."),
+    NOT_ENOUGH_STOCK(CONFLICT.value(), "재고가 충분하지 않습니다."),
 
     /*
      * 500

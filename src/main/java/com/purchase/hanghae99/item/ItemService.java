@@ -13,4 +13,5 @@ public interface ItemService {
     ResReadItemDto readItem(Long itemId);
     ResUpdateItemDto updateItem(Long itemId, ReqUpdateItemDto req);
     void deleteItem(Long itemId);
+    Item findItem(Long itemId);
 }

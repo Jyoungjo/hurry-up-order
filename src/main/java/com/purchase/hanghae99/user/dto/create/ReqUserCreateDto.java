@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.ArrayList;
+
 import static com.purchase.hanghae99.common.AesUtils.*;
 
 @NoArgsConstructor
@@ -39,6 +41,8 @@ public class ReqUserCreateDto {
                 .address(aesCBCEncode(address))
                 .phoneNumber(aesCBCEncode(phoneNumber))
                 .role(UserRole.UNCERTIFIED_USER)
+                .orderList(new ArrayList<>())
+                .wishlists(new ArrayList<>())
                 .build();
     }
 }

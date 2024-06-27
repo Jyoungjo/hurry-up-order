@@ -6,6 +6,7 @@ import com.purchase.hanghae99.item.dto.create.ResCreateItemDto;
 import com.purchase.hanghae99.item.dto.read.ResReadItemDto;
 import com.purchase.hanghae99.item.dto.update.ReqUpdateItemDto;
 import com.purchase.hanghae99.item.dto.update.ResUpdateItemDto;
+import com.purchase.hanghae99.stock.StockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,25 +21,29 @@ import static com.purchase.hanghae99.common.exception.ExceptionCode.*;
 @Transactional(readOnly = true)
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
+    private final StockService stockService;
 
     @Override
     @Transactional
     public ResCreateItemDto createItem(ReqCreateItemDto req) {
         Item item = req.toEntity();
-        return ResCreateItemDto.fromEntity(itemRepository.save(item));
+        Item savedItem = itemRepository.save(item);
+        stockService.increaseStock(savedItem, req.getQuantity());
+        return ResCreateItemDto.fromEntity(savedItem, stockService.getStockQuantity(item.getId()));
     }
 
     @Override
     public Page<ResReadItemDto> readAllItems(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
-        return itemRepository.findAll(pageable).map(ResReadItemDto::fromEntity);
+        return itemRepository.findAll(pageable)
+                .map(item -> ResReadItemDto.fromEntity(item, stockService.getStockQuantity(item.getId())));
     }
 
     @Override
     public ResReadItemDto readItem(Long itemId) {
         Item savedItem = itemRepository.findById(itemId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_ITEM));
-        return ResReadItemDto.fromEntity(savedItem);
+        return ResReadItemDto.fromEntity(savedItem, stockService.getStockQuantity(itemId));
     }
 
     @Override
@@ -58,5 +63,11 @@ public class ItemServiceImpl implements ItemService {
         }
 
         itemRepository.deleteById(itemId);
+    }
+
+    @Override
+    public Item findItem(Long itemId) {
+        return itemRepository.findById(itemId)
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_ITEM));
     }
 }

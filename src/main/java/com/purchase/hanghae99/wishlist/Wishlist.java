@@ -1,23 +1,20 @@
 package com.purchase.hanghae99.wishlist;
 
 import com.purchase.hanghae99.user.User;
+import com.purchase.hanghae99.wishlist_item.WishlistItem;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "TB_WISHLIST")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
-@SQLDelete(sql = "UPDATE TB_WISHLIST SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
-@SQLRestriction("deleted_at is NULL")
+@Builder
 public class Wishlist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +22,18 @@ public class Wishlist {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
-    private User userId;
+    private User user;
 
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "wishlist", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private List<WishlistItem> wishlistItems;
+
+    public static Wishlist of(User user) {
+        return Wishlist.builder()
+                .user(user)
+                .createdAt(LocalDateTime.now())
+                .wishlistItems(new ArrayList<>())
+                .build();
+    }
 }

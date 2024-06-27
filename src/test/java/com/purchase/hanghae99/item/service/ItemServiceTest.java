@@ -55,7 +55,7 @@ public class ItemServiceTest {
     void succeedAddItem() {
         // given
         ReqCreateItemDto req = new ReqCreateItemDto(
-                "제품명", "제품에 대한 설명입니다.", 150000
+                "제품명", "제품에 대한 설명입니다.", 150000, 500
         );
 
         // when

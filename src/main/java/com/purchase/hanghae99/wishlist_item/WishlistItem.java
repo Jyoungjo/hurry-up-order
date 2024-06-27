@@ -1,37 +1,39 @@
-package com.purchase.hanghae99.order_items;
+package com.purchase.hanghae99.wishlist_item;
 
 import com.purchase.hanghae99.common.BaseEntity;
 import com.purchase.hanghae99.item.Item;
-import com.purchase.hanghae99.order.Order;
+import com.purchase.hanghae99.wishlist.Wishlist;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "TB_ORDER_ITEMS")
+@Table(name = "TB_WISHLIST_ITEM")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
-@SQLDelete(sql = "UPDATE TB_ORDER_ITEMS SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLDelete(sql = "UPDATE TB_WISHLIST_ITEM SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @SQLRestriction("deleted_at is NULL")
-public class OrderItem extends BaseEntity {
+@Builder
+public class WishlistItem extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="order_id")
-    private Order orderId;
+    @JoinColumn(name="wishlist_id")
+    private Wishlist wishlist;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="item_id")
-    private Item itemId;
-    private Integer quantity;
-    private Integer unitPrice;
-    private OrderStatus status;
+    private Item item;
     private LocalDateTime deletedAt;
+
+    public static WishlistItem of(Item item, Wishlist wishlist) {
+        return WishlistItem.builder()
+                .item(item)
+                .wishlist(wishlist)
+                .build();
+    }
 }
