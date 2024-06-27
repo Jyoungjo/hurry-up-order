@@ -91,7 +91,7 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepository.findByUser(user)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_CART));
 
-        checkAccount(cart.getUser().getEmail(), authentication.getName());
+        checkAccount(cart.getUser().getEmail(), emailOfConnectingUser);
 
         cart.getCartItems().clear();
         cartRepository.save(cart);
