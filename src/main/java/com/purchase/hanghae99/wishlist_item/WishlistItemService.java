@@ -31,7 +31,7 @@ public class WishlistItemService {
     }
 
     public void deleteWishListItem(Wishlist wishlist, Long itemId) {
-        WishlistItem wishlistItem = wishListItemRepository.findByWishListAndItemId(wishlist, itemId)
+        WishlistItem wishlistItem = wishListItemRepository.findByWishlistAndItemId(wishlist, itemId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.NOT_FOUND_WISHLIST_ITEM));
 
         wishListItemRepository.delete(wishlistItem);
