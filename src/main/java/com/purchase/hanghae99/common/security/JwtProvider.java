@@ -18,7 +18,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.time.Duration;
 import java.util.*;
 
 import static com.purchase.hanghae99.common.CustomCookieManager.ACCESS_TOKEN;
@@ -84,10 +83,11 @@ public class JwtProvider {
     /**
      * RefreshToken 생성
      */
-    public String createRefreshToken() {
+    public String createRefreshToken(Map<String, Object> claims) {
         Date now = new Date();
         return Jwts.builder()
                 .setSubject(REFRESH_TOKEN_SUBJECT)
+                .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + refreshTokenExpirationPeriod))
                 .signWith(getSecretKey(), HS512)
@@ -101,11 +101,11 @@ public class JwtProvider {
      * 유효하다면 getClaim()으로 이메일 추출
      * 유효하지 않다면 빈 Optional 객체 반환
      */
-    public Claims getClaims(String accessToken) {
+    public Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSecretKey())
                 .build()
-                .parseClaimsJws(accessToken)
+                .parseClaimsJws(token)
                 .getBody();
     }
 
@@ -130,30 +130,20 @@ public class JwtProvider {
         } catch (IllegalArgumentException e) {
             throw new BusinessException(ILLEGAL_ARGUMENT_JWT);
         }
-
         return true;
     }
 
-    public void reissue(HttpServletRequest request, HttpServletResponse response) {
-        String accessToken = cookieManager.getCookie(request, ACCESS_TOKEN);
+    public String reissue(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = cookieManager.getCookie(request, REFRESH_TOKEN);
 
-        if (!redisService.getValues(refreshToken).isEmpty()) {
+        if (!redisService.getValues(refreshToken).equals("false") || !isTokenValid(refreshToken)) {
             throw new BusinessException(UNAUTHORIZED_ACCESS);
         }
 
-        String newRefreshToken = refreshToken;
-
-        if (!isTokenValid(refreshToken)) {
-            newRefreshToken = createRefreshToken();
-        }
-
-        Claims accessTokenClaims = getClaims(accessToken);
-        String newAccessToken = createAccessToken(accessTokenClaims);
+        Claims claims = getClaims(refreshToken);
+        String newAccessToken = createAccessToken(claims);
 
         cookieManager.setCookie(response, newAccessToken, ACCESS_TOKEN, accessTokenExpirationPeriod);
-        cookieManager.setCookie(response, newRefreshToken, REFRESH_TOKEN, refreshTokenExpirationPeriod);
-
-        redisService.setValues(REFRESH_TOKEN, newRefreshToken, Duration.ofMillis(refreshTokenExpirationPeriod));
+        return newAccessToken;
     }
 }

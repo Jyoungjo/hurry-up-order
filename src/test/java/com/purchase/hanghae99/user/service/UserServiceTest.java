@@ -512,7 +512,7 @@ public class UserServiceTest {
         String refreshToken = "evfjklwhalrhjlkhnajklwrhfjkldhjakwlfhejkawlhfjklewajhklefhjklads";
 
         when(jwtProvider.createAccessToken(any())).thenReturn(accessToken);
-        when(jwtProvider.createRefreshToken()).thenReturn(refreshToken);
+        when(jwtProvider.createRefreshToken(any())).thenReturn(refreshToken);
 
         when(jwtProvider.getAccessTokenExpirationPeriod()).thenReturn(900000L);
         when(jwtProvider.getRefreshTokenExpirationPeriod()).thenReturn(86400000L);

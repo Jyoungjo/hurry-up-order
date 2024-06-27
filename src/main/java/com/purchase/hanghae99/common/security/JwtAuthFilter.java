@@ -2,13 +2,14 @@ package com.purchase.hanghae99.common.security;
 
 import com.purchase.hanghae99.common.CustomCookieManager;
 import com.purchase.hanghae99.common.RedisService;
+import com.purchase.hanghae99.common.exception.BusinessException;
+import com.purchase.hanghae99.common.exception.ExceptionCode;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -31,12 +32,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String accessToken = cookieManager.getCookie(request, ACCESS_TOKEN);
             String refreshToken = cookieManager.getCookie(request, REFRESH_TOKEN);
 
-            if (StringUtils.hasText(accessToken) && getLogoutInfo(refreshToken)) {
-                if (!jwtProvider.isTokenValid(accessToken)) {
-                    jwtProvider.reissue(request, response);
-                }
-
+            if (checkAccessToken(accessToken)) {
                 setAuthentication(accessToken);
+            } else if (checkRefreshToken(refreshToken)) {
+                accessToken = jwtProvider.reissue(request, response);
+                setAuthentication(accessToken);
+            } else {
+                throw new BusinessException(ExceptionCode.UNAUTHORIZED_ACCESS);
             }
         } catch (Exception e) {
             request.setAttribute("message", e.getMessage());
@@ -45,15 +47,29 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    private boolean checkAccessToken(String accessToken) {
+        return StringUtils.hasText(accessToken) && isTokenValid(accessToken);
+    }
+
+    private boolean checkRefreshToken(String refreshToken) {
+        return StringUtils.hasText(refreshToken) && isTokenValid(refreshToken) && getLogoutInfo(refreshToken);
+    }
+
     private boolean getLogoutInfo(String refreshToken) {
         return redisService.getValues(refreshToken).equals("false");
     }
 
+    private boolean isTokenValid(String token) {
+        try {
+            return jwtProvider.isTokenValid(token);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     private void setAuthentication(String accessToken) {
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
         Authentication authentication = jwtProvider.getAuthentication(accessToken);
-        context.setAuthentication(authentication);
-        SecurityContextHolder.setContext(context);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
 //    TODO: 나중에 로직에 따라 필터를 거치는 로직인지 아닌지 구분해야함

@@ -147,7 +147,7 @@ public class UserServiceImpl implements UserService{
         claims.put(JwtProvider.EMAIL_CLAIM, decodedEmail);
 
         String accessToken = jwtProvider.createAccessToken(claims);
-        String refreshToken = jwtProvider.createRefreshToken();
+        String refreshToken = jwtProvider.createRefreshToken(claims);
 
         cookieManager.setCookie(response, accessToken, ACCESS_TOKEN, jwtProvider.getAccessTokenExpirationPeriod());
         cookieManager.setCookie(response, refreshToken, REFRESH_TOKEN, jwtProvider.getRefreshTokenExpirationPeriod());
