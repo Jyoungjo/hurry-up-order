@@ -29,7 +29,7 @@ public class OrderItemService {
         }).forEach(orderItem -> {
             orderItemRepository.save(orderItem);
             // 재고 처리
-            stockService.decreaseStock(orderItem.getItem().getId(), orderItem.getQuantity());
+            stockService.decreaseStock(orderItem.getItem(), orderItem.getQuantity());
         });
     }
 
@@ -45,7 +45,7 @@ public class OrderItemService {
         orderItemRepository.save(orderItem);
 
         // 재고 복구
-        stockService.increaseStock(orderItem.getItem().getId(), orderItem.getQuantity());
+        stockService.increaseStock(orderItem.getItem(), orderItem.getQuantity());
     }
 
     public void returnOrder(Order order, Long itemId) {

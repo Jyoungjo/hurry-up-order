@@ -11,13 +11,15 @@ public class ResCreateItemDto {
     private Long id;
     private String name;
     private String description;
+    private Integer stock;
     private Integer price;
 
-    public static ResCreateItemDto fromEntity(Item item) {
+    public static ResCreateItemDto fromEntity(Item item, int stock) {
         return ResCreateItemDto.builder()
                 .id(item.getId())
                 .name(item.getName())
                 .description(item.getDescription())
+                .stock(stock)
                 .price(item.getPrice())
                 .build();
     }

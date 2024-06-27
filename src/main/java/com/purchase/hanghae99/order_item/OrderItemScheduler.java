@@ -46,7 +46,7 @@ public class OrderItemScheduler {
                 .forEach(orderItem -> {
                     orderItem.updateStatus(OrderStatus.RETURNED);
                     orderItemRepository.save(orderItem);
-                    stockService.increaseStock(orderItem.getItem().getId(), orderItem.getQuantity());
+                    stockService.increaseStock(orderItem.getItem(), orderItem.getQuantity());
                 });
     }
 }
