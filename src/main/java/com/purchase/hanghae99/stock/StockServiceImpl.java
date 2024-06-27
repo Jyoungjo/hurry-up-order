@@ -2,7 +2,6 @@ package com.purchase.hanghae99.stock;
 
 import com.purchase.hanghae99.common.exception.BusinessException;
 import com.purchase.hanghae99.item.Item;
-import com.purchase.hanghae99.item.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,16 +12,13 @@ import static com.purchase.hanghae99.common.exception.ExceptionCode.*;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class StockServiceImpl implements StockService {
-    private final ItemService itemService;
     private final StockRepository stockRepository;
 
     @Override
-    @Transactional
-    public void increaseStock(Long itemId, int quantity) {
-        Stock stock = stockRepository.findByItemId(itemId)
+    public void increaseStock(Item item, int quantity) {
+        Stock stock = stockRepository.findByItem(item)
                 .orElseGet(() -> {
-                    Item item = itemService.findItem(itemId);
-                    Stock newStock = Stock.of(item, quantity);
+                    Stock newStock = Stock.of(item, 0);
                     return stockRepository.save(newStock);
                 });
         stock.increaseQuantity(quantity);
@@ -31,9 +27,30 @@ public class StockServiceImpl implements StockService {
 
     @Override
     @Transactional
+    public void increaseStock(Long itemId, int quantity) {
+        Stock stock = stockRepository.findByItemId(itemId)
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_STOCK));
+        stock.increaseQuantity(quantity);
+        stockRepository.save(stock);
+    }
+
+    @Override
+    public void decreaseStock(Item item, int quantity) {
+        Stock stock = stockRepository.findByItem(item)
+                        .orElseThrow(() -> new BusinessException(NOT_FOUND_STOCK));
+        if (stock.getQuantity() < quantity) {
+            throw new BusinessException(NOT_ENOUGH_STOCK);
+        }
+
+        stock.decreaseQuantity(quantity);
+        stockRepository.save(stock);
+    }
+
+    @Override
+    @Transactional
     public void decreaseStock(Long itemId, int quantity) {
         Stock stock = stockRepository.findByItemId(itemId)
-                        .orElseThrow(() -> new BusinessException(NOT_FOUND_STOCK));
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_STOCK));
         if (stock.getQuantity() < quantity) {
             throw new BusinessException(NOT_ENOUGH_STOCK);
         }
