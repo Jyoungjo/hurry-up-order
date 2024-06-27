@@ -4,10 +4,14 @@ import com.purchase.hanghae99.order.Order;
 import com.purchase.hanghae99.order_item.OrderItem;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Getter
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ResOrderDto {

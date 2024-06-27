@@ -1,9 +1,7 @@
 package com.purchase.hanghae99.order_item;
 
-import com.purchase.hanghae99.common.BaseEntity;
 import com.purchase.hanghae99.item.Item;
 import com.purchase.hanghae99.order.Order;
-import com.purchase.hanghae99.order.dto.ReqOrderItemDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -19,7 +17,7 @@ import java.time.LocalDateTime;
 @SQLDelete(sql = "UPDATE TB_ORDER_ITEMS SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @SQLRestriction("deleted_at is NULL")
 @Builder
-public class OrderItem extends BaseEntity {
+public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,24 +29,35 @@ public class OrderItem extends BaseEntity {
     private Item item;
     private Integer quantity;
     private Integer unitPrice;
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
+    private LocalDateTime readyAt;
+    private LocalDateTime shippingAt;
+    private LocalDateTime deliveredAt;
+    private LocalDateTime requestReturnAt;
+    private LocalDateTime returnedAt;
     private LocalDateTime deletedAt;
 
-    public static OrderItem of(Order order, Item item, ReqOrderItemDto dto) {
+    public static OrderItem of(Order order, Item item, Integer quantity) {
         return OrderItem.builder()
                 .order(order)
                 .item(item)
-                .quantity(dto.getItemCount())
+                .quantity(quantity)
                 .unitPrice(item.getPrice())
                 .status(OrderStatus.ACCEPTANCE)
                 .build();
     }
 
-    public void updateQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
     public void updateStatus(OrderStatus orderStatus) {
         this.status = orderStatus;
+        if (orderStatus.equals(OrderStatus.DELIVERED)) {
+            this.deliveredAt = LocalDateTime.now();
+        } else if (orderStatus.equals(OrderStatus.REQUEST_RETURN)) {
+            this.requestReturnAt = LocalDateTime.now();
+        } else if (orderStatus.equals(OrderStatus.READY)) {
+            this.readyAt = LocalDateTime.now();
+        } else if (orderStatus.equals(OrderStatus.SHIPPING)) {
+            this.shippingAt = LocalDateTime.now();
+        }
     }
 }

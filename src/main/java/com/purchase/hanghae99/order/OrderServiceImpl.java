@@ -36,7 +36,11 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
 
         // Order 객체 생성
-        Order order = Order.of(user);
+        Order order = orderRepository.findByUser(user)
+                .orElseGet(() -> {
+                    Order newOrder = Order.of(user);
+                    return orderRepository.save(newOrder);
+                });
 
         // OrderItem 객체 생성 및 저장 로직
         orderItemService.createOrderItem(order, req.getOrderItemList());
@@ -73,21 +77,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public ResOrderDto updateOrder(Authentication authentication, Long orderId, ReqOrderDto req) {
-        checkUserExistence(authentication.getName());
-
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
-
-        checkAccount(order.getUser().getEmail(), authentication.getName());
-
-        orderItemService.updateOrderItems(order, req.getOrderItemList());
-        order.calTotalSum();
-        return ResOrderDto.fromEntity(orderRepository.save(order));
-    }
-
-    @Override
-    @Transactional
     public void deleteOrder(Authentication authentication, Long orderId) {
         checkUserExistence(authentication.getName());
 
@@ -97,15 +86,37 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.delete(order);
     }
 
+    @Override
+    @Transactional
+    public void cancelOrder(Authentication authentication, Long itemId) {
+        String emailOfConnectingUser = authentication.getName();
+
+        User user = userRepository.findByEmail(emailOfConnectingUser)
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
+
+        Order order = orderRepository.findByUser(user)
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
+
+        orderItemService.cancelOrder(order, itemId);
+    }
+
+    @Override
+    @Transactional
+    public void returnOrder(Authentication authentication, Long itemId) {
+        String emailOfConnectingUser = authentication.getName();
+
+        User user = userRepository.findByEmail(emailOfConnectingUser)
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
+
+        Order order = orderRepository.findByUser(user)
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
+
+        orderItemService.returnOrder(order, itemId);
+    }
+
     private void checkUserExistence(String emailOfConnectingUser) {
         if (userRepository.findByEmail(emailOfConnectingUser).isEmpty()) {
             throw new BusinessException(NOT_FOUND_USER);
-        }
-    }
-
-    private void checkAccount(String orderEmail, String myEmail) {
-        if (!orderEmail.equals(myEmail)) {
-            throw new BusinessException(UNAUTHORIZED_ACCESS);
         }
     }
 }

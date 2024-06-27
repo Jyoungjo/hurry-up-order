@@ -37,18 +37,27 @@ public class OrderController {
         return ResponseEntity.ok(orderService.readOrder(authentication, orderId));
     }
 
-    @PutMapping("/{orderId}")
-    public ResponseEntity<ResOrderDto> updateOrder(
-            Authentication authentication, @PathVariable("orderId") Long orderId, @RequestBody ReqOrderDto req
-    ) {
-        return ResponseEntity.ok(orderService.updateOrder(authentication, orderId, req));
-    }
-
     @DeleteMapping("/{orderId}")
     public ResponseEntity<Void> deleteOrder(
             Authentication authentication, @PathVariable("orderId") Long orderId
     ) {
         orderService.deleteOrder(authentication, orderId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping
+    public ResponseEntity<Void> cancelOrder(
+            Authentication authentication, @RequestParam("itemId") Long itemId
+    ) {
+        orderService.cancelOrder(authentication, itemId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping
+    public ResponseEntity<Void> returnOrder(
+            Authentication authentication, @RequestParam("itemId") Long itemId
+    ) {
+        orderService.returnOrder(authentication, itemId);
         return ResponseEntity.noContent().build();
     }
 }

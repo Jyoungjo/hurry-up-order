@@ -3,10 +3,7 @@ package com.purchase.hanghae99.stock;
 import com.purchase.hanghae99.common.BaseEntity;
 import com.purchase.hanghae99.item.Item;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -19,6 +16,7 @@ import java.time.LocalDateTime;
 @Getter
 @SQLDelete(sql = "UPDATE TB_STOCK SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @SQLRestriction("deleted_at is NULL")
+@Builder
 public class Stock extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,4 +26,19 @@ public class Stock extends BaseEntity {
     private Item item;
     private Integer quantity;
     private LocalDateTime deletedAt;
+
+    public void increaseQuantity(int quantity) {
+        this.quantity += quantity;
+    }
+
+    public void decreaseQuantity(int quantity) {
+        this.quantity -= quantity;
+    }
+
+    public static Stock of(Item item, int quantity) {
+        return Stock.builder()
+                .item(item)
+                .quantity(quantity)
+                .build();
+    }
 }
