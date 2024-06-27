@@ -1,6 +1,5 @@
 package com.purchase.hanghae99.common.security;
 
-import com.purchase.hanghae99.common.exception.BusinessException;
 import com.purchase.hanghae99.common.CustomCookieManager;
 import com.purchase.hanghae99.common.RedisService;
 import jakarta.servlet.FilterChain;
@@ -18,7 +17,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 import static com.purchase.hanghae99.common.CustomCookieManager.*;
-import static com.purchase.hanghae99.common.exception.ExceptionCode.UNAUTHORIZED_ACCESS;
 
 @Component
 @RequiredArgsConstructor
@@ -34,10 +32,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String refreshToken = cookieManager.getCookie(request, REFRESH_TOKEN);
 
             if (StringUtils.hasText(accessToken) && getLogoutInfo(refreshToken)) {
-                if (!redisService.getValues(refreshToken).isEmpty()) {
-                    throw new BusinessException(UNAUTHORIZED_ACCESS);
-                }
-
                 if (!jwtProvider.isTokenValid(accessToken)) {
                     jwtProvider.reissue(request, response);
                 }

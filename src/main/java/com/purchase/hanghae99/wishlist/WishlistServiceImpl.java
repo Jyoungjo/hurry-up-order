@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.purchase.hanghae99.common.AesUtils.*;
 import static com.purchase.hanghae99.common.exception.ExceptionCode.*;
 
 @Service
@@ -22,8 +23,8 @@ public class WishlistServiceImpl implements WishlistService {
 
     @Override
     @Transactional
-    public void addItemToWishList(Authentication authentication, Long itemId) {
-        String emailOfConnectingUser = authentication.getName();
+    public void addItemToWishList(Authentication authentication, Long itemId) throws Exception {
+        String emailOfConnectingUser = aesCBCEncode(authentication.getName());
 
         User user = userRepository.findByEmail(emailOfConnectingUser)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
@@ -39,8 +40,8 @@ public class WishlistServiceImpl implements WishlistService {
 
     @Override
     @Transactional
-    public void removeItemFromWishList(Authentication authentication, Long itemId) {
-        String emailOfConnectingUser = authentication.getName();
+    public void removeItemFromWishList(Authentication authentication, Long itemId) throws Exception {
+        String emailOfConnectingUser = aesCBCEncode(authentication.getName());
 
         User user = userRepository.findByEmail(emailOfConnectingUser)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
@@ -52,10 +53,10 @@ public class WishlistServiceImpl implements WishlistService {
     }
 
     @Override
-    public ResWishListDto readMyWishList(Authentication authentication) {
-        String emailOfConnectionUser = authentication.getName();
+    public ResWishListDto readMyWishList(Authentication authentication) throws Exception {
+        String emailOfConnectingUser = aesCBCEncode(authentication.getName());
 
-        User user = userRepository.findByEmail(emailOfConnectionUser)
+        User user = userRepository.findByEmail(emailOfConnectingUser)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
 
         Wishlist wishlist = wishListRepository.findByUser(user)

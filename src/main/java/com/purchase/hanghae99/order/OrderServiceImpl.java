@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.purchase.hanghae99.common.AesUtils.aesCBCEncode;
 import static com.purchase.hanghae99.common.exception.ExceptionCode.*;
 
 @Service
@@ -29,10 +30,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public ResOrderDto createOrder(ReqOrderDto req, Authentication authentication) {
-        String email = authentication.getName();
+    public ResOrderDto createOrder(ReqOrderDto req, Authentication authentication) throws Exception {
+        String emailOfConnectingUser = aesCBCEncode(authentication.getName());
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(emailOfConnectingUser)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
 
         // Order 객체 생성
@@ -51,8 +52,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<ResOrderDto> readAllOrder(Authentication authentication, Integer page, Integer size) {
-        User user = userRepository.findByEmail(authentication.getName())
+    public Page<ResOrderDto> readAllOrder(Authentication authentication, Integer page, Integer size) throws Exception {
+        String emailOfConnectingUser = aesCBCEncode(authentication.getName());
+
+        User user = userRepository.findByEmail(emailOfConnectingUser)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
 
         Pageable pageable = PageRequest.of(page, size);
@@ -66,8 +69,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ResOrderDto readOrder(Authentication authentication, Long orderId) {
-        checkUserExistence(authentication.getName());
+    public ResOrderDto readOrder(Authentication authentication, Long orderId) throws Exception {
+        String emailOfConnectingUser = aesCBCEncode(authentication.getName());
+
+        checkUserExistence(emailOfConnectingUser);
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
@@ -77,8 +82,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void deleteOrder(Authentication authentication, Long orderId) {
-        checkUserExistence(authentication.getName());
+    public void deleteOrder(Authentication authentication, Long orderId) throws Exception {
+        String emailOfConnectingUser = aesCBCEncode(authentication.getName());
+
+        checkUserExistence(emailOfConnectingUser);
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
@@ -88,8 +95,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void cancelOrder(Authentication authentication, Long itemId) {
-        String emailOfConnectingUser = authentication.getName();
+    public void cancelOrder(Authentication authentication, Long itemId) throws Exception {
+        String emailOfConnectingUser = aesCBCEncode(authentication.getName());
 
         User user = userRepository.findByEmail(emailOfConnectingUser)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
@@ -102,8 +109,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void returnOrder(Authentication authentication, Long itemId) {
-        String emailOfConnectingUser = authentication.getName();
+    public void returnOrder(Authentication authentication, Long itemId) throws Exception {
+        String emailOfConnectingUser = aesCBCEncode(authentication.getName());
 
         User user = userRepository.findByEmail(emailOfConnectingUser)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));

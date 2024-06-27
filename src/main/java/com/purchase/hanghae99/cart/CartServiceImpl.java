@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.purchase.hanghae99.common.AesUtils.*;
 import static com.purchase.hanghae99.common.exception.ExceptionCode.*;
 
 @Service
@@ -23,8 +24,8 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public void addItemToCart(Authentication authentication, ReqCartDto req) {
-        String emailOfConnectingUser = authentication.getName();
+    public void addItemToCart(Authentication authentication, ReqCartDto req) throws Exception {
+        String emailOfConnectingUser = aesCBCEncode(authentication.getName());
 
         User user = userRepository.findByEmail(emailOfConnectingUser)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
@@ -39,8 +40,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public ResCartDto readMyCart(Authentication authentication) {
-        String emailOfConnectingUser = authentication.getName();
+    public ResCartDto readMyCart(Authentication authentication) throws Exception {
+        String emailOfConnectingUser = aesCBCEncode(authentication.getName());
 
         User user = userRepository.findByEmail(emailOfConnectingUser)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
@@ -53,8 +54,10 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public void incrementCartItemQuantity(Authentication authentication, Long itemId) {
-        User user = userRepository.findByEmail(authentication.getName())
+    public void incrementCartItemQuantity(Authentication authentication, Long itemId) throws Exception {
+        String emailOfConnectingUser = aesCBCEncode(authentication.getName());
+
+        User user = userRepository.findByEmail(emailOfConnectingUser)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
 
         Cart cart = cartRepository.findByUser(user)
@@ -65,8 +68,10 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public void decrementCartItemQuantity(Authentication authentication, Long itemId) {
-        User user = userRepository.findByEmail(authentication.getName())
+    public void decrementCartItemQuantity(Authentication authentication, Long itemId) throws Exception {
+        String emailOfConnectingUser = aesCBCEncode(authentication.getName());
+
+        User user = userRepository.findByEmail(emailOfConnectingUser)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
 
         Cart cart = cartRepository.findByUser(user)
@@ -77,8 +82,10 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public void clearCart(Authentication authentication) {
-        User user = userRepository.findByEmail(authentication.getName())
+    public void clearCart(Authentication authentication) throws Exception {
+        String emailOfConnectingUser = aesCBCEncode(authentication.getName());
+
+        User user = userRepository.findByEmail(emailOfConnectingUser)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
 
         Cart cart = cartRepository.findByUser(user)

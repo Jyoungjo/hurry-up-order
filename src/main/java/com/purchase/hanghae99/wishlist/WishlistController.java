@@ -16,7 +16,7 @@ public class WishlistController {
     public ResponseEntity<Void> addItemToWishList(
             Authentication authentication,
             @RequestParam("itemId") Long itemId
-    ) {
+    ) throws Exception {
         wishListService.addItemToWishList(authentication, itemId);
         return ResponseEntity.noContent().build();
     }
@@ -25,7 +25,7 @@ public class WishlistController {
     public ResponseEntity<Void> removeItemFromWishList(
             Authentication authentication,
             @RequestParam("itemId") Long itemId
-    ) {
+    ) throws Exception {
         wishListService.removeItemFromWishList(authentication, itemId);
         return ResponseEntity.noContent().build();
     }
@@ -33,7 +33,7 @@ public class WishlistController {
     @GetMapping
     public ResponseEntity<ResWishListDto> readWishList(
             Authentication authentication
-    ) {
+    ) throws Exception {
         return ResponseEntity.ok(wishListService.readMyWishList(authentication));
     }
 }
