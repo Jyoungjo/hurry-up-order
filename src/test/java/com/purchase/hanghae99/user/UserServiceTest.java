@@ -6,6 +6,7 @@ import com.purchase.hanghae99.common.RedisService;
 import com.purchase.hanghae99.common.exception.BusinessException;
 import com.purchase.hanghae99.common.security.JwtProvider;
 import com.purchase.hanghae99.email.EmailService;
+import com.purchase.hanghae99.email.ResEmailDto;
 import com.purchase.hanghae99.user.dto.create.ReqUserCreateDto;
 import com.purchase.hanghae99.user.dto.create.ResUserCreateDto;
 import com.purchase.hanghae99.user.dto.delete.ReqUserDeleteDto;
@@ -76,14 +77,14 @@ public class UserServiceTest {
     void init() throws Exception {
         user = User.builder()
                 .id(1L)
-                .name("이름1")
-                .email("A3ACFA0A0267531DDD493EAD683A99AE")
+                .name("fe8c75c4f0b22cfe3a5fbf1409a10b6c") // 이름1
+                .email("a3acfa0a0267531ddd493ead683a99ae") // test@email.com
                 .password(passwordEncoder.encode("a12345678"))
                 .role(UserRole.UNCERTIFIED_USER)
                 .deletedAt(null)
                 .emailVerifiedAt(null)
-                .phoneNumber("010-1234-5678")
-                .address("주소1")
+                .phoneNumber("554b3762a1a2a3a71fc15423a0fe76a4") // 010-1234-5678
+                .address("2cd158282c4d6e520a5a437e477c1b69") // 주소1
                 .build();
 
         AesUtils aesUtils = new AesUtils();
@@ -102,7 +103,7 @@ public class UserServiceTest {
         // when
         when(userRepository.existsByEmail(any())).thenReturn(false);
         when(userRepository.existsByPhoneNumber(any())).thenReturn(false);
-        when(passwordEncoder.encode(any())).thenReturn("a123456");
+        doNothing().when(emailService).sendMail(anyString());
         when(userRepository.save(any())).thenReturn(user);
 
         ResUserCreateDto res = userService.createUser(req);
@@ -151,10 +152,8 @@ public class UserServiceTest {
     // READ ONE
     @DisplayName("회원 조회 기능 성공")
     @Test
-    void readOne() throws Exception {
+    void readOne() {
         // given
-        ReqUserCreateDto req = saveUser();
-        userService.createUser(req);
         user.updateEmailVerification();
 
         Long userId = 1L;
@@ -186,11 +185,8 @@ public class UserServiceTest {
     // READ ONE
     @DisplayName("이메일 인증을 하지 않은 유저를 검색하면 실패한다.")
     @Test
-    void failReadOneByUncertifiedUser() throws Exception {
+    void failReadOneByUncertifiedUser() {
         // given
-        ReqUserCreateDto req = saveUser();
-        userService.createUser(req);
-
         Long userId = 1L;
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
 
@@ -202,27 +198,23 @@ public class UserServiceTest {
                 .hasMessageContaining(NOT_FOUND_USER.getMessage());
     }
 
-    // TODO 디코딩 에러 발생하는 상황 테스트 해야함
-
     // UPDATE INFO
     @DisplayName("회원 정보 수정 기능 성공")
     @Test
     void updateInfo() throws Exception {
         // given
-        ReqUserCreateDto req = saveUser();
-        userService.createUser(req);
-
         ReqUserInfoUpdateDto updateReq = new ReqUserInfoUpdateDto(
                 "주소2", "010-9876-5432"
         );
 
         Long userId = 1L;
-        String originalPhoneNumber = req.getPhoneNumber();
-        String originalAddress = req.getAddress();
+        String originalPhoneNumber = "010-1234-5678";
+        String originalAddress = "주소1";
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
 
         user.updateUserInfo(updateReq.getPhoneNumber(), updateReq.getAddress());
-
-        when(userRepository.findById(any())).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
         // when
         ResUserUpdateDto res = userService.updateUserInfo(userId, updateReq);
@@ -254,22 +246,20 @@ public class UserServiceTest {
     // UPDATE PASSWORD
     @DisplayName("회원 비밀번호 수정 기능 성공")
     @Test
-    void updatePassword() throws Exception {
+    void updatePassword() {
         // given
-        ReqUserCreateDto req = saveUser();
-        userService.createUser(req);
-
         ReqUserPasswordUpdateDto updateReq = new ReqUserPasswordUpdateDto(
                 "a12345678", "a123456789!", "a123456789!"
         );
 
         Long userId = 1L;
-        String originalPassword = req.getPassword();
+        String originalPassword = "a123456";
 
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(any(), any())).thenReturn(true);
         when(passwordEncoder.encode(any())).thenReturn("a123456789!");
         user.updatePassword(updateReq.getNewPassword());
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
         // when
         userService.updateUserPassword(userId, updateReq);
@@ -301,11 +291,8 @@ public class UserServiceTest {
     // UPDATE PASSWORD
     @DisplayName("기존 비밀번호가 일치하지 않으면 실패한다.")
     @Test
-    void failUpdatePasswordByNotMatchPassword() throws Exception {
+    void failUpdatePasswordByNotMatchPassword() {
         // given
-        ReqUserCreateDto req = saveUser();
-        userService.createUser(req);
-
         ReqUserPasswordUpdateDto updateReq = new ReqUserPasswordUpdateDto(
                 "a12345679", "a123456789!", "a123456789!"
         );
@@ -325,11 +312,8 @@ public class UserServiceTest {
     // UPDATE PASSWORD
     @DisplayName("새로운 비밀번호와 새로운 비밀번호를 확인하는 과정에서 일치하지 않으면 실패한다.")
     @Test
-    void failUpdatePasswordByNotMatchNewPassword() throws Exception {
+    void failUpdatePasswordByNotMatchNewPassword() {
         // given
-        ReqUserCreateDto req = saveUser();
-        userService.createUser(req);
-
         ReqUserPasswordUpdateDto updateReq = new ReqUserPasswordUpdateDto(
                 "a12345678", "a123456789!", "a123456789@"
         );
@@ -351,9 +335,6 @@ public class UserServiceTest {
     @Test
     void updateEmailInfo() throws Exception {
         // given
-        ReqUserCreateDto req = saveUser();
-        userService.createUser(req);
-
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(emailService.checkVerificationStr(any(), any())).thenReturn(true);
         user.updateEmailVerification();
@@ -388,20 +369,17 @@ public class UserServiceTest {
     @Test
     void failUpdateEmailInfoByNotMatchCertificationCode() throws Exception {
         // given
-        ReqUserCreateDto req = saveUser();
-        userService.createUser(req);
-
         Long userId = 1L;
         String userStr = "q1a5w2s3";
 
-        // when
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
-        when(emailService.checkVerificationStr(any(), any())).thenReturn(false);
+        when(emailService.checkVerificationStr(anyString(), anyString())).thenReturn(false);
+
+        // when
+        ResEmailDto failDto = userService.updateEmailVerification(userId, userStr);
 
         // then
-        assertThatThrownBy(() -> userService.updateEmailVerification(userId, userStr))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(UNAUTHORIZED_ACCESS.getMessage());
+        assertThat(failDto.getStatus()).isEqualTo(false);
     }
 
     // DELETE
@@ -409,9 +387,6 @@ public class UserServiceTest {
     @Test
     void deleteUser() throws Exception {
         // given
-        ReqUserCreateDto req = saveUser();
-        userService.createUser(req);
-
         Long userId = 1L;
         ReqUserDeleteDto reqDto = new ReqUserDeleteDto(
                 "a12345678", "a12345678"
@@ -436,46 +411,40 @@ public class UserServiceTest {
                 "a12345678", "a12345678"
         );
         Authentication authentication = new TestingAuthenticationToken("test@email.com", null, String.valueOf(UserRole.CERTIFIED_USER));
-        
+
         // when
         when(userRepository.findById(any())).thenReturn(Optional.empty());
-        
+
         // then
         assertThatThrownBy(() -> userService.deleteUser(authentication, userId, reqDto))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(NOT_FOUND_USER.getMessage());
     }
-    
+
     // DELETE
     @DisplayName("인증 정보가 존재하지 않을 경우 실패한다.")
     @Test
-    void failDeleteUserByNotExistedAuthentication() throws Exception {
+    void failDeleteUserByNotExistedAuthentication() {
         // given
-        ReqUserCreateDto req = saveUser();
-        userService.createUser(req);
-
         Long userId = 1L;
         ReqUserDeleteDto reqDto = new ReqUserDeleteDto(
                 "a12345678", "a12345678"
         );
-        
+
         // when
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
-        
+
         // then
         assertThatThrownBy(() -> userService.deleteUser(null, userId, reqDto))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(UNAUTHORIZED_ACCESS.getMessage());
     }
-    
+
     // DELETE
     @DisplayName("접속한 유저와 uri가 일치하지 않을 경우 실패한다.")
     @Test
     void failDeleteUserByNotAccessedUser() throws Exception {
         // given
-        ReqUserCreateDto req = saveUser();
-        String emailOfSavedUser = userService.createUser(req).getEmail();
-
         Long userId = 1L;
         ReqUserDeleteDto reqDto = new ReqUserDeleteDto(
                 "a12345678", "a12345678"
@@ -485,7 +454,7 @@ public class UserServiceTest {
 
         // when
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
-        
+
         // then
         assertThatThrownBy(() -> userService.deleteUser(authentication, userId, reqDto))
                 .isInstanceOf(BusinessException.class)
@@ -666,16 +635,5 @@ public class UserServiceTest {
         assertThatThrownBy(() -> userService.logout(req, res))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(EXPIRED_JWT.getMessage());
-    }
-
-    private ReqUserCreateDto saveUser() {
-        ReqUserCreateDto req = new ReqUserCreateDto(
-                "test@email.com", "a123456", "이름1", "주소1", "010-1234-5678"
-        );
-
-        when(passwordEncoder.encode(any())).thenReturn("a123456");
-        when(userRepository.save(any())).thenReturn(user);
-
-        return req;
     }
 }

@@ -67,7 +67,7 @@ public class ItemRepositoryTest {
         Item savedItem = itemRepository.save(item());
 
         // when
-        Optional<Item> foundItem = itemRepository.findById(1L);
+        Optional<Item> foundItem = itemRepository.findById(savedItem.getId());
         
         // then
         assertThat(foundItem).isPresent();

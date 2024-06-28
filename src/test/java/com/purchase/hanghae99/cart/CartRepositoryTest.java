@@ -61,7 +61,7 @@ public class CartRepositoryTest {
         Cart savedCart = cartRepository.save(cart);
 
         // then
-        assertThat(savedCart.getId()).isEqualTo(cart.getId());
+        assertThat(savedCart.getUser()).isEqualTo(cart.getUser());
     }
 
     // READ ONE
@@ -72,7 +72,7 @@ public class CartRepositoryTest {
         Cart savedCart = cartRepository.save(cart());
 
         // when
-        Optional<Cart> foundCart = cartRepository.findById(1L);
+        Optional<Cart> foundCart = cartRepository.findById(savedCart.getId());
 
         // then
         assertThat(foundCart).isPresent();
