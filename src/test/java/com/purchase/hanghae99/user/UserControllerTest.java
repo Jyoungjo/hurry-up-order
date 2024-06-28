@@ -3,6 +3,7 @@ package com.purchase.hanghae99.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.purchase.hanghae99.common.exception.BusinessException;
 import com.purchase.hanghae99.common.security.JwtAuthFilter;
+import com.purchase.hanghae99.email.EmailDtoFactory;
 import com.purchase.hanghae99.email.ResEmailDto;
 import com.purchase.hanghae99.user.dto.create.ReqUserCreateDto;
 import com.purchase.hanghae99.user.dto.create.ResUserCreateDto;
@@ -183,7 +184,8 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(get("/api/v1/users/" + userId)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};"))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andDo(document("user/유저_조회/성공"));
@@ -201,7 +203,8 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(get("/api/v1/users/" + userId)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(NOT_FOUND_USER.getMessage()))
                 .andDo(print())
@@ -228,12 +231,13 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/users/" + userId + "/info")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("user/유저_정보_수정"));
+                .andDo(document("user/유저_정보_수정/성공"));
     }
 
     // UPDATE INFO
@@ -252,6 +256,7 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/users/" + userId + "/info")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -277,6 +282,7 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/users/" + userId + "/info")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -302,6 +308,7 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/users/" + userId + "/info")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -331,6 +338,7 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/users/" + userId + "/password")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -355,6 +363,7 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/users/" + userId + "/password")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -380,6 +389,7 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/users/" + userId + "/password")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -405,6 +415,7 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/users/" + userId + "/password")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -423,9 +434,7 @@ public class UserControllerTest {
 
         String userStr = "853i135B";
 
-        ResEmailDto res = new ResEmailDto(
-                true, "인증 완료"
-        );
+        ResEmailDto res = EmailDtoFactory.succeed();
 
         // when
         when(userService.updateEmailVerification(anyLong(), anyString())).thenReturn(res);
@@ -504,6 +513,7 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(delete("/api/v1/users/" + userId)
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -528,6 +538,7 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(delete("/api/v1/users/" + userId)
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -553,6 +564,7 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(delete("/api/v1/users/" + userId)
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -578,6 +590,7 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(delete("/api/v1/users/" + userId)
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -603,6 +616,7 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(delete("/api/v1/users/" + userId)
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -718,6 +732,7 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(post("/api/v1/users/logout")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isNoContent())
@@ -736,6 +751,7 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(post("/api/v1/users/logout")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isUnauthorized())

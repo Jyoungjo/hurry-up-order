@@ -67,6 +67,7 @@ public class ItemControllerTest {
 
         // then
         mockMvc.perform(post("/api/v1/items")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -89,6 +90,7 @@ public class ItemControllerTest {
 
         // then
         mockMvc.perform(post("/api/v1/items")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -112,6 +114,7 @@ public class ItemControllerTest {
 
         // then
         mockMvc.perform(post("/api/v1/items")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -135,6 +138,7 @@ public class ItemControllerTest {
 
         // then
         mockMvc.perform(post("/api/v1/items")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -202,6 +206,26 @@ public class ItemControllerTest {
                 .andDo(document("item/상품_단일_조회/성공"));
     }
 
+    // READ ONE
+    @DisplayName("상품 단일 조회 실패 - 존재하지 않는 상품")
+    @Test
+    void readItemFailNotFound() throws Exception {
+        // given
+        long itemId = 1L;
+
+        // when
+        when(itemService.readItem(anyLong())).thenThrow(new BusinessException(NOT_FOUND_ITEM));
+
+        // then
+        mockMvc.perform(get("/api/v1/items/" + itemId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value(NOT_FOUND_ITEM.getMessage()))
+                .andDo(print())
+                .andDo(document("item/상품_단일_조회/실패/존재하지_않는_상품"));
+    }
+
     // UPDATE
     @DisplayName("상품 정보 수정 확인")
     @Test
@@ -222,6 +246,7 @@ public class ItemControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/items/" + itemId)
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -246,6 +271,7 @@ public class ItemControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/items/" + itemId)
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -271,6 +297,7 @@ public class ItemControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/items/" + itemId)
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -296,6 +323,7 @@ public class ItemControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/items/" + itemId)
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -317,6 +345,7 @@ public class ItemControllerTest {
 
         // then
         mockMvc.perform(delete("/api/v1/items/" + itemId)
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isNoContent())
@@ -336,6 +365,7 @@ public class ItemControllerTest {
 
         // then
         mockMvc.perform(delete("/api/v1/items/" + itemId)
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isNotFound())

@@ -56,6 +56,7 @@ public class CartControllerTest {
 
         // then
         mockMvc.perform(post("/api/v1/carts")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -77,6 +78,7 @@ public class CartControllerTest {
 
         // then
         mockMvc.perform(post("/api/v1/carts")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -105,6 +107,7 @@ public class CartControllerTest {
 
         // then
         mockMvc.perform(get("/api/v1/carts")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isOk())
@@ -123,6 +126,7 @@ public class CartControllerTest {
 
         // then
         mockMvc.perform(get("/api/v1/carts")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isNotFound())
@@ -142,6 +146,7 @@ public class CartControllerTest {
 
         // then
         mockMvc.perform(get("/api/v1/carts")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isNotFound())
@@ -162,6 +167,7 @@ public class CartControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/carts/increase")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("itemId", String.valueOf(itemId))
                         .with(csrf()))
@@ -183,6 +189,7 @@ public class CartControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/carts/increase")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("itemId", String.valueOf(itemId))
                         .with(csrf()))
@@ -205,6 +212,7 @@ public class CartControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/carts/increase")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("itemId", String.valueOf(itemId))
                         .with(csrf()))
@@ -226,6 +234,7 @@ public class CartControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/carts/decrease")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("itemId", String.valueOf(itemId))
                         .with(csrf()))
@@ -247,6 +256,7 @@ public class CartControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/carts/decrease")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("itemId", String.valueOf(itemId))
                         .with(csrf()))
@@ -269,6 +279,7 @@ public class CartControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/carts/decrease")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("itemId", String.valueOf(itemId))
                         .with(csrf()))
@@ -289,6 +300,7 @@ public class CartControllerTest {
 
         // then
         mockMvc.perform(delete("/api/v1/carts")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isNoContent())
@@ -307,6 +319,7 @@ public class CartControllerTest {
 
         // then
         mockMvc.perform(delete("/api/v1/carts")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isNotFound())
@@ -326,6 +339,7 @@ public class CartControllerTest {
 
         // then
         mockMvc.perform(delete("/api/v1/carts")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isNotFound())

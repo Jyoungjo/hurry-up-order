@@ -80,6 +80,7 @@ public class OrderControllerTest {
 
         // then
         mockMvc.perform(post("/api/v1/orders")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -118,6 +119,7 @@ public class OrderControllerTest {
 
         // then
         mockMvc.perform(post("/api/v1/orders")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -157,6 +159,7 @@ public class OrderControllerTest {
 
         // then
         mockMvc.perform(get("/api/v1/orders")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("page", String.valueOf(page))
                         .param("size", String.valueOf(size))
@@ -180,6 +183,7 @@ public class OrderControllerTest {
 
         // then
         mockMvc.perform(get("/api/v1/orders")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("page", String.valueOf(page))
                         .param("size", String.valueOf(size))
@@ -214,6 +218,7 @@ public class OrderControllerTest {
 
         // then
         mockMvc.perform(get("/api/v1/orders/" + orderId)
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isOk())
@@ -234,6 +239,7 @@ public class OrderControllerTest {
 
         // then
         mockMvc.perform(get("/api/v1/orders/" + orderId)
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isNotFound())
@@ -255,6 +261,7 @@ public class OrderControllerTest {
 
         // then
         mockMvc.perform(get("/api/v1/orders/" + orderId)
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isForbidden())
@@ -276,6 +283,7 @@ public class OrderControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/orders/" + orderId + "/cancel")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("itemId", String.valueOf(itemId))
                         .with(csrf()))
@@ -298,6 +306,7 @@ public class OrderControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/orders/" + orderId + "/cancel")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("itemId", String.valueOf(itemId))
                         .with(csrf()))
@@ -321,6 +330,7 @@ public class OrderControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/orders/" + orderId + "/cancel")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("itemId", String.valueOf(itemId))
                         .with(csrf()))
@@ -343,6 +353,7 @@ public class OrderControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/orders/" + orderId + "/return")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("itemId", String.valueOf(itemId))
                         .with(csrf()))
@@ -365,6 +376,7 @@ public class OrderControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/orders/" + orderId + "/return")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("itemId", String.valueOf(itemId))
                         .with(csrf()))
@@ -388,6 +400,7 @@ public class OrderControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/orders/" + orderId + "/return")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("itemId", String.valueOf(itemId))
                         .with(csrf()))
@@ -409,6 +422,7 @@ public class OrderControllerTest {
 
         // then
         mockMvc.perform(delete("/api/v1/orders/" + orderId)
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isNoContent())
@@ -429,6 +443,7 @@ public class OrderControllerTest {
 
         // then
         mockMvc.perform(delete("/api/v1/orders/" + orderId)
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isNotFound())
@@ -450,6 +465,7 @@ public class OrderControllerTest {
 
         // then
         mockMvc.perform(delete("/api/v1/orders/" + orderId)
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isForbidden())

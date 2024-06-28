@@ -53,6 +53,7 @@ public class StockControllerTest {
 
         // then
         mockMvc.perform(post("/api/v1/stocks")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -74,6 +75,7 @@ public class StockControllerTest {
 
         // then
         mockMvc.perform(post("/api/v1/stocks")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -95,6 +97,7 @@ public class StockControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/stocks")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -116,6 +119,7 @@ public class StockControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/stocks")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))
@@ -138,6 +142,7 @@ public class StockControllerTest {
 
         // then
         mockMvc.perform(put("/api/v1/stocks")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req))
                         .with(csrf()))

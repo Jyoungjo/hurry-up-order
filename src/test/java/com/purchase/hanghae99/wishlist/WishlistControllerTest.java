@@ -54,6 +54,7 @@ public class WishlistControllerTest {
 
         // then
         mockMvc.perform(post("/api/v1/wishlists")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("itemId", String.valueOf(itemId))
                         .with(csrf()))
@@ -75,6 +76,7 @@ public class WishlistControllerTest {
 
         // then
         mockMvc.perform(post("/api/v1/wishlists")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("itemId", String.valueOf(itemId))
                         .with(csrf()))
@@ -102,6 +104,7 @@ public class WishlistControllerTest {
 
         // then
         mockMvc.perform(get("/api/v1/wishlists")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isOk())
@@ -121,6 +124,7 @@ public class WishlistControllerTest {
 
         // then
         mockMvc.perform(get("/api/v1/wishlists")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isNotFound())
@@ -141,6 +145,7 @@ public class WishlistControllerTest {
 
         // then
         mockMvc.perform(get("/api/v1/wishlists")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isNotFound())
@@ -161,12 +166,13 @@ public class WishlistControllerTest {
 
         // then
         mockMvc.perform(delete("/api/v1/wishlists")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("itemId", String.valueOf(itemId))
                         .with(csrf()))
                 .andExpect(status().isNoContent())
                 .andDo(print())
-                .andDo(document("wishlist/위시리스트_상품_삭제/성공"));
+                .andDo(document("wishlist/위시리스트_상품_제거/성공"));
     }
 
     // DELETE
@@ -182,6 +188,7 @@ public class WishlistControllerTest {
 
         // then
         mockMvc.perform(delete("/api/v1/wishlists")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("itemId", String.valueOf(itemId))
                         .with(csrf()))
@@ -204,6 +211,7 @@ public class WishlistControllerTest {
 
         // then
         mockMvc.perform(delete("/api/v1/wishlists")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("itemId", String.valueOf(itemId))
                         .with(csrf()))
@@ -224,6 +232,7 @@ public class WishlistControllerTest {
 
         // then
         mockMvc.perform(delete("/api/v1/wishlists/clear")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isNoContent())
@@ -243,6 +252,7 @@ public class WishlistControllerTest {
 
         // then
         mockMvc.perform(delete("/api/v1/wishlists/clear")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isNotFound())
@@ -263,6 +273,7 @@ public class WishlistControllerTest {
 
         // then
         mockMvc.perform(delete("/api/v1/wishlists/clear")
+                        .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isNotFound())
