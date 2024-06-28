@@ -62,9 +62,24 @@ public class WishlistServiceImpl implements WishlistService {
         Wishlist wishlist = wishListRepository.findByUser(user)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_WISHLIST));
 
+        return ResWishListDto.fromEntity(wishlist);
+    }
+
+    @Override
+    @Transactional
+    public void clearWishlist(Authentication authentication) throws Exception {
+        String emailOfConnectingUser = aesCBCEncode(authentication.getName());
+
+        User user = userRepository.findByEmail(emailOfConnectingUser)
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
+
+        Wishlist wishlist = wishListRepository.findByUser(user)
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_WISHLIST));
+
         checkAccount(wishlist.getUser().getEmail(), emailOfConnectingUser);
 
-        return ResWishListDto.fromEntity(wishlist);
+        wishlist.getWishlistItems().clear();
+        wishListRepository.save(wishlist);
     }
 
     private void checkAccount(String email, String myEmail) {

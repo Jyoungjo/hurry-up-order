@@ -36,4 +36,10 @@ public class WishlistController {
     ) throws Exception {
         return ResponseEntity.ok(wishListService.readMyWishList(authentication));
     }
+
+    @DeleteMapping("/clear")
+    public ResponseEntity<Void> clearWishlist(Authentication authentication) throws Exception {
+        wishListService.clearWishlist(authentication);
+        return ResponseEntity.noContent().build();
+    }
 }
