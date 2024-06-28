@@ -6,7 +6,7 @@ import lombok.*;
 import static com.purchase.hanghae99.common.AesUtils.*;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ResUserInfoDto {

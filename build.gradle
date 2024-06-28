@@ -26,7 +26,7 @@ repositories {
 }
 
 ext {
-	set('snippetsDir', file("build/generated-snippets"))
+	snippetsDir = file('build/generated-snippets')
 }
 
 dependencies {
@@ -42,7 +42,10 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
+
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testRuntimeOnly 'com.h2database:h2'
@@ -54,6 +57,11 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
 	implementation 'commons-codec:commons-codec:1.17.0'
+
+	testImplementation 'com.github.codemonstur:embedded-redis:1.4.3'
+
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('test') {
@@ -61,8 +69,9 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-tasks.named('asciidoctor') {
+asciidoctor {
 	inputs.dir snippetsDir
+	configurations 'asciidoctorExt'
 	dependsOn test
 }
 

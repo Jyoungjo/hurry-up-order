@@ -1,8 +1,6 @@
-package com.purchase.hanghae99.item.repository;
+package com.purchase.hanghae99.item;
 
 import com.purchase.hanghae99.config.JpaConfig;
-import com.purchase.hanghae99.item.Item;
-import com.purchase.hanghae99.item.ItemRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +67,7 @@ public class ItemRepositoryTest {
         Item savedItem = itemRepository.save(item());
 
         // when
-        Optional<Item> foundItem = itemRepository.findById(1L);
+        Optional<Item> foundItem = itemRepository.findById(savedItem.getId());
         
         // then
         assertThat(foundItem).isPresent();

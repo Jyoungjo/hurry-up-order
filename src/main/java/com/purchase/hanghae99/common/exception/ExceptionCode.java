@@ -14,7 +14,7 @@ public enum ExceptionCode {
      */
     INVALID_TYPE_VALUE(BAD_REQUEST.value(), "유효성이 일치하지 않음."),
     BAD_CREDENTIALS(BAD_REQUEST.value(), "bad credentials"),
-    INVALID_INPUT_VALUE(BAD_REQUEST.value(), "invalid input type"),
+    INVALID_INPUT_VALUE(BAD_REQUEST.value(), "입력값을 확인해주세요."),
     ENCODING_ERROR(BAD_REQUEST.value(), "encoding error"),
     DECODING_ERROR(BAD_REQUEST.value(), "decoding error"),
 
@@ -57,8 +57,9 @@ public enum ExceptionCode {
     /*
      * 409
      */
-    ALREADY_REGISTERED_EMAIL(CONFLICT.value(), "already registered email"),
-    ALREADY_REGISTERED_PHONE_NUMBER(CONFLICT.value(), "already registered phone number"),
+    INVALID_VERIFICATION_NUMBER(CONFLICT.value(), "인증번호가 일치하지 않습니다."),
+    ALREADY_REGISTERED_EMAIL(CONFLICT.value(), "이미 등록된 이메일 입니다."),
+    ALREADY_REGISTERED_PHONE_NUMBER(CONFLICT.value(), "이미 등록된 전화번호 입니다."),
     ALREADY_EXISTS_ITEM(CONFLICT.value(), "이미 등록된 아이템 입니다."),
     ALREADY_SHIPPING(CONFLICT.value(), "이미 배송중인 물품은 취소할 수 없습니다."),
     NO_RETURN(CONFLICT.value(), "이미 배송중인 물품은 취소할 수 없습니다."),

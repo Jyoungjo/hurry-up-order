@@ -1,9 +1,7 @@
-package com.purchase.hanghae99.user.repository;
+package com.purchase.hanghae99.user;
 
 import com.purchase.hanghae99.config.JpaConfig;
 import com.purchase.hanghae99.config.PasswordEncoderTestConfig;
-import com.purchase.hanghae99.user.User;
-import com.purchase.hanghae99.user.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
