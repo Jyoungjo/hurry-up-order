@@ -57,6 +57,11 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
 	implementation 'commons-codec:commons-codec:1.17.0'
+
+	testImplementation 'com.github.codemonstur:embedded-redis:1.4.3'
+
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('test') {
