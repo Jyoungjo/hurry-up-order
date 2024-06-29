@@ -4,8 +4,6 @@ import com.purchase.hanghae99.cart.Cart;
 import com.purchase.hanghae99.item.Item;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
@@ -14,8 +12,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
-@SQLDelete(sql = "UPDATE TB_CART_ITEM SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
-@SQLRestriction("deleted_at is NULL")
 @Builder
 public class CartItem {
     @Id
@@ -28,7 +24,7 @@ public class CartItem {
     @JoinColumn(name="item_id")
     private Item item;
     private Integer quantity;
-    private LocalDateTime deletedAt;
+    private LocalDateTime createdAt;
 
     public void updateQuantity(Integer quantity) {
         this.quantity += quantity;

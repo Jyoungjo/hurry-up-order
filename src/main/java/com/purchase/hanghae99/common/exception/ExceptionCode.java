@@ -48,6 +48,7 @@ public enum ExceptionCode {
     NOT_FOUND_CART(NOT_FOUND.value(), "존재하지 않는 장바구니입니다."),
     NOT_FOUND_CART_ITEM(NOT_FOUND.value(), "장바구니에 존재하지 않는 물품입니다."),
     NOT_FOUND_STOCK(NOT_FOUND.value(), "재고가 존재하지 않습니다."),
+    NOT_FOUND_SHIPMENT(NOT_FOUND.value(), "배송 정보가 존재하지 않습니다."),
 
     /*
      * 405

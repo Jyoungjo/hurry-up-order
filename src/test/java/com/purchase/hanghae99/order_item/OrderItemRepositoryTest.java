@@ -5,6 +5,9 @@ import com.purchase.hanghae99.item.Item;
 import com.purchase.hanghae99.item.ItemRepository;
 import com.purchase.hanghae99.order.Order;
 import com.purchase.hanghae99.order.OrderRepository;
+import com.purchase.hanghae99.shipment.Shipment;
+import com.purchase.hanghae99.shipment.ShipmentRepository;
+import com.purchase.hanghae99.shipment.ShipmentStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,8 +33,12 @@ public class OrderItemRepositoryTest {
     @Autowired
     private ItemRepository itemRepository;
 
+    @Autowired
+    private ShipmentRepository shipmentRepository;
+
     private Order order;
     private Item item;
+    private Shipment shipment;
 
     private OrderItem orderItem() {
         return OrderItem.builder()
@@ -40,7 +47,7 @@ public class OrderItemRepositoryTest {
                 .item(item)
                 .quantity(50)
                 .unitPrice(10000)
-                .status(OrderStatus.ACCEPTANCE)
+                .shipment(shipment)
                 .build();
     }
 
@@ -60,6 +67,13 @@ public class OrderItemRepositoryTest {
                 .price(150000)
                 .description("이 제품에 대한 설명 입니다.")
                 .deletedAt(null)
+                .build());
+
+        shipment = shipmentRepository.save(Shipment.builder()
+                .id(1L)
+                .orderItem(null)
+                .status(ShipmentStatus.ACCEPTANCE)
+                .createdAt(LocalDateTime.of(2024, 6, 28, 12, 8))
                 .build());
     }
 
@@ -90,21 +104,5 @@ public class OrderItemRepositoryTest {
         // then
         assertThat(foundOrderItem).isPresent();
         assertThat(foundOrderItem.get().getItem()).isEqualTo(savedOrderItem.getItem());
-    }
-
-    // UPDATE
-    @DisplayName("주문 - 물품 정보 변경 성공")
-    @Test
-    void updateOrderItem() {
-        // given
-        OrderItem savedOrderItem = orderItemRepository.save(orderItem());
-        OrderStatus current = savedOrderItem.getStatus();
-
-        // when
-        savedOrderItem.updateStatus(OrderStatus.READY);
-        OrderItem updatedOrderItem = orderItemRepository.save(savedOrderItem);
-
-        // then
-        assertThat(updatedOrderItem.getStatus()).isNotEqualTo(current);
     }
 }

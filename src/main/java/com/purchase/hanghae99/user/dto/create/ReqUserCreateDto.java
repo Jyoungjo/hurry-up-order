@@ -42,7 +42,6 @@ public class ReqUserCreateDto {
                 .phoneNumber(aesCBCEncode(phoneNumber))
                 .role(UserRole.UNCERTIFIED_USER)
                 .orderList(new ArrayList<>())
-                .wishlists(new ArrayList<>())
                 .build();
     }
 }
