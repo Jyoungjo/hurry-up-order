@@ -29,5 +29,6 @@ public class Payment extends BaseEntity {
     private LocalDateTime paymentDate;
     private Integer paymentPrice;
     private String paymentMethod;
+    // TODO 결제 상태 컬럼
     private LocalDateTime deletedAt;
 }
