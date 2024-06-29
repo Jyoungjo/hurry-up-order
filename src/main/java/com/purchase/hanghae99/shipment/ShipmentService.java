@@ -41,7 +41,7 @@ public class ShipmentService {
     }
 
     private void checkPossibleReturn(Shipment shipment) {
-        if (!shipment.getStatus().equals(DELIVERED) || !shipment.getCreatedAt().plusDays(1).isBefore(LocalDateTime.now())) {
+        if (!shipment.getStatus().equals(DELIVERED) || shipment.getCreatedAt().plusDays(1).isBefore(LocalDateTime.now())) {
             throw new BusinessException(NO_RETURN);
         }
     }
