@@ -112,7 +112,7 @@ public class OrderServiceImpl implements OrderService {
 
         checkMatchesUser(order.getUser().getEmail(), emailOfConnectingUser);
 
-        orderItemService.returnOrder(order, itemId);
+        orderItemService.requestReturnOrder(order, itemId);
     }
 
     private void checkMatchesUser(String userEmail, String emailOfConnectingUser) {

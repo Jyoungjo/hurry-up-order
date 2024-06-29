@@ -1,11 +1,11 @@
-package com.purchase.hanghae99.order_item;
+package com.purchase.hanghae99.shipment;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum OrderStatus {
+public enum ShipmentStatus {
     ACCEPTANCE("주문 접수"),
     READY("배송 준비"),
     SHIPPING("배송중"),

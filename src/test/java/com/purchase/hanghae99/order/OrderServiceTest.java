@@ -309,14 +309,14 @@ public class OrderServiceTest {
         Long itemId = 1L;
 
         when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
-        doNothing().when(orderItemService).returnOrder(any(Order.class), anyLong());
+        doNothing().when(orderItemService).requestReturnOrder(any(Order.class), anyLong());
 
         // when
         orderService.returnOrder(authentication, orderId, itemId);
 
         // then
         verify(orderRepository, times(1)).findById(orderId);
-        verify(orderItemService, times(1)).returnOrder(order, itemId);
+        verify(orderItemService, times(1)).requestReturnOrder(order, itemId);
     }
 
     // UPDATE

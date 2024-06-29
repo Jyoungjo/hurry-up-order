@@ -7,7 +7,7 @@ import com.purchase.hanghae99.order.dto.ReqOrderDto;
 import com.purchase.hanghae99.order.dto.ReqOrderItemDto;
 import com.purchase.hanghae99.order.dto.ResOrderDto;
 import com.purchase.hanghae99.order.dto.ResOrderItemDto;
-import com.purchase.hanghae99.order_item.OrderStatus;
+import com.purchase.hanghae99.shipment.ShipmentStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,10 +67,10 @@ public class OrderControllerTest {
                 1L, 55000, LocalDateTime.of(2024, 6, 28, 12, 8),
                 List.of(
                         new ResOrderItemDto(
-                                1L, 5, 5000, OrderStatus.ACCEPTANCE
+                                1L, 5, 5000, 25000, ShipmentStatus.ACCEPTANCE
                         ),
                         new ResOrderItemDto(
-                                2L, 5, 6000, OrderStatus.ACCEPTANCE
+                                2L, 5, 6000, 30000, ShipmentStatus.ACCEPTANCE
                         )
                 )
         );
@@ -98,18 +98,6 @@ public class OrderControllerTest {
                 List.of(
                         new ReqOrderItemDto(1L, 5),
                         new ReqOrderItemDto(2L, 5)
-                )
-        );
-
-        ResOrderDto res = new ResOrderDto(
-                1L, 55000, LocalDateTime.of(2024, 6, 28, 12, 8),
-                List.of(
-                        new ResOrderItemDto(
-                                1L, 5, 5000, OrderStatus.ACCEPTANCE
-                        ),
-                        new ResOrderItemDto(
-                                2L, 5, 6000, OrderStatus.ACCEPTANCE
-                        )
                 )
         );
 
@@ -143,10 +131,10 @@ public class OrderControllerTest {
                         1L, 55000, LocalDateTime.of(2024, 6, 28, 12, 8),
                         List.of(
                                 new ResOrderItemDto(
-                                        1L, 5, 5000, OrderStatus.ACCEPTANCE
+                                        1L, 5, 5000, 25000, ShipmentStatus.ACCEPTANCE
                                 ),
                                 new ResOrderItemDto(
-                                        2L, 5, 6000, OrderStatus.ACCEPTANCE
+                                        2L, 5, 6000, 30000, ShipmentStatus.ACCEPTANCE
                                 )
                         )
                 )
@@ -205,10 +193,10 @@ public class OrderControllerTest {
                 1L, 55000, LocalDateTime.of(2024, 6, 28, 12, 8),
                 List.of(
                         new ResOrderItemDto(
-                                1L, 5, 5000, OrderStatus.ACCEPTANCE
+                                1L, 5, 5000, 25000, ShipmentStatus.ACCEPTANCE
                         ),
                         new ResOrderItemDto(
-                                2L, 5, 6000, OrderStatus.ACCEPTANCE
+                                2L, 5, 6000, 30000, ShipmentStatus.ACCEPTANCE
                         )
                 )
         );

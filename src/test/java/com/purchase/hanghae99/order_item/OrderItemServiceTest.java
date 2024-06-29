@@ -5,6 +5,9 @@ import com.purchase.hanghae99.item.Item;
 import com.purchase.hanghae99.item.ItemService;
 import com.purchase.hanghae99.order.Order;
 import com.purchase.hanghae99.order.dto.ReqOrderItemDto;
+import com.purchase.hanghae99.shipment.Shipment;
+import com.purchase.hanghae99.shipment.ShipmentService;
+import com.purchase.hanghae99.shipment.ShipmentStatus;
 import com.purchase.hanghae99.stock.StockService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,12 +36,16 @@ public class OrderItemServiceTest {
     @Mock
     private StockService stockService;
 
+    @Mock
+    private ShipmentService shipmentService;
+
     @InjectMocks
     private OrderItemService orderItemService;
 
     private OrderItem orderItem;
     private Order order;
     private Item item;
+    private Shipment shipment;
 
     @BeforeEach
     void init() {
@@ -57,13 +64,20 @@ public class OrderItemServiceTest {
                 .orderItemList(new ArrayList<>())
                 .build();
 
+        shipment = Shipment.builder()
+                .id(1L)
+                .status(ShipmentStatus.ACCEPTANCE)
+                .createdAt(LocalDateTime.of(2024, 6, 28, 12, 8))
+                .build();
+
         orderItem = OrderItem.builder()
                 .id(1L)
                 .order(order)
                 .item(item)
                 .quantity(2)
                 .unitPrice(10000)
-                .status(OrderStatus.ACCEPTANCE)
+                .totalSum(20000)
+                .shipment(shipment)
                 .build();
     }
 
@@ -77,6 +91,7 @@ public class OrderItemServiceTest {
         );
 
         when(itemService.findItem(anyLong())).thenReturn(item);
+        when(shipmentService.createShipment()).thenReturn(shipment);
         when(orderItemRepository.save(any(OrderItem.class))).thenReturn(orderItem);
         doNothing().when(stockService).decreaseStock(any(Item.class), anyInt());
 
@@ -168,16 +183,18 @@ public class OrderItemServiceTest {
                 .orderItemList(List.of(orderItem))
                 .build();
 
-        when(orderItemRepository.save(any(OrderItem.class))).thenReturn(orderItem);
+        doAnswer(invocation -> {
+            Shipment sm = invocation.getArgument(0);
+            sm.updateStatus(ShipmentStatus.CANCELLED);
+            return null;
+        }).when(shipmentService).cancelShipment(any(Shipment.class));
         doNothing().when(stockService).increaseStock(any(Item.class), anyInt());
 
         // when
         orderItemService.cancelOrder(newOrder, itemId);
 
         // then
-        assertThat(orderItem.getStatus()).isEqualTo(OrderStatus.CANCELLED);
-        verify(orderItemRepository, times(1)).save(any(OrderItem.class));
-        verify(stockService, times(1)).increaseStock(any(Item.class), anyInt());
+        assertThat(orderItem.getShipment().getStatus()).isEqualTo(ShipmentStatus.CANCELLED);
     }
 
     // UPDATE
@@ -208,6 +225,13 @@ public class OrderItemServiceTest {
     void cancelOrderItemFailAlreadyShipped() {
         // given
         Long itemId = 1L;
+        Shipment newShipment = Shipment.builder()
+                .id(1L)
+                .orderItem(null)
+                .status(ShipmentStatus.SHIPPING)
+                .createdAt(LocalDateTime.of(2024, 6, 28, 12, 8))
+                .build();
+
         Order newOrder = Order.builder()
                 .id(1L)
                 .user(null)
@@ -220,12 +244,13 @@ public class OrderItemServiceTest {
                                 .item(item)
                                 .quantity(2)
                                 .unitPrice(10000)
-                                .status(OrderStatus.SHIPPING)
+                                .shipment(newShipment)
                                 .build()
                 ))
                 .build();
 
         // when
+        doThrow(new BusinessException(ALREADY_SHIPPING)).when(shipmentService).cancelShipment(any(Shipment.class));
 
         // then
         assertThatThrownBy(() -> orderItemService.cancelOrder(newOrder, itemId))
@@ -239,14 +264,20 @@ public class OrderItemServiceTest {
     void returnOrderItem() {
         // given
         Long itemId = 1L;
+        Shipment newShipment = Shipment.builder()
+                .id(1L)
+                .orderItem(null)
+                .status(ShipmentStatus.DELIVERED)
+                .createdAt(LocalDateTime.of(2024, 6, 29, 12, 8))
+                .build();
+
         OrderItem newOrderItem = OrderItem.builder()
                 .id(1L)
                 .order(null)
                 .item(item)
                 .quantity(2)
                 .unitPrice(10000)
-                .status(OrderStatus.DELIVERED)
-                .deliveredAt(LocalDateTime.now())
+                .shipment(newShipment)
                 .build();
 
         Order newOrder = Order.builder()
@@ -257,14 +288,17 @@ public class OrderItemServiceTest {
                 .orderItemList(List.of(newOrderItem))
                 .build();
 
-        when(orderItemRepository.save(any(OrderItem.class))).thenReturn(newOrderItem);
+        doAnswer(invocation -> {
+            Shipment sm = invocation.getArgument(0);
+            sm.updateStatus(ShipmentStatus.REQUEST_RETURN);
+            return null;
+        }).when(shipmentService).requestReturnShipment(any(Shipment.class));
 
         // when
-        orderItemService.returnOrder(newOrder, itemId);
+        orderItemService.requestReturnOrder(newOrder, itemId);
 
         // then
-        assertThat(newOrderItem.getStatus()).isEqualTo(OrderStatus.REQUEST_RETURN);
-        verify(orderItemRepository, times(1)).save(any(OrderItem.class));
+        assertThat(newOrderItem.getShipment().getStatus()).isEqualTo(ShipmentStatus.REQUEST_RETURN);
     }
 
     // UPDATE
@@ -285,7 +319,7 @@ public class OrderItemServiceTest {
         // when
 
         // then
-        assertThatThrownBy(() -> orderItemService.returnOrder(newOrder, itemId))
+        assertThatThrownBy(() -> orderItemService.requestReturnOrder(newOrder, itemId))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(NOT_FOUND_ORDER_ITEM.getMessage());
     }
@@ -297,14 +331,20 @@ public class OrderItemServiceTest {
         // given
         Long itemId = 1L;
 
+        Shipment newShipment = Shipment.builder()
+                .id(1L)
+                .orderItem(null)
+                .status(ShipmentStatus.DELIVERED)
+                .createdAt(LocalDateTime.of(2024, 6, 28, 12, 8))
+                .build();
+
         OrderItem newOrderItem = OrderItem.builder()
                 .id(1L)
                 .order(null)
                 .item(item)
                 .quantity(2)
                 .unitPrice(10000)
-                .status(OrderStatus.DELIVERED)
-                .deliveredAt(LocalDateTime.of(2024, 6, 27, 12, 8))
+                .shipment(newShipment)
                 .build();
 
         Order newOrder = Order.builder()
@@ -316,9 +356,10 @@ public class OrderItemServiceTest {
                 .build();
 
         // when
+        doThrow(new BusinessException(NO_RETURN)).when(shipmentService).requestReturnShipment(any(Shipment.class));
 
         // then
-        assertThatThrownBy(() -> orderItemService.returnOrder(newOrder, itemId))
+        assertThatThrownBy(() -> orderItemService.requestReturnOrder(newOrder, itemId))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(NO_RETURN.getMessage());
     }
