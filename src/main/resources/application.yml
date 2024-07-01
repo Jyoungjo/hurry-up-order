@@ -1,6 +1,14 @@
-server:
-  port: 8080
 spring:
+  profiles:
+    group:
+      "dev": "dev, devsecret, common, secret"
+      "prod": "prod, prodsecret, common, secret"
+    active: dev
+---
+spring:
+  config:
+    activate:
+      on-profile: common
   profiles:
     include: secret
   jpa:
@@ -30,3 +38,17 @@ jwt:
   refresh:
     expiration: 86400000 #  1일
     header: Authorization-refresh
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+server:
+  port: 8080
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+server:
+  port: 8081
