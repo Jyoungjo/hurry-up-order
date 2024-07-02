@@ -1,5 +1,6 @@
 package com.purchase.hanghae99.email;
 
+import com.purchase.hanghae99.common.RedisService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -7,15 +8,14 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.Duration;
 import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
 public class EmailService {
     private final JavaMailSender javaMailSender;
-    private final Map<String, String> emailVerificationMap = new HashMap<>();
+    private final RedisService redisService;
 
     @Async
     public void sendMail(String email) {
@@ -34,7 +34,7 @@ public class EmailService {
 
             javaMailSender.send(mimeMessage);
 
-            emailVerificationMap.put(email, authNumber);
+            redisService.setValues(email, authNumber, Duration.ofMinutes(5));
         } catch (MessagingException e) {
             e.printStackTrace();
         }
@@ -57,7 +57,7 @@ public class EmailService {
     }
 
     public String getVerificationNumber(String email) {
-        return emailVerificationMap.getOrDefault(email, "");
+        return redisService.getValues(email);
     }
 
     public boolean checkVerificationStr(String mail, String userStr) {

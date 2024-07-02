@@ -23,6 +23,7 @@ public class ResOrderItemDto {
                 .itemId(orderItem.getItem().getId())
                 .quantity(orderItem.getQuantity())
                 .unitPrice(orderItem.getUnitPrice())
+                .totalSum(orderItem.getTotalSum())
                 .status(orderItem.getShipment().getStatus())
                 .build();
     }

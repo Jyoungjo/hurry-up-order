@@ -32,6 +32,7 @@ public class OrderItemService {
                     OrderItem orderItem = orderItemRepository.save(
                             OrderItem.of(order, foundItem, shipment, orderItemDto.getItemCount())
                     );
+                    order.getOrderItemList().add(orderItem);
                     // 재고 처리
                     stockService.decreaseStock(orderItem.getItem(), orderItem.getQuantity());
                     return orderItem;

@@ -37,8 +37,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
 
         // Order 객체 생성
-        Order order = Order.of(user);
-        orderRepository.save(order);
+        Order order = orderRepository.save(Order.of(user));
 
         // OrderItem 객체 생성 및 저장 로직
         orderItemService.createOrderItem(order, req.getOrderItemList());
