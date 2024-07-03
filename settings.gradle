@@ -1,1 +1,5 @@
 rootProject.name = 'hanghae99'
+include 'preorder-user'
+include 'preorder-order'
+include 'preorder-item'
+include 'preorder-core'

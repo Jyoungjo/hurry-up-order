@@ -1,0 +1,50 @@
+package com.purchase.hanghae99_order.cart;
+
+import com.purchase.hanghae99_order.cart.dto.ReqCartDto;
+import com.purchase.hanghae99_order.cart.dto.ResCartDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/carts")
+public class CartController {
+    private final CartService cartService;
+
+    @PostMapping
+    public ResponseEntity<Void> addItemToCart(
+            Authentication authentication, @RequestBody ReqCartDto req
+    ) throws Exception {
+        cartService.addItemToCart(authentication, req);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<ResCartDto> readMyCart(Authentication authentication) throws Exception {
+        return ResponseEntity.ok(cartService.readMyCart(authentication));
+    }
+
+    @PutMapping("/increase")
+    public ResponseEntity<Void> incrementCartItemQuantity(
+            Authentication authentication, @RequestParam("itemId") Long itemId
+    ) throws Exception {
+        cartService.incrementCartItemQuantity(authentication, itemId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/decrease")
+    public ResponseEntity<Void> decrementCartItemQuantity(
+            Authentication authentication, @RequestParam("itemId") Long itemId
+    ) throws Exception {
+        cartService.decrementCartItemQuantity(authentication, itemId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> clearCart(Authentication authentication) throws Exception {
+        cartService.clearCart(authentication);
+        return ResponseEntity.noContent().build();
+    }
+}
