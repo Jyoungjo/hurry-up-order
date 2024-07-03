@@ -228,6 +228,9 @@ gradle-app.setting
 # Java heap dump
 *.hprof
 
-src/main/resources/application-secret.yml
+preorder-item/src/main/resources/application-secret.yml
+preorder-order/src/main/resources/application-secret.yml
+preorder-user/src/main/resources/application-secret.yml
+preorder-core/src/main/resources/application-secret.yml
 
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij,windows,macos,gradle
