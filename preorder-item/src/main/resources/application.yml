@@ -30,7 +30,7 @@ eureka:
   instance:
     prefer-ip-address: true
   client:
-    registry-fetch-interval-seconds: 5
+    registry-fetch-interval-seconds: 30
     disable-delta: true
     register-with-eureka: true
     fetch-registry: true
@@ -59,12 +59,12 @@ eureka:
   instance:
     prefer-ip-address: true
   client:
-    registry-fetch-interval-seconds: 5
+    registry-fetch-interval-seconds: 30
     disable-delta: true
     register-with-eureka: true
     fetch-registry: true
     service-uri:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://eureka-server:8761/eureka
 
 ---
 spring:

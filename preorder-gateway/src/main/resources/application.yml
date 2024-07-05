@@ -1,9 +1,15 @@
-server:
-  port: 9000
-
 spring:
   profiles:
+    group:
+      local: "common, dev"
+      prod: "common, prod"
     include: secret
+    active: local
+---
+spring:
+  config:
+    activate:
+      on-profile: common
   application:
     name: preorder-gateway
   cloud:
@@ -36,8 +42,6 @@ eureka:
   client:
     register-with-eureka: true
     fetch-registry: true
-    service-uri:
-      defaultZone: http://localhost:8761/eureka
 
 jwt:
   access:
@@ -46,3 +50,24 @@ jwt:
   refresh:
     expiration: 86400000 #  1일
     header: Authorization-refresh
+
+server:
+  port: 9000
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+eureka:
+  client:
+    service-uri:
+      defaultZone: http://localhost:8761/eureka
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+eureka:
+  client:
+    service-uri:
+      defaultZone: http://eureka-server:8761/eureka
