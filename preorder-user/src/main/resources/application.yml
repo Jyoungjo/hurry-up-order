@@ -57,7 +57,7 @@ eureka:
     disable-delta: true
     register-with-eureka: true
     fetch-registry: true
-    service-uri:
+    service-url:
       defaultZone: http://localhost:8761/eureka
 
 feign:
@@ -92,7 +92,7 @@ eureka:
     disable-delta: true
     register-with-eureka: true
     fetch-registry: true
-    service-uri:
+    service-url:
       defaultZone: http://eureka-server:8761/eureka
 
 feign:
