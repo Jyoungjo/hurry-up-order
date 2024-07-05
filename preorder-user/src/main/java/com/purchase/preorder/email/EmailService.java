@@ -1,6 +1,6 @@
 package com.purchase.preorder.email;
 
-import com.purchase.hanghae99.common.RedisService;
+import com.purchase.preorder.common.RedisService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
