@@ -1,0 +1,105 @@
+spring:
+  application:
+    name: order-service
+  profiles:
+    group:
+      local: "dev, secret-dev"
+      prod: "prod, secret-prod"
+      test: "test, secret-test"
+    include: secret
+    active: local
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    show-sql: true
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
+server:
+  port: 8888
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    registry-fetch-interval-seconds: 30
+    disable-delta: true
+    register-with-eureka: true
+    fetch-registry: true
+    service-uri:
+      defaultZone: http://localhost:8761/eureka
+
+feign:
+  client:
+    config:
+      item-service:
+        url: http://localhost:8889
+      user-service:
+        url: http://localhost:8887
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    show-sql: true
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
+server:
+  port: 8081
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    registry-fetch-interval-seconds: 30
+    disable-delta: true
+    register-with-eureka: true
+    fetch-registry: true
+    service-uri:
+      defaultZone: http://eureka-server:8761/eureka
+
+feign:
+  client:
+    config:
+      item-service:
+        url: http://item-service:8082
+      user-service:
+        url: http://user-service:8080
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    database: h2
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+        show_sql: true
+server:
+  port: 9998
