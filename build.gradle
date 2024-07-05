@@ -31,7 +31,6 @@ subprojects {
 		developmentOnly 'org.springframework.boot:spring-boot-devtools' // 전체
 		compileOnly 'org.projectlombok:lombok' // 전체
 		annotationProcessor 'org.projectlombok:lombok' // 전체
-		implementation 'org.springframework.boot:spring-boot-starter-web'
 	}
 
 	tasks.named('test') {

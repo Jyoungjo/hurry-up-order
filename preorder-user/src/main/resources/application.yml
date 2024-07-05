@@ -1,16 +1,19 @@
 spring:
   profiles:
     group:
-      local: "dev, common, secret-dev"
-      prod: "prod, common, secret-prod"
-      test: "test, common, secret-test"
+      local: "dev, common, secret-common, secret-dev"
+      prod: "prod, common, secret-common, secret-prod"
+      test: "test, common, secret-common, secret-test"
     include: secret
     active: local
 ---
 spring:
+  application:
+    name: user-service
   config:
     activate:
       on-profile: common
+
   mail:
     host: smtp.gmail.com
     port: 587
@@ -45,6 +48,24 @@ spring:
       enabled: true
 server:
   port: 8887
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    registry-fetch-interval-seconds: 5
+    disable-delta: true
+    register-with-eureka: true
+    fetch-registry: true
+    service-uri:
+      defaultZone: http://localhost:8761/eureka
+
+feign:
+  client:
+    config:
+      item-service:
+        url: http://localhost:8889
+
 ---
 spring:
   config:
@@ -62,11 +83,30 @@ spring:
       enabled: true
 server:
   port: 8080
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    registry-fetch-interval-seconds: 5
+    disable-delta: true
+    register-with-eureka: true
+    fetch-registry: true
+    service-uri:
+      defaultZone: http://localhost:8761/eureka
+
+feign:
+  client:
+    config:
+      item-service:
+        url: http://itemService:8082
+
 ---
 spring:
   config:
     activate:
       on-profile: test
+
   h2:
     console:
       enabled: true

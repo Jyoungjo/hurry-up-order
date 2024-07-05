@@ -3,3 +3,6 @@ include 'preorder-user'
 include 'preorder-order'
 include 'preorder-item'
 include 'preorder-core'
+include 'preorder-gateway'
+include 'preorder-eureka'
+
