@@ -18,6 +18,9 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockCookie;
 import org.springframework.mock.web.MockHttpServletRequest;
 
@@ -165,26 +168,29 @@ public class OrderServiceTest {
                 .thenReturn(accessToken);
         when(userClient.getUserByEmail(anyString())).thenReturn(user);
 
-        List<Order> orderList = List.of(
-                new Order(
-                        1L,
-                        1L,
-                        LocalDateTime.of(2024, 6, 28, 12, 8),
-                        100,
-                        null,
-                        new ArrayList<>()
-                ),
-                new Order(
-                        2L,
-                        1L,
-                        LocalDateTime.of(2024, 6, 28, 12, 15),
-                        500,
-                        null,
-                        new ArrayList<>()
-                )
+        Pageable pageable = PageRequest.of(0, 5);
+        Page<Order> orderList = new PageImpl<>(
+                List.of(
+                        new Order(
+                                1L,
+                                1L,
+                                LocalDateTime.of(2024, 6, 28, 12, 8),
+                                100,
+                                null,
+                                new ArrayList<>()
+                        ),
+                        new Order(
+                                2L,
+                                1L,
+                                LocalDateTime.of(2024, 6, 28, 12, 15),
+                                500,
+                                null,
+                                new ArrayList<>()
+                        )
+                ), pageable, 2
         );
 
-        when(orderRepository.findAll()).thenReturn(orderList);
+        when(orderRepository.findByUserId(anyLong(), any(Pageable.class))).thenReturn(orderList);
 
         // when
         Page<ResOrderDto> res = orderService.readAllOrder(request, page, size);
