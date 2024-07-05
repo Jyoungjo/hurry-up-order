@@ -1,0 +1,73 @@
+spring:
+  profiles:
+    group:
+      local: "common, dev"
+      prod: "common, prod"
+    include: secret
+    active: local
+---
+spring:
+  config:
+    activate:
+      on-profile: common
+  application:
+    name: preorder-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/**
+          filters:
+            - name: AuthorizationFilter
+
+        - id: item-service
+          uri: lb://ITEM-SERVICE
+          predicates:
+            - Path=/item-service/**
+          filters:
+            - name: AuthorizationFilter
+
+        - id: order-service
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/order-service/**
+          filters:
+            - name: AuthorizationFilter
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+
+jwt:
+  access:
+    expiration: 900000 # 15분
+    header: Authorization
+  refresh:
+    expiration: 86400000 #  1일
+    header: Authorization-refresh
+
+server:
+  port: 9000
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+eureka:
+  client:
+    service-uri:
+      defaultZone: http://localhost:8761/eureka
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+eureka:
+  client:
+    service-uri:
+      defaultZone: http://eureka-server:8761/eureka
