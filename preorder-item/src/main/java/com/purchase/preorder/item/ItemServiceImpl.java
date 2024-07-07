@@ -26,9 +26,15 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ResCreateItemDto createItem(ReqCreateItemDto req) {
-        Item savedItem = itemRepository.save(req.toEntity());
-        stockService.increaseStock(savedItem.getId(), req.getQuantity());
-        return ResCreateItemDto.fromEntity(savedItem, stockService.getStockQuantity(savedItem.getId()));
+        Item item = Item.of(req);
+
+        if (req.getIsReserved().equals(true)) {
+             item = Item.of(req);
+        }
+
+        itemRepository.save(item);
+        stockService.createStock(item, req.getQuantity());
+        return ResCreateItemDto.fromEntity(item, req.getQuantity());
     }
 
     @Override

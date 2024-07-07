@@ -1,12 +1,14 @@
 package com.purchase.preorder.item.dto.create;
 
-import com.purchase.preorder.item.Item;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,12 +24,7 @@ public class ReqCreateItemDto {
     private String description;
     private Integer quantity;
     private Integer price;
-
-    public Item toEntity() {
-        return Item.builder()
-                .name(name)
-                .description(description)
-                .price(price)
-                .build();
-    }
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime openTime;
+    private Boolean isReserved;
 }

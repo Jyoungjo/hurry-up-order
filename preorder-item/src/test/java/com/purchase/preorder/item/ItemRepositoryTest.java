@@ -10,15 +10,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @Import(JpaConfig.class)
-@ActiveProfiles("test")
 public class ItemRepositoryTest {
     @Autowired
     private ItemRepository itemRepository;
@@ -27,8 +26,10 @@ public class ItemRepositoryTest {
         return Item.builder()
                 .id(1L)
                 .name("제품명")
-                .price(150000)
                 .description("이 제품에 대한 설명 입니다.")
+                .price(150000)
+                .openTime(LocalDateTime.now())
+                .isReserved(false)
                 .deletedAt(null)
                 .build();
     }

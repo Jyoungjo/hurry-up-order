@@ -1,6 +1,7 @@
 package com.purchase.preorder.item;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.purchase.preorder.config.JacksonConfig;
 import com.purchase.preorder.exception.BusinessException;
 import com.purchase.preorder.item.dto.create.ReqCreateItemDto;
 import com.purchase.preorder.item.dto.create.ResCreateItemDto;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.purchase.preorder.exception.ExceptionCode.INVALID_INPUT_VALUE;
@@ -32,10 +35,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = {ItemController.class})
+@Import(JacksonConfig.class)
 @AutoConfigureRestDocs
 public class ItemControllerTest {
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockBean
     private ItemService itemService;
@@ -46,7 +53,8 @@ public class ItemControllerTest {
     void addItem() throws Exception {
         // given
         ReqCreateItemDto req = new ReqCreateItemDto(
-                "상품명1", "상품명1에 대한 설명입니다.", 150, 50000
+                "상품명1", "상품명1에 대한 설명입니다.", 150, 50000,
+                LocalDateTime.now(), false
         );
 
         ResCreateItemDto res = new ResCreateItemDto(
@@ -60,7 +68,7 @@ public class ItemControllerTest {
         mockMvc.perform(post("/item-service/api/v1/items")
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(req)))
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
                 .andDo(print())
                 .andDo(document("item/상품_등록/성공"));
@@ -72,7 +80,8 @@ public class ItemControllerTest {
     void addItemFailMissingFields() throws Exception {
         // given
         ReqCreateItemDto req = new ReqCreateItemDto(
-                "", "상품명1에 대한 설명입니다.", 150, 50000
+                "", "상품명1에 대한 설명입니다.", 150, 50000,
+                LocalDateTime.now(), false
         );
 
         // when
@@ -82,7 +91,7 @@ public class ItemControllerTest {
         mockMvc.perform(post("/item-service/api/v1/items")
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(req)))
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(INVALID_INPUT_VALUE.getMessage()))
                 .andDo(print())
@@ -95,7 +104,8 @@ public class ItemControllerTest {
     void addItemFailInsufficientCharacters() throws Exception {
         // given
         ReqCreateItemDto req = new ReqCreateItemDto(
-                "1", "상품명1에 대한 설명입니다.", 150, 50000
+                "1", "상품명1에 대한 설명입니다.", 150, 50000,
+                LocalDateTime.now(), false
         );
 
         // when
@@ -105,7 +115,7 @@ public class ItemControllerTest {
         mockMvc.perform(post("/item-service/api/v1/items")
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(req)))
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(INVALID_INPUT_VALUE.getMessage()))
                 .andDo(print())
@@ -118,7 +128,8 @@ public class ItemControllerTest {
     void addItemFailExceedCharacters() throws Exception {
         // given
         ReqCreateItemDto req = new ReqCreateItemDto(
-                "글자수 20자 이상이면 초과!!!!!!", "상품명1에 대한 설명입니다.", 150, 50000
+                "글자수 20자 이상이면 초과!!!!!!", "상품명1에 대한 설명입니다.", 150, 50000,
+                LocalDateTime.now(), false
         );
 
         // when
@@ -128,7 +139,7 @@ public class ItemControllerTest {
         mockMvc.perform(post("/item-service/api/v1/items")
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(req)))
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(INVALID_INPUT_VALUE.getMessage()))
                 .andDo(print())
@@ -147,10 +158,14 @@ public class ItemControllerTest {
         List<ResReadItemDto> itemList =
                 List.of(
                         new ResReadItemDto(
-                                1L, "제품1", "제품1에 대한 설명입니다.", 5000
+                                1L, "제품1", "제품1에 대한 설명입니다.", 10000, 5000,
+                                LocalDateTime.of(2024, 7, 7, 14, 0, 0),
+                                true
                         ),
                         new ResReadItemDto(
-                                2L, "제품2", "제품2에 대한 설명입니다.", 6000
+                                2L, "제품2", "제품2에 대한 설명입니다.", 15000, 6000,
+                                LocalDateTime.of(2024, 7, 5, 14, 0, 0),
+                                false
                         )
                 );
 
@@ -177,7 +192,9 @@ public class ItemControllerTest {
         long itemId = 1L;
 
         ResReadItemDto res = new ResReadItemDto(
-                1L, "제품1", "제품1에 대한 설명입니다.", 5000
+                1L, "제품1", "제품1에 대한 설명입니다.", 10000, 5000,
+                LocalDateTime.of(2024, 7, 7, 14, 0, 0),
+                true
         );
 
         // when
@@ -222,7 +239,9 @@ public class ItemControllerTest {
         );
 
         ResReadItemDto res = new ResReadItemDto(
-                1L, "제품1", "제품1에 대한 설명입니다.", 5000
+                1L, "제품1", "제품1에 대한 설명입니다.", 10000, 5000,
+                LocalDateTime.of(2024, 7, 7, 14, 0, 0),
+                true
         );
 
         // when
@@ -232,7 +251,7 @@ public class ItemControllerTest {
         mockMvc.perform(put("/item-service/api/v1/items/" + itemId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(req)))
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andDo(document("item/상품_정보_수정/성공"));
@@ -256,7 +275,7 @@ public class ItemControllerTest {
         mockMvc.perform(put("/item-service/api/v1/items/" + itemId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(req)))
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(INVALID_INPUT_VALUE.getMessage()))
                 .andDo(print())
@@ -281,7 +300,7 @@ public class ItemControllerTest {
         mockMvc.perform(put("/item-service/api/v1/items/" + itemId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(req)))
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(INVALID_INPUT_VALUE.getMessage()))
                 .andDo(print())
@@ -306,7 +325,7 @@ public class ItemControllerTest {
         mockMvc.perform(put("/item-service/api/v1/items/" + itemId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(req)))
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(INVALID_INPUT_VALUE.getMessage()))
                 .andDo(print())

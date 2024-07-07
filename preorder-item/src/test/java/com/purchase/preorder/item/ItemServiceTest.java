@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,13 +57,14 @@ public class ItemServiceTest {
     void succeedAddItem() {
         // given
         ReqCreateItemDto req = new ReqCreateItemDto(
-                "제품명", "제품에 대한 설명입니다.", 150000, 500
+                "제품명", "제품에 대한 설명입니다.", 150000, 500,
+                LocalDateTime.now(), false
         );
 
-        // when
         when(itemRepository.save(any())).thenReturn(item);
-        doNothing().when(stockService).increaseStock(anyLong(), anyInt());
+        doNothing().when(stockService).createStock(any(Item.class), anyInt());
 
+        // when
         ResCreateItemDto res = itemService.createItem(req);
 
         // then
@@ -80,8 +82,10 @@ public class ItemServiceTest {
         Pageable pageable = PageRequest.of(page, size);
         List<Item> itemList =
                 List.of(
-                        new Item(1L, "제품1", "제품1에 대한 설명입니다.", 150000, null),
-                        new Item(2L, "제품2", "제품2에 대한 설명입니다.", 170000, null)
+                        new Item(1L, "제품1", "제품1에 대한 설명입니다.", 150000,
+                                LocalDateTime.now(), false, null),
+                        new Item(2L, "제품2", "제품2에 대한 설명입니다.", 170000,
+                                LocalDateTime.now(), false,null)
                 );
 
         Page<Item> itemPage = new PageImpl<>(itemList, pageable, itemList.size());

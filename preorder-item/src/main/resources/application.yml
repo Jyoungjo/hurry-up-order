@@ -18,6 +18,11 @@ spring:
       enabled: true
     restart:
       enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    show-sql: true
 
 eureka:
   instance:
