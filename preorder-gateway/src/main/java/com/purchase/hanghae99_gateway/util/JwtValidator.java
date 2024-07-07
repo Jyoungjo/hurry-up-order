@@ -1,4 +1,4 @@
-package com.purchase.hanghae99_gateway;
+package com.purchase.hanghae99_gateway.util;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;

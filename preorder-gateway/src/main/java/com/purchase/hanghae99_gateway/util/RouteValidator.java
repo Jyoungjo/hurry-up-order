@@ -1,4 +1,4 @@
-package com.purchase.hanghae99_gateway;
+package com.purchase.hanghae99_gateway.util;
 
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
