@@ -2,6 +2,7 @@ package com.purchase.preorder.stock;
 
 import com.purchase.preorder.exception.BusinessException;
 import com.purchase.preorder.exception.ExceptionCode;
+import com.purchase.preorder.item.Item;
 import com.purchase.preorder.stock.dto.ReqStockDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class StockServiceImpl implements StockService {
     private final StockRepository stockRepository;
+
+    @Override
+    public void createStock(Item item, int quantity) {
+        stockRepository.save(Stock.of(item, quantity));
+    }
 
     @Override
     public void increaseStock(Long itemId, int quantity) {

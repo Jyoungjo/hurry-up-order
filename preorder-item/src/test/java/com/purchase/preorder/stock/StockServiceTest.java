@@ -45,6 +45,22 @@ public class StockServiceTest {
     }
 
     // CREATE
+    @DisplayName("재고 생성 성공")
+    @Test
+    void createStock() {
+        // given
+        int quantity = 5000;
+
+        when(stockRepository.save(any(Stock.class))).thenReturn(stock);
+
+        // when
+        stockService.createStock(item, quantity);
+
+        // then
+        verify(stockRepository, times(1)).save(any(Stock.class));
+    }
+
+    // UPDATE
     @DisplayName("재고 증가 기능 성공 - 기존 재고가 존재하는 경우 (params: item, quantity)")
     @Test
     void increaseStockWithItem() {
@@ -60,7 +76,7 @@ public class StockServiceTest {
         assertThat(stock.getQuantity()).isEqualTo(6000);
     }
 
-    // CREATE
+    // UPDATE
     @DisplayName("재고 증가 기능 성공 (params: itemId, quantity)")
     @Test
     void increaseStockWithItemId() {
@@ -77,7 +93,7 @@ public class StockServiceTest {
         assertThat(stock.getQuantity()).isEqualTo(6000);
     }
 
-    // CREATE
+    // UPDATE
     @DisplayName("재고 증가 기능 실패 - 존재하지 않는 재고 (params: itemId, quantity)")
     @Test
     void increaseStockWithItemIdFailNotFound() {
@@ -95,7 +111,7 @@ public class StockServiceTest {
                 .hasMessageContaining(NOT_FOUND_STOCK.getMessage());
     }
 
-    // PUT
+    // UPDATE
     @DisplayName("재고 감소 기능 성공 (params: item, quantity)")
     @Test
     void decreaseStockWithItem() {
@@ -111,7 +127,7 @@ public class StockServiceTest {
         assertThat(stock.getQuantity()).isEqualTo(4000);
     }
 
-    // PUT
+    // UPDATE
     @DisplayName("재고 감소 기능 실패 - 존재하지 않는 재고 (params: item, quantity)")
     @Test
     void decreaseStockWithItemFailNotFound() {
@@ -128,7 +144,7 @@ public class StockServiceTest {
                 .hasMessageContaining(NOT_FOUND_STOCK.getMessage());
     }
 
-    // PUT
+    // UPDATE
     @DisplayName("재고 감소 기능 실패 - 재고의 양이 충분하지 않은 경우 (params: item, quantity)")
     @Test
     void decreaseStockWithItemFailNotEnough() {
@@ -150,7 +166,7 @@ public class StockServiceTest {
                 .hasMessageContaining(NOT_ENOUGH_STOCK.getMessage());
     }
 
-    // PUT
+    // UPDATE
     @DisplayName("재고 감소 기능 성공 (params: itemId, quantity)")
     @Test
     void decreaseStockWithItemId() {
@@ -167,7 +183,7 @@ public class StockServiceTest {
         assertThat(stock.getQuantity()).isEqualTo(4000);
     }
 
-    // PUT
+    // UPDATE
     @DisplayName("재고 감소 기능 실패 - 존재하지 않는 재고 (params: itemId, quantity)")
     @Test
     void decreaseStockWithItemIdFailNotFound() {
@@ -185,7 +201,7 @@ public class StockServiceTest {
                 .hasMessageContaining(NOT_FOUND_STOCK.getMessage());
     }
 
-    // PUT
+    // UPDATE
     @DisplayName("재고 감소 기능 실패 - 재고의 양이 충분하지 않은 경우 (params: itemId, quantity)")
     @Test
     void decreaseStockWithItemIdFailNotEnough() {
