@@ -3,8 +3,8 @@ spring:
     name: order-service
   profiles:
     group:
-      local: "dev, secret-dev"
-      prod: "prod, secret-prod"
+      local: "common, dev, secret-dev"
+      prod: "common, prod, secret-prod"
       test: "test, secret-test"
     include: secret
     active: local
@@ -12,19 +12,17 @@ spring:
 spring:
   config:
     activate:
-      on-profile: dev
-  jpa:
-    hibernate:
-      ddl-auto: update
-    database: postgresql
-    show-sql: true
+      on-profile: common
   devtools:
     livereload:
       enabled: true
     restart:
       enabled: true
-server:
-  port: 8888
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    show-sql: true
 
 eureka:
   instance:
@@ -34,6 +32,56 @@ eureka:
     disable-delta: true
     register-with-eureka: true
     fetch-registry: true
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 10000
+        ringBufferSizeInClosedState: 10
+        ringBufferSizeInHalfOpenState: 5
+    instances:
+      getItem:
+        baseConfig: default
+        failureRateThreshold: 10  # 10% 실패율에 서킷 브레이커가 열림
+      increaseStock:
+        baseConfig: default
+        failureRateThreshold: 10  # 10% 실패율에 서킷 브레이커가 열림
+      decreaseStock:
+        baseConfig: default
+        failureRateThreshold: 10  # 10% 실패율에 서킷 브레이커가 열림
+      getUserByEmail:
+        baseConfig: default
+        failureRateThreshold: 10  # 타임아웃 실패율을 감지할 경우 사용
+
+  retry:
+    instances:
+      getItem:
+        maxAttempts: 3  # 최대 3번 재시도
+        waitDuration: 1s  # 재시도 사이의 대기 시간
+      increaseStock:
+        maxAttempts: 3  # 최대 3번 재시도
+        waitDuration: 1s  # 재시도 사이의 대기 시간
+      decreaseStock:
+        maxAttempts: 3  # 최대 3번 재시도
+        waitDuration: 1s  # 재시도 사이의 대기 시간
+      getUserByEmail:
+        maxAttempts: 3
+        waitDuration: 1s
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+server:
+  port: 8888
+
+eureka:
+  client:
     service-url:
       defaultZone: http://localhost:8761/eureka
 
@@ -50,27 +98,12 @@ spring:
   config:
     activate:
       on-profile: prod
-  jpa:
-    hibernate:
-      ddl-auto: update
-    database: postgresql
-    show-sql: true
-  devtools:
-    livereload:
-      enabled: true
-    restart:
-      enabled: true
+
 server:
   port: 8081
 
 eureka:
-  instance:
-    prefer-ip-address: true
   client:
-    registry-fetch-interval-seconds: 30
-    disable-delta: true
-    register-with-eureka: true
-    fetch-registry: true
     service-url:
       defaultZone: http://eureka-server:8761/eureka
 

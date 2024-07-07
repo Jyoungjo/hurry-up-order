@@ -36,7 +36,7 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
 
             if (routeValidator.isSecured.test(request)) {
                 String accessToken = getAccessTokenFromHeader(exchange);
-                if (!checkAccessToken(accessToken)) {
+                if (!StringUtils.hasText(accessToken) || !checkAccessToken(accessToken)) {
                     return unauthorizedResponse(exchange);
                 }
             }

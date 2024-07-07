@@ -1,25 +1,22 @@
 package com.purchase.preorder.order;
 
-import com.purchase.preorder.exception.BusinessException;
-import com.purchase.preorder.exception.ExceptionCode;
-import com.purchase.preorder.util.AesUtils;
-import com.purchase.preorder.util.CustomCookieManager;
-import com.purchase.preorder.util.JwtParser;
 import com.purchase.preorder.client.UserClient;
 import com.purchase.preorder.client.UserResponse;
+import com.purchase.preorder.exception.BusinessException;
+import com.purchase.preorder.exception.ExceptionCode;
 import com.purchase.preorder.order.dto.ReqOrderDto;
 import com.purchase.preorder.order.dto.ResOrderDto;
 import com.purchase.preorder.order_item.OrderItemService;
+import com.purchase.preorder.util.AesUtils;
+import com.purchase.preorder.util.CustomCookieManager;
+import com.purchase.preorder.util.JwtParser;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -54,13 +51,8 @@ public class OrderServiceImpl implements OrderService {
         UserResponse user = userClient.getUserByEmail(emailOfConnectingUser);
 
         Pageable pageable = PageRequest.of(page, size);
-        List<ResOrderDto> orderDtoList = orderRepository.findAll()
-                .stream()
-                .filter(order -> order.getUserId().equals(user.getId()))
-                .map(ResOrderDto::fromEntity)
-                .toList();
 
-        return new PageImpl<>(orderDtoList, pageable, orderDtoList.size());
+        return orderRepository.findByUserId(user.getId(), pageable).map(ResOrderDto::fromEntity);
     }
 
     @Override
