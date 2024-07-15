@@ -1,5 +1,6 @@
 package com.purchase.preorder.client;
 
+import com.purchase.preorder.client.response.UserResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.cloud.openfeign.FeignClient;

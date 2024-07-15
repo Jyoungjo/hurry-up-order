@@ -25,20 +25,17 @@ public class Order extends BaseEntity {
     private Long id;
     private Long userId;
     private LocalDateTime orderDate;
-    private Integer totalSum;
+    private Integer totalPrice;
     private LocalDateTime deletedAt;
     @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<OrderItem> orderItemList;
 
-    public static Order of(Long userId) {
+    public static Order of(Long userId, int totalPrice) {
         return Order.builder()
                 .userId(userId)
                 .orderDate(LocalDateTime.now())
+                .totalPrice(totalPrice)
                 .orderItemList(new ArrayList<>())
                 .build();
-    }
-
-    public void saveTotalSum(int totalSum) {
-        this.totalSum = totalSum;
     }
 }

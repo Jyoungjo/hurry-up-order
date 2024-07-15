@@ -41,14 +41,14 @@ public class ItemServiceImpl implements ItemService {
     public Page<ResReadItemDto> readAllItems(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         return itemRepository.findAll(pageable)
-                .map(item -> ResReadItemDto.fromEntity(item, stockService.getStockQuantity(item.getId())));
+                .map(item -> ResReadItemDto.fromEntity(item, stockService.getStockQuantity(item.getId()).getQuantity()));
     }
 
     @Override
     public ResReadItemDto readItem(Long itemId) {
         Item savedItem = itemRepository.findById(itemId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_ITEM));
-        return ResReadItemDto.fromEntity(savedItem, stockService.getStockQuantity(itemId));
+        return ResReadItemDto.fromEntity(savedItem, stockService.getStockQuantity(itemId).getQuantity());
     }
 
     @Override

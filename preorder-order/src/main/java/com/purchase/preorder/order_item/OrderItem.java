@@ -1,6 +1,6 @@
 package com.purchase.preorder.order_item;
 
-import com.purchase.preorder.client.ItemResponse;
+import com.purchase.preorder.client.response.ItemResponse;
 import com.purchase.preorder.order.Order;
 import com.purchase.preorder.shipment.Shipment;
 import jakarta.persistence.*;

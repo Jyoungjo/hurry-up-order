@@ -36,6 +36,13 @@ spring:
           filters:
             - name: AuthorizationFilter
 
+        - id: payment-service
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/payment-service/**
+          filters:
+            - name: AuthorizationFilter
+
 eureka:
   instance:
     prefer-ip-address: true

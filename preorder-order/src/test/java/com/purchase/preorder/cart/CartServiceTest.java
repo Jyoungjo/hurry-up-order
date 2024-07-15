@@ -5,7 +5,7 @@ import com.purchase.preorder.cart.dto.ResCartDto;
 import com.purchase.preorder.cart.dto.ResCartItemDto;
 import com.purchase.preorder.cart_item.CartItemService;
 import com.purchase.preorder.client.UserClient;
-import com.purchase.preorder.client.UserResponse;
+import com.purchase.preorder.client.response.UserResponse;
 import com.purchase.preorder.exception.BusinessException;
 import com.purchase.preorder.util.AesUtils;
 import com.purchase.preorder.util.CustomCookieManager;

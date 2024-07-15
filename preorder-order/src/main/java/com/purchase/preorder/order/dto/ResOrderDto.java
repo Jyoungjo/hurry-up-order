@@ -24,7 +24,7 @@ public class ResOrderDto {
         return ResOrderDto.builder()
                 .orderId(order.getId())
                 .userId(order.getUserId())
-                .totalSum(order.getTotalSum())
+                .totalSum(order.getTotalPrice())
                 .orderDate(order.getOrderDate())
                 .orderItemList(order.getOrderItemList().stream()
                         .map(ResOrderItemDto::fromEntity)

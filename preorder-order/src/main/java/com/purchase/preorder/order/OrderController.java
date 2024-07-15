@@ -1,5 +1,6 @@
 package com.purchase.preorder.order;
 
+import com.purchase.preorder.order.dto.ReqLimitedOrderDto;
 import com.purchase.preorder.order.dto.ReqOrderDto;
 import com.purchase.preorder.order.dto.ResOrderDto;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +22,13 @@ public class OrderController {
             @RequestBody ReqOrderDto req, HttpServletRequest request
     ) throws Exception {
         return ResponseEntity.status(CREATED).body(orderService.createOrder(req, request));
+    }
+
+    @PostMapping("/limited")
+    public ResponseEntity<ResOrderDto> createOrderOfLimitedItem(
+            @RequestBody ReqLimitedOrderDto req, HttpServletRequest request
+    ) throws Exception {
+        return ResponseEntity.status(CREATED).body(orderService.createOrderOfLimitedItem(req, request));
     }
 
     @GetMapping

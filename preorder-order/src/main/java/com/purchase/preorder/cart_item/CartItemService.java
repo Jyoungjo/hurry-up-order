@@ -4,7 +4,7 @@ import com.purchase.preorder.cart.Cart;
 import com.purchase.preorder.cart.dto.ReqCartDto;
 import com.purchase.preorder.cart.dto.ResCartItemDto;
 import com.purchase.preorder.client.ItemClient;
-import com.purchase.preorder.client.ItemResponse;
+import com.purchase.preorder.client.response.ItemResponse;
 import com.purchase.preorder.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -53,7 +53,7 @@ public class OrderItemRepositoryTest {
                 .id(1L)
                 .userId(1L)
                 .orderDate(LocalDateTime.of(2024, 6, 28, 12, 8))
-                .totalSum(100)
+                .totalPrice(100)
                 .orderItemList(new ArrayList<>())
                 .build());
 

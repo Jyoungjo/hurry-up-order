@@ -1,4 +1,4 @@
-package com.purchase.preorder.client;
+package com.purchase.preorder.client.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

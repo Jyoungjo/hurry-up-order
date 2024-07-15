@@ -7,6 +7,7 @@ import com.purchase.preorder.item.dto.read.ResReadItemDto;
 import com.purchase.preorder.item.dto.update.ReqUpdateItemDto;
 import com.purchase.preorder.item.dto.update.ResUpdateItemDto;
 import com.purchase.preorder.stock.StockServiceImpl;
+import com.purchase.preorder.stock.dto.ResStockDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -90,7 +91,10 @@ public class ItemServiceTest {
 
         Page<Item> itemPage = new PageImpl<>(itemList, pageable, itemList.size());
 
+        ResStockDto resStockDto = new ResStockDto(100);
+
         when(itemRepository.findAll(any(Pageable.class))).thenReturn(itemPage);
+        when(stockService.getStockQuantity(anyLong())).thenReturn(resStockDto);
 
         // when
         Page<ResReadItemDto> res = itemService.readAllItems(page, size);
@@ -107,8 +111,10 @@ public class ItemServiceTest {
     void succeedReadOne() {
         // given
         Long itemId = 1L;
+        ResStockDto resStockDto = new ResStockDto(100);
 
         when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
+        when(stockService.getStockQuantity(anyLong())).thenReturn(resStockDto);
 
         // when
         ResReadItemDto res = itemService.readItem(itemId);

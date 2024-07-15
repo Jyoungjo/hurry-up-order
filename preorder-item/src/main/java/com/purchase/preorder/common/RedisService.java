@@ -6,7 +6,6 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.util.Set;
 
 @Service
@@ -16,16 +15,20 @@ public class RedisService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Transactional
-    public void setValues(String key, String value, Duration expiration) {
-        redisTemplate.opsForValue().set(key, value, expiration);
+    public void setValues(String key, int value) {
+        redisTemplate.opsForValue().set(key, String.valueOf(value));
     }
 
     public String getValues(String key) {
         ValueOperations<String, Object> values = redisTemplate.opsForValue();
         if (values.get(key) == null) {
-            return "false";
+            return null;
         }
-        return (String) values.get(key);
+        return String.valueOf(values.get(key));
+    }
+
+    public Long increment(String key, int value) {
+        return redisTemplate.opsForValue().increment(key, value);
     }
 
     @Transactional

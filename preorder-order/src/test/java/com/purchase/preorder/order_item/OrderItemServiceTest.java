@@ -1,7 +1,7 @@
 package com.purchase.preorder.order_item;
 
 import com.purchase.preorder.client.ItemClient;
-import com.purchase.preorder.client.ItemResponse;
+import com.purchase.preorder.client.response.ItemResponse;
 import com.purchase.preorder.exception.BusinessException;
 import com.purchase.preorder.order.Order;
 import com.purchase.preorder.order.dto.ReqOrderItemDto;
@@ -54,7 +54,7 @@ public class OrderItemServiceTest {
                 .id(1L)
                 .userId(1L)
                 .orderDate(LocalDateTime.of(2024, 6, 28, 12, 8))
-                .totalSum(null)
+                .totalPrice(null)
                 .orderItemList(new ArrayList<>())
                 .build();
 
@@ -81,7 +81,7 @@ public class OrderItemServiceTest {
     void createOrderItem() {
         // given
         List<ReqOrderItemDto> orderItemDtoList = List.of(
-                new ReqOrderItemDto(1L, 2)
+                new ReqOrderItemDto(1L, 2, 5000)
         );
 
         when(itemClient.getItem(anyLong())).thenReturn(item);
@@ -96,8 +96,6 @@ public class OrderItemServiceTest {
         verify(itemClient, times(1)).getItem(anyLong());
         verify(orderItemRepository, times(1)).save(any(OrderItem.class));
         verify(itemClient, times(1)).decreaseStock(anyLong(), anyInt());
-
-        assertThat(order.getTotalSum()).isEqualTo(20000);
     }
 
     // CREATE
@@ -106,7 +104,7 @@ public class OrderItemServiceTest {
     void createOrderItemFailNotFoundItem() {
         // given
         List<ReqOrderItemDto> orderItemDtoList = List.of(
-                new ReqOrderItemDto(1L, 2)
+                new ReqOrderItemDto(1L, 2, 5000)
         );
 
         when(itemClient.getItem(anyLong())).thenThrow(new BusinessException(NOT_FOUND_ITEM));
@@ -125,7 +123,7 @@ public class OrderItemServiceTest {
     void createOrderItemFailNotFoundStock() {
         // given
         List<ReqOrderItemDto> orderItemDtoList = List.of(
-                new ReqOrderItemDto(1L, 2)
+                new ReqOrderItemDto(1L, 2, 5000)
         );
 
         when(itemClient.getItem(anyLong())).thenReturn(item);
@@ -147,7 +145,7 @@ public class OrderItemServiceTest {
     void createOrderItemFailNotEnoughStock() {
         // given
         List<ReqOrderItemDto> orderItemDtoList = List.of(
-                new ReqOrderItemDto(1L, 2)
+                new ReqOrderItemDto(1L, 2, 5000)
         );
 
         when(itemClient.getItem(anyLong())).thenReturn(item);
@@ -173,7 +171,7 @@ public class OrderItemServiceTest {
                 .id(1L)
                 .userId(1L)
                 .orderDate(LocalDateTime.of(2024, 6, 28, 12, 8))
-                .totalSum(null)
+                .totalPrice(null)
                 .orderItemList(List.of(orderItem))
                 .build();
 
@@ -201,7 +199,7 @@ public class OrderItemServiceTest {
                 .id(1L)
                 .userId(1L)
                 .orderDate(LocalDateTime.of(2024, 6, 28, 12, 8))
-                .totalSum(null)
+                .totalPrice(null)
                 .orderItemList(new ArrayList<>())
                 .build();
 
@@ -230,7 +228,7 @@ public class OrderItemServiceTest {
                 .id(1L)
                 .userId(1L)
                 .orderDate(LocalDateTime.of(2024, 6, 28, 12, 8))
-                .totalSum(null)
+                .totalPrice(null)
                 .orderItemList(List.of(
                         OrderItem.builder()
                                 .id(1L)
@@ -278,7 +276,7 @@ public class OrderItemServiceTest {
                 .id(1L)
                 .userId(1L)
                 .orderDate(LocalDateTime.of(2024, 6, 28, 12, 8))
-                .totalSum(null)
+                .totalPrice(null)
                 .orderItemList(List.of(newOrderItem))
                 .build();
 
@@ -306,7 +304,7 @@ public class OrderItemServiceTest {
                 .id(1L)
                 .userId(1L)
                 .orderDate(LocalDateTime.of(2024, 6, 28, 12, 8))
-                .totalSum(null)
+                .totalPrice(null)
                 .orderItemList(new ArrayList<>())
                 .build();
 
@@ -345,7 +343,7 @@ public class OrderItemServiceTest {
                 .id(1L)
                 .userId(1L)
                 .orderDate(LocalDateTime.of(2024, 6, 28, 12, 8))
-                .totalSum(null)
+                .totalPrice(null)
                 .orderItemList(List.of(newOrderItem))
                 .build();
 

@@ -1,5 +1,6 @@
 package com.purchase.preorder.stock;
 
+import com.purchase.preorder.common.RedisService;
 import com.purchase.preorder.exception.BusinessException;
 import com.purchase.preorder.item.Item;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,9 @@ import static org.mockito.Mockito.*;
 public class StockServiceTest {
     @Mock
     private StockRepository stockRepository;
+
+    @Mock
+    private RedisService redisService;
 
     @InjectMocks
     private StockServiceImpl stockService;
@@ -61,22 +65,6 @@ public class StockServiceTest {
     }
 
     // UPDATE
-    @DisplayName("재고 증가 기능 성공 - 기존 재고가 존재하는 경우 (params: item, quantity)")
-    @Test
-    void increaseStockWithItem() {
-        // given
-        int quantity = 1000;
-
-        when(stockRepository.findByItemId(anyLong())).thenReturn(Optional.of(stock));
-
-        // when
-        stockService.increaseStock(item.getId(), quantity);
-
-        // then
-        assertThat(stock.getQuantity()).isEqualTo(6000);
-    }
-
-    // UPDATE
     @DisplayName("재고 증가 기능 성공 (params: itemId, quantity)")
     @Test
     void increaseStockWithItemId() {
@@ -84,6 +72,7 @@ public class StockServiceTest {
         Long itemId = 1L;
         int quantity = 1000;
 
+        when(redisService.increment(anyString(), anyInt())).thenReturn(6000L);
         when(stockRepository.findByItemId(anyLong())).thenReturn(Optional.of(stock));
 
         // when
@@ -101,6 +90,7 @@ public class StockServiceTest {
         Long itemId = 1L;
         int quantity = 1000;
 
+        when(redisService.increment(anyString(), anyInt())).thenReturn(6000L);
         when(stockRepository.findByItemId(anyLong())).thenReturn(Optional.empty());
 
         // when
@@ -112,12 +102,13 @@ public class StockServiceTest {
     }
 
     // UPDATE
-    @DisplayName("재고 감소 기능 성공 (params: item, quantity)")
+    @DisplayName("재고 감소 기능 성공 (params: itemId, quantity)")
     @Test
     void decreaseStockWithItem() {
         // given
         int quantity = 1000;
 
+        when(redisService.increment(anyString(), anyInt())).thenReturn(4000L);
         when(stockRepository.findByItemId(anyLong())).thenReturn(Optional.of(stock));
 
         // when
@@ -128,75 +119,19 @@ public class StockServiceTest {
     }
 
     // UPDATE
-    @DisplayName("재고 감소 기능 실패 - 존재하지 않는 재고 (params: item, quantity)")
+    @DisplayName("재고 감소 기능 실패 - 존재하지 않는 재고 (params: itemId, quantity)")
     @Test
     void decreaseStockWithItemFailNotFound() {
         // given
         int quantity = 1000;
 
+        when(redisService.increment(anyString(), anyInt())).thenReturn(4000L);
         when(stockRepository.findByItemId(anyLong())).thenReturn(Optional.empty());
 
         // when
 
         // then
         assertThatThrownBy(() -> stockService.decreaseStock(item.getId(), quantity))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(NOT_FOUND_STOCK.getMessage());
-    }
-
-    // UPDATE
-    @DisplayName("재고 감소 기능 실패 - 재고의 양이 충분하지 않은 경우 (params: item, quantity)")
-    @Test
-    void decreaseStockWithItemFailNotEnough() {
-        // given
-        int quantity = 1000;
-
-        Stock newStock = Stock.builder()
-                .item(item)
-                .quantity(500)
-                .build();
-
-        when(stockRepository.findByItemId(anyLong())).thenReturn(Optional.of(newStock));
-
-        // when
-
-        // then
-        assertThatThrownBy(() -> stockService.decreaseStock(item.getId(), quantity))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(NOT_ENOUGH_STOCK.getMessage());
-    }
-
-    // UPDATE
-    @DisplayName("재고 감소 기능 성공 (params: itemId, quantity)")
-    @Test
-    void decreaseStockWithItemId() {
-        // given
-        Long itemId = 1L;
-        int quantity = 1000;
-
-        when(stockRepository.findByItemId(anyLong())).thenReturn(Optional.of(stock));
-
-        // when
-        stockService.decreaseStock(itemId, quantity);
-
-        // then
-        assertThat(stock.getQuantity()).isEqualTo(4000);
-    }
-
-    // UPDATE
-    @DisplayName("재고 감소 기능 실패 - 존재하지 않는 재고 (params: itemId, quantity)")
-    @Test
-    void decreaseStockWithItemIdFailNotFound() {
-        // given
-        Long itemId = 1L;
-        int quantity = 1000;
-
-        when(stockRepository.findByItemId(anyLong())).thenReturn(Optional.empty());
-
-        // when
-
-        // then
-        assertThatThrownBy(() -> stockService.decreaseStock(itemId, quantity))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(NOT_FOUND_STOCK.getMessage());
     }
@@ -204,22 +139,16 @@ public class StockServiceTest {
     // UPDATE
     @DisplayName("재고 감소 기능 실패 - 재고의 양이 충분하지 않은 경우 (params: itemId, quantity)")
     @Test
-    void decreaseStockWithItemIdFailNotEnough() {
+    void decreaseStockWithItemFailNotEnough() {
         // given
-        Long itemId = 1L;
         int quantity = 1000;
 
-        Stock newStock = Stock.builder()
-                .item(item)
-                .quantity(500)
-                .build();
-
-        when(stockRepository.findByItemId(anyLong())).thenReturn(Optional.of(newStock));
+        when(redisService.increment(anyString(), anyInt())).thenReturn(-500L);
 
         // when
 
         // then
-        assertThatThrownBy(() -> stockService.decreaseStock(itemId, quantity))
+        assertThatThrownBy(() -> stockService.decreaseStock(item.getId(), quantity))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(NOT_ENOUGH_STOCK.getMessage());
     }
@@ -231,10 +160,10 @@ public class StockServiceTest {
         // given
         Long itemId = 1L;
 
-        when(stockRepository.findByItemId(anyLong())).thenReturn(Optional.of(stock));
+        when(redisService.getValues(anyString())).thenReturn("5000");
 
         // when
-        int quantity = stockService.getStockQuantity(itemId);
+        int quantity = stockService.getStockQuantity(itemId).getQuantity();
 
         // then
         assertThat(stock.getQuantity()).isEqualTo(quantity);
@@ -247,6 +176,7 @@ public class StockServiceTest {
         // given
         Long itemId = 1L;
 
+        when(redisService.getValues(anyString())).thenReturn(null);
         when(stockRepository.findByItemId(anyLong())).thenReturn(Optional.empty());
 
         // when
