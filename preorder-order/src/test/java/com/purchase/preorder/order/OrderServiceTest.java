@@ -1,8 +1,14 @@
 package com.purchase.preorder.order;
 
+import com.purchase.preorder.client.ItemClient;
+import com.purchase.preorder.client.PaymentClient;
+import com.purchase.preorder.client.ReqPaymentDto;
 import com.purchase.preorder.client.UserClient;
-import com.purchase.preorder.client.UserResponse;
+import com.purchase.preorder.client.response.PaymentResponse;
+import com.purchase.preorder.client.response.StockResponse;
+import com.purchase.preorder.client.response.UserResponse;
 import com.purchase.preorder.exception.BusinessException;
+import com.purchase.preorder.order.dto.ReqLimitedOrderDto;
 import com.purchase.preorder.order.dto.ReqOrderDto;
 import com.purchase.preorder.order.dto.ReqOrderItemDto;
 import com.purchase.preorder.order.dto.ResOrderDto;
@@ -39,6 +45,10 @@ public class OrderServiceTest {
     @Mock
     private UserClient userClient;
     @Mock
+    private ItemClient itemClient;
+    @Mock
+    private PaymentClient paymentClient;
+    @Mock
     private OrderRepository orderRepository;
     @Mock
     private OrderItemService orderItemService;
@@ -47,7 +57,11 @@ public class OrderServiceTest {
     private OrderServiceImpl orderService;
 
     private UserResponse user;
+    private PaymentResponse payment;
+    private StockResponse stock;
     private Order order;
+    private static final int TOTAL_USERS = 1000;
+    private static final int SUCCESSFUL_ORDERS = 10;
     private static MockedStatic<JwtParser> jwtParser;
     private static MockedStatic<CustomCookieManager> cookieManager;
 
@@ -59,11 +73,15 @@ public class OrderServiceTest {
                 "010-1234-1234", "CERTIFIED_USER", null
         );
 
+        payment = new PaymentResponse(1L, true);
+
+        stock = new StockResponse(10);
+
         order = Order.builder()
                 .id(1L)
                 .userId(1L)
                 .orderDate(LocalDateTime.of(2024, 6, 28, 12, 8))
-                .totalSum(100)
+                .totalPrice(100)
                 .orderItemList(new ArrayList<>())
                 .build();
 
@@ -93,8 +111,8 @@ public class OrderServiceTest {
         // given
         ReqOrderDto req = new ReqOrderDto(
                 List.of(
-                        new ReqOrderItemDto(1L, 500),
-                        new ReqOrderItemDto(2L, 600)
+                        new ReqOrderItemDto(1L, 500, 5000),
+                        new ReqOrderItemDto(2L, 600, 5000)
                 )
         );
 
@@ -109,7 +127,7 @@ public class OrderServiceTest {
                 .thenReturn(accessToken);
         when(userClient.getUserByEmail(anyString())).thenReturn(user);
         when(orderRepository.save(any(Order.class))).thenReturn(order);
-        doNothing().when(orderItemService).createOrderItem(any(Order.class), any());
+        doNothing().when(orderItemService).createOrderItem(any(Order.class), any(List.class));
 
         // when
         ResOrderDto res = orderService.createOrder(req, request);
@@ -125,8 +143,8 @@ public class OrderServiceTest {
         // given
         ReqOrderDto req = new ReqOrderDto(
                 List.of(
-                        new ReqOrderItemDto(1L, 500),
-                        new ReqOrderItemDto(2L, 600)
+                        new ReqOrderItemDto(1L, 500, 5000),
+                        new ReqOrderItemDto(2L, 600, 5000)
                 )
         );
 
@@ -147,6 +165,36 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> orderService.createOrder(req, request))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(NOT_FOUND_USER.getMessage());
+    }
+
+    // CREATE
+    @DisplayName("선착순 주문 생성 기능 성공")
+    @Test
+    void createOrderOfLimitedItem() throws Exception {
+        // given
+        ReqLimitedOrderDto req = new ReqLimitedOrderDto(1L, 10000);
+        MockHttpServletRequest request = new MockHttpServletRequest();
+
+        String accessToken = "hdjkslafhjkljeklhajkwlhfjkldhsajklfhujelwhmrklejkl21h3jlk1h24jkl";
+
+        request.setCookies(new MockCookie("accessToken", accessToken));
+
+        when(itemClient.getStock(anyLong())).thenReturn(stock);
+        cookieManager.when(() -> CustomCookieManager.getCookie(any(HttpServletRequest.class), anyString()))
+                .thenReturn(accessToken);
+        jwtParser.when(() -> JwtParser.getEmail(anyString())).thenReturn("test@email.com");
+        when(userClient.getUserByEmail(anyString())).thenReturn(user);
+        when(orderRepository.save(any(Order.class))).thenReturn(order);
+        doNothing().when(itemClient).decreaseStock(anyLong(), anyInt());
+        when(paymentClient.initiatePayment(any(ReqPaymentDto.class))).thenReturn(payment);
+        when(paymentClient.completePayment(anyLong())).thenReturn(payment);
+        doNothing().when(orderItemService).createOrderItem(any(Order.class), any(ReqLimitedOrderDto.class));
+
+        // when
+        ResOrderDto res = orderService.createOrderOfLimitedItem(req, request);
+
+        // then
+        assertThat(res.getOrderId()).isEqualTo(order.getId());
     }
 
     // READ ALL

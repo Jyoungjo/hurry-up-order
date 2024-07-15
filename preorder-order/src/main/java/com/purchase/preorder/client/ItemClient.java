@@ -1,5 +1,7 @@
 package com.purchase.preorder.client;
 
+import com.purchase.preorder.client.response.ItemResponse;
+import com.purchase.preorder.client.response.StockResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -21,6 +23,11 @@ public interface ItemClient {
     @CircuitBreaker(name = "decreaseStock", fallbackMethod = "fallback")
     @Retry(name = "decreaseStock", fallbackMethod = "fallback")
     void decreaseStock(@RequestParam("itemId") Long itemId, @RequestParam("quantity") int quantity);
+
+    @GetMapping("/item-service/api/v1/stocks/items/{itemId}")
+    @CircuitBreaker(name = "getStock", fallbackMethod = "fallback")
+    @Retry(name = "getStock", fallbackMethod = "fallback")
+    StockResponse getStock(@PathVariable("itemId") Long itemId);
 
     default String fallback(Throwable t) {
         return "Fallback response due to: " + t.getMessage();

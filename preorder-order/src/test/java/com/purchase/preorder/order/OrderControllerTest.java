@@ -48,8 +48,8 @@ public class OrderControllerTest {
         // given
         ReqOrderDto req = new ReqOrderDto(
                 List.of(
-                        new ReqOrderItemDto(1L, 5),
-                        new ReqOrderItemDto(2L, 5)
+                        new ReqOrderItemDto(1L, 5, 5000),
+                        new ReqOrderItemDto(2L, 5, 6000)
                 )
         );
 
@@ -85,8 +85,8 @@ public class OrderControllerTest {
         // given
         ReqOrderDto req = new ReqOrderDto(
                 List.of(
-                        new ReqOrderItemDto(1L, 5),
-                        new ReqOrderItemDto(2L, 5)
+                        new ReqOrderItemDto(1L, 5, 5000),
+                        new ReqOrderItemDto(2L, 5, 6000)
                 )
         );
 

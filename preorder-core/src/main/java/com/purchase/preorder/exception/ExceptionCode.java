@@ -17,6 +17,7 @@ public enum ExceptionCode {
     INVALID_INPUT_VALUE(BAD_REQUEST.value(), "입력값을 확인해주세요."),
     ENCODING_ERROR(BAD_REQUEST.value(), "encoding error"),
     DECODING_ERROR(BAD_REQUEST.value(), "decoding error"),
+    CANCEL_PAYMENT(BAD_REQUEST.value(), "결제가 취소되었습니다."),
 
     /*
      * 401
@@ -49,6 +50,7 @@ public enum ExceptionCode {
     NOT_FOUND_CART_ITEM(NOT_FOUND.value(), "장바구니에 존재하지 않는 물품입니다."),
     NOT_FOUND_STOCK(NOT_FOUND.value(), "재고가 존재하지 않습니다."),
     NOT_FOUND_SHIPMENT(NOT_FOUND.value(), "배송 정보가 존재하지 않습니다."),
+    NOT_FOUND_PAYMENT(NOT_FOUND.value(), "결제 정보가 존재하지 않습니다."),
 
     /*
      * 405

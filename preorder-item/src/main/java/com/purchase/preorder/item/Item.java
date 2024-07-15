@@ -1,6 +1,7 @@
 package com.purchase.preorder.item;
 
 import com.purchase.preorder.common.BaseEntity;
+import com.purchase.preorder.item.dto.create.ReqCreateItemDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -23,11 +24,23 @@ public class Item extends BaseEntity {
     private String name;
     private String description;
     private Integer price;
+    private LocalDateTime openTime;
+    private Boolean isReserved;
     private LocalDateTime deletedAt;
 
     public void updateInfo(String name, String description, Integer price) {
         this.name = name;
         this.description = description;
         this.price = price;
+    }
+
+    public static Item of(ReqCreateItemDto req) {
+        return Item.builder()
+                .name(req.getName())
+                .description(req.getDescription())
+                .price(req.getPrice())
+                .openTime(req.getOpenTime())
+                .isReserved(req.getIsReserved())
+                .build();
     }
 }

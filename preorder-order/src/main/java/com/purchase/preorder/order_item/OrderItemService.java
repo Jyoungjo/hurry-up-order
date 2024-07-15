@@ -1,9 +1,10 @@
 package com.purchase.preorder.order_item;
 
 import com.purchase.preorder.client.ItemClient;
-import com.purchase.preorder.client.ItemResponse;
+import com.purchase.preorder.client.response.ItemResponse;
 import com.purchase.preorder.exception.BusinessException;
 import com.purchase.preorder.order.Order;
+import com.purchase.preorder.order.dto.ReqLimitedOrderDto;
 import com.purchase.preorder.order.dto.ReqOrderItemDto;
 import com.purchase.preorder.shipment.Shipment;
 import com.purchase.preorder.shipment.ShipmentService;
@@ -22,22 +23,27 @@ public class OrderItemService {
     private final ShipmentService shipmentService;
 
     public void createOrderItem(Order order, List<ReqOrderItemDto> orderItemList) {
-        int total = orderItemList.stream()
-                .map(orderItemDto -> {
-                    ItemResponse foundItem = itemClient.getItem(orderItemDto.getItemId());
-                    // 배송 정보 생성
-                    Shipment shipment = shipmentService.createShipment();
-                    OrderItem orderItem = orderItemRepository.save(
-                            OrderItem.of(order, foundItem, shipment, orderItemDto.getItemCount())
-                    );
-                    order.getOrderItemList().add(orderItem);
-                    // 재고 처리
-                    itemClient.decreaseStock(foundItem.getId(), orderItem.getQuantity());
-                    return orderItem;
-                }).mapToInt(OrderItem::getTotalSum)
-                .sum();
+        orderItemList.forEach(orderItemDto -> {
+            ItemResponse foundItem = itemClient.getItem(orderItemDto.getItemId());
+            // 배송 정보 생성
+            Shipment shipment = shipmentService.createShipment();
+            OrderItem orderItem = orderItemRepository.save(
+                    OrderItem.of(order, foundItem, shipment, orderItemDto.getItemCount())
+            );
+            order.getOrderItemList().add(orderItem);
+            // 재고 처리
+            itemClient.decreaseStock(foundItem.getId(), orderItem.getQuantity());
+        });
+    }
 
-        order.saveTotalSum(total);
+    public void createOrderItem(Order order, ReqLimitedOrderDto limitedOrderDto) {
+        ItemResponse foundItem = itemClient.getItem(limitedOrderDto.getItemId());
+
+        // 배송 정보 생성
+        Shipment shipment = shipmentService.createShipment();
+        OrderItem orderItem = orderItemRepository.save(OrderItem.of(order, foundItem, shipment, 1));
+
+        order.getOrderItemList().add(orderItem);
     }
 
     public void cancelOrder(Order order, Long itemId) {

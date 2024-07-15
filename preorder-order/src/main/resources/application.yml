@@ -53,7 +53,16 @@ resilience4j:
       decreaseStock:
         baseConfig: default
         failureRateThreshold: 10  # 10% 실패율에 서킷 브레이커가 열림
+      getStock:
+        baseConfig: default
+        failureRateThreshold: 10  # 10% 실패율에 서킷 브레이커가 열림
       getUserByEmail:
+        baseConfig: default
+        failureRateThreshold: 10  # 타임아웃 실패율을 감지할 경우 사용
+      initiatePayment:
+        baseConfig: default
+        failureRateThreshold: 10  # 타임아웃 실패율을 감지할 경우 사용
+      completePayment:
         baseConfig: default
         failureRateThreshold: 10  # 타임아웃 실패율을 감지할 경우 사용
 
@@ -63,12 +72,21 @@ resilience4j:
         maxAttempts: 3  # 최대 3번 재시도
         waitDuration: 1s  # 재시도 사이의 대기 시간
       increaseStock:
-        maxAttempts: 3  # 최대 3번 재시도
-        waitDuration: 1s  # 재시도 사이의 대기 시간
+        maxAttempts: 3
+        waitDuration: 1s
       decreaseStock:
-        maxAttempts: 3  # 최대 3번 재시도
-        waitDuration: 1s  # 재시도 사이의 대기 시간
+        maxAttempts: 3
+        waitDuration: 1s
+      getStock:
+        maxAttempts: 3
+        waitDuration: 1s
       getUserByEmail:
+        maxAttempts: 3
+        waitDuration: 1s
+      initiatePayment:
+        maxAttempts: 3
+        waitDuration: 1s
+      completePayment:
         maxAttempts: 3
         waitDuration: 1s
 ---
@@ -92,6 +110,8 @@ feign:
         url: http://localhost:8889
       user-service:
         url: http://localhost:8887
+      payment-service:
+        url: http://localhost:8886
 
 ---
 spring:
@@ -114,6 +134,8 @@ feign:
         url: http://item-service:8082
       user-service:
         url: http://user-service:8080
+      payment-service:
+        url: http://payment-service:8079
 
 ---
 spring:
@@ -134,6 +156,13 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
         show_sql: true
+  cloud:
+    gateway:
+      enabled: false
+
+eureka:
+  client:
+    enabled: false
 
 feign:
   client:
@@ -142,3 +171,5 @@ feign:
         url: http://localhost:8889
       user-service:
         url: http://localhost:8887
+      payment-service:
+        url: http://localhost:8886

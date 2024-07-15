@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class ReqOrderItemDto {
     private Long itemId;
     private Integer itemCount;
+    private Integer price;
 }
