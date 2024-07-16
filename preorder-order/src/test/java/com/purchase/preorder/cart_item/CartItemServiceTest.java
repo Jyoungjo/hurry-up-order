@@ -3,7 +3,7 @@ package com.purchase.preorder.cart_item;
 import com.purchase.preorder.cart.Cart;
 import com.purchase.preorder.cart.dto.ReqCartDto;
 import com.purchase.preorder.client.ItemClient;
-import com.purchase.preorder.client.ItemResponse;
+import com.purchase.preorder.client.response.ItemResponse;
 import com.purchase.preorder.exception.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

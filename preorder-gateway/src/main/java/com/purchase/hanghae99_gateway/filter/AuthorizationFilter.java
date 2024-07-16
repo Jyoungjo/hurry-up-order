@@ -1,17 +1,19 @@
-package com.purchase.hanghae99_gateway;
+package com.purchase.hanghae99_gateway.filter;
 
+import com.purchase.hanghae99_gateway.util.JwtValidator;
+import com.purchase.hanghae99_gateway.util.RouteValidator;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.ErrorResponseException;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -36,8 +38,12 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
 
             if (routeValidator.isSecured.test(request)) {
                 String accessToken = getAccessTokenFromHeader(exchange);
-                if (!checkAccessToken(accessToken)) {
-                    return unauthorizedResponse(exchange);
+                if (!StringUtils.hasText(accessToken) || !checkAccessToken(accessToken)) {
+                    throw new ErrorResponseException(
+                            HttpStatusCode.valueOf(401),
+                            ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(401), "다시 인증해주세요."),
+                            null
+                    );
                 }
             }
 
@@ -51,12 +57,18 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
     private String getAccessTokenFromHeader(ServerWebExchange exchange) {
         String name = "accessToken";
 
-        return exchange.getRequest().getHeaders().get("Cookie").stream()
+        return exchange.getRequest().getHeaders().getOrEmpty("Cookie").stream()
                 .flatMap(cookie -> Arrays.stream(cookie.split("; ")))
                 .filter(cookie -> cookie.startsWith(name))
                 .map(cookie -> cookie.substring(name.length() + 1))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new ErrorResponseException(
+                        HttpStatusCode.valueOf(401),
+                        ProblemDetail.forStatusAndDetail(
+                                HttpStatusCode.valueOf(401), "인증 정보가 존재하지 않습니다."
+                        ),
+                        null
+                ));
     }
 
     private boolean checkAccessToken(String accessToken) {
@@ -72,17 +84,17 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
         }
     }
 
-    // 인증 실패 Response
-    private Mono<Void> unauthorizedResponse(ServerWebExchange exchange) {
-        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-        exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
-
-        String errorMessage = "{\"message\": \"잘못된 접근입니다.\"}";
-        log.error(exchange.getResponse().getStatusCode().toString());
-
-        DataBuffer dataBuffer = exchange.getResponse().bufferFactory().wrap(errorMessage.getBytes());
-        return exchange.getResponse().writeWith(Mono.just(dataBuffer));
-    }
+//    // 인증 실패 Response
+//    private Mono<Void> unauthorizedResponse(ServerWebExchange exchange) {
+//        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+//        exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+//
+//        String errorMessage = "{\"message\": \"잘못된 접근입니다.\"}";
+//        log.error(exchange.getResponse().getStatusCode().toString());
+//
+//        DataBuffer dataBuffer = exchange.getResponse().bufferFactory().wrap(errorMessage.getBytes());
+//        return exchange.getResponse().writeWith(Mono.just(dataBuffer));
+//    }
 
     // Config할 inner class -> 설정파일에 있는 args
     @Getter

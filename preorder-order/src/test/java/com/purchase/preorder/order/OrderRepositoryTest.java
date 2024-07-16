@@ -28,7 +28,7 @@ public class OrderRepositoryTest {
                 .id(1L)
                 .userId(1L)
                 .orderDate(LocalDateTime.of(2024, 6, 28, 12, 8))
-                .totalSum(100)
+                .totalPrice(100)
                 .orderItemList(new ArrayList<>())
                 .build();
     }
@@ -74,23 +74,6 @@ public class OrderRepositoryTest {
         // then
         Assertions.assertThat(foundOrder).isPresent();
         assertThat(foundOrder.get().getUserId()).isEqualTo(savedOrder.getUserId());
-    }
-
-    // UPDATE
-    @DisplayName("주문 정보 변경 성공")
-    @Test
-    void updateOrder() {
-        // given
-        Order savedOrder = orderRepository.save(order());
-
-        int totalSum = savedOrder.getTotalSum();
-
-        // when
-        savedOrder.saveTotalSum(500);
-        Order updatedOrder = orderRepository.save(savedOrder);
-
-        // then
-        assertThat(updatedOrder.getTotalSum()).isNotEqualTo(totalSum);
     }
 
     // DELETE

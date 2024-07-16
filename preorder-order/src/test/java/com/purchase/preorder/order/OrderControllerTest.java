@@ -48,13 +48,13 @@ public class OrderControllerTest {
         // given
         ReqOrderDto req = new ReqOrderDto(
                 List.of(
-                        new ReqOrderItemDto(1L, 5),
-                        new ReqOrderItemDto(2L, 5)
+                        new ReqOrderItemDto(1L, 5, 5000),
+                        new ReqOrderItemDto(2L, 5, 6000)
                 )
         );
 
         ResOrderDto res = new ResOrderDto(
-                1L, 55000, LocalDateTime.of(2024, 6, 28, 12, 8),
+                1L, 1L, 55000, LocalDateTime.of(2024, 6, 28, 12, 8),
                 List.of(
                         new ResOrderItemDto(
                                 1L, 5, 5000, 25000, ShipmentStatus.ACCEPTANCE
@@ -85,8 +85,8 @@ public class OrderControllerTest {
         // given
         ReqOrderDto req = new ReqOrderDto(
                 List.of(
-                        new ReqOrderItemDto(1L, 5),
-                        new ReqOrderItemDto(2L, 5)
+                        new ReqOrderItemDto(1L, 5, 5000),
+                        new ReqOrderItemDto(2L, 5, 6000)
                 )
         );
 
@@ -116,7 +116,7 @@ public class OrderControllerTest {
         Pageable pageable = PageRequest.of(page, size);
         List<ResOrderDto> orderList = List.of(
                 new ResOrderDto(
-                        1L, 55000, LocalDateTime.of(2024, 6, 28, 12, 8),
+                        1L, 1L, 55000, LocalDateTime.of(2024, 6, 28, 12, 8),
                         List.of(
                                 new ResOrderItemDto(
                                         1L, 5, 5000, 25000, ShipmentStatus.ACCEPTANCE
@@ -176,7 +176,7 @@ public class OrderControllerTest {
         Long orderId = 1L;
 
         ResOrderDto res = new ResOrderDto(
-                1L, 55000, LocalDateTime.of(2024, 6, 28, 12, 8),
+                1L, 1L, 55000, LocalDateTime.of(2024, 6, 28, 12, 8),
                 List.of(
                         new ResOrderItemDto(
                                 1L, 5, 5000, 25000, ShipmentStatus.ACCEPTANCE

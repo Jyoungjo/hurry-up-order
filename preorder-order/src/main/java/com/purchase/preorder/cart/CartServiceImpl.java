@@ -10,7 +10,7 @@ import com.purchase.preorder.cart.dto.ReqCartDto;
 import com.purchase.preorder.cart.dto.ResCartDto;
 import com.purchase.preorder.cart_item.CartItemService;
 import com.purchase.preorder.client.UserClient;
-import com.purchase.preorder.client.UserResponse;
+import com.purchase.preorder.client.response.UserResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

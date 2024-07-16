@@ -1,6 +1,7 @@
 package com.purchase.preorder.stock;
 
 import com.purchase.preorder.stock.dto.ReqStockDto;
+import com.purchase.preorder.stock.dto.ResStockDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class StockController {
 
     // TODO 테스트 진행
     @GetMapping("/stocks/items/{itemId}")
-    public ResponseEntity<Integer> getStockQuantity(@PathVariable("itemId") Long itemId) {
+    public ResponseEntity<ResStockDto> getStockQuantity(@PathVariable("itemId") Long itemId) {
         return ResponseEntity.ok(stockService.getStockQuantity(itemId));
     }
 }

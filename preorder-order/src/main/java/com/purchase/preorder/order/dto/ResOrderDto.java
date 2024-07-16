@@ -15,6 +15,7 @@ import java.util.List;
 @Builder
 public class ResOrderDto {
     private Long orderId;
+    private Long userId;
     private Integer totalSum;
     private LocalDateTime orderDate;
     private List<ResOrderItemDto> orderItemList;
@@ -22,7 +23,8 @@ public class ResOrderDto {
     public static ResOrderDto fromEntity(Order order) {
         return ResOrderDto.builder()
                 .orderId(order.getId())
-                .totalSum(order.getTotalSum())
+                .userId(order.getUserId())
+                .totalSum(order.getTotalPrice())
                 .orderDate(order.getOrderDate())
                 .orderItemList(order.getOrderItemList().stream()
                         .map(ResOrderItemDto::fromEntity)

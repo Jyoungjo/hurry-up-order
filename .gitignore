@@ -231,6 +231,7 @@ gradle-app.setting
 preorder-item/src/main/resources/application-secret.yml
 preorder-order/src/main/resources/application-secret.yml
 preorder-user/src/main/resources/application-secret.yml
+preorder-payment/src/main/resources/application-secret.yml
 preorder-core/src/main/resources/application-secret.yml
 preorder-gateway/src/main/resources/application-secret.yml
 

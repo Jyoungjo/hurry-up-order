@@ -10,5 +10,5 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 public class ReqOrderDto {
-    List<ReqOrderItemDto> orderItemList;
+    private List<ReqOrderItemDto> orderItemList;
 }

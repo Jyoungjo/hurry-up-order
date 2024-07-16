@@ -26,23 +26,29 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ResCreateItemDto createItem(ReqCreateItemDto req) {
-        Item savedItem = itemRepository.save(req.toEntity());
-        stockService.increaseStock(savedItem.getId(), req.getQuantity());
-        return ResCreateItemDto.fromEntity(savedItem, stockService.getStockQuantity(savedItem.getId()));
+        Item item = Item.of(req);
+
+        if (req.getIsReserved().equals(true)) {
+             item = Item.of(req);
+        }
+
+        itemRepository.save(item);
+        stockService.createStock(item, req.getQuantity());
+        return ResCreateItemDto.fromEntity(item, req.getQuantity());
     }
 
     @Override
     public Page<ResReadItemDto> readAllItems(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         return itemRepository.findAll(pageable)
-                .map(item -> ResReadItemDto.fromEntity(item, stockService.getStockQuantity(item.getId())));
+                .map(item -> ResReadItemDto.fromEntity(item, stockService.getStockQuantity(item.getId()).getQuantity()));
     }
 
     @Override
     public ResReadItemDto readItem(Long itemId) {
         Item savedItem = itemRepository.findById(itemId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_ITEM));
-        return ResReadItemDto.fromEntity(savedItem, stockService.getStockQuantity(itemId));
+        return ResReadItemDto.fromEntity(savedItem, stockService.getStockQuantity(itemId).getQuantity());
     }
 
     @Override

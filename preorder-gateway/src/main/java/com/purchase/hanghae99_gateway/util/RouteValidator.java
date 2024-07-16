@@ -1,4 +1,4 @@
-package com.purchase.hanghae99_gateway;
+package com.purchase.hanghae99_gateway.util;
 
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,9 @@ public class RouteValidator {
     public static final List<String> openApiEndpoints = List.of(
             "/eureka",
             "/user-service/api/v1/users",
-            "/user-service/api/v1/users/login"
+            "/user-service/api/v1/users/login",
+            "/item-service/errorful/", // 장애 상황 테스트
+            "/user-service/error/" // 장애 상황 테스트
     );
 
     public Predicate<ServerHttpRequest> isSecured =
