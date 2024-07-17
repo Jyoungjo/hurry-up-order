@@ -14,27 +14,28 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
+    private final Random random;
 
     @Transactional
     public ResPaymentDto initiatePayment(ReqPaymentDto req) {
-        Payment payment = paymentRepository.save(Payment.of(req));
-
-        if (new Random().nextInt(100) < 20) {
+        if (random.nextInt(100) < 20) {
             throw new BusinessException(ExceptionCode.CANCEL_PAYMENT);
         }
+
+        Payment payment = paymentRepository.save(Payment.of(req));
 
         return ResPaymentDto.fromEntity(payment);
     }
 
     @Transactional
     public ResPaymentDto completePayment(Long paymentId) {
+        if (random.nextInt(100) < 20) {
+            throw new BusinessException(ExceptionCode.CANCEL_PAYMENT);
+        }
+
         Payment payment = paymentRepository.findById(paymentId)
                 .filter(p -> p.getPaymentStatus().equals(PaymentStatus.INITIATED))
                 .orElseThrow(() -> new BusinessException(ExceptionCode.NOT_FOUND_PAYMENT));
-
-        if (new Random().nextInt(100) < 20) {
-            throw new BusinessException(ExceptionCode.CANCEL_PAYMENT);
-        }
 
         payment.completePayment();
         paymentRepository.save(payment);
