@@ -1,0 +1,344 @@
+= USER API 명세서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+[[common]]
+== 공통 사항
+
+API에 관계없이 아래 사항을 지켜주셔야 합니다.
+
+=== Domain
+
+|===
+| 환경 | domain
+
+| 개발서버
+| `localhost`
+
+| 운영서버
+| `AWS EC2 - t3.large`
+|===
+
+
+=== Header
+
+|===
+| name | 설명
+
+| `Cookie`
+| accessToken : Access Token을 담고 있습니다.
+
+refreshToken : Refresh Token을 담고 있습니다.
+|===
+
+== 회원가입
+
+=== 성공
+
+==== Request
+include::{snippets}/user/회원가입/성공/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/회원가입/성공/http-response.adoc[]
+
+=== 실패 - 필수 입력값 누락
+
+==== Request
+include::{snippets}/user/회원가입/실패/필수_입력값_누락/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/회원가입/실패/필수_입력값_누락/http-response.adoc[]
+
+=== 실패 - 이메일 형식 오류
+
+==== Request
+include::{snippets}/user/회원가입/실패/이메일_형식_오류/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/회원가입/실패/이메일_형식_오류/http-response.adoc[]
+
+=== 실패 - 중복 이메일 입력
+
+==== Request
+include::{snippets}/user/회원가입/실패/중복_이메일/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/회원가입/실패/중복_이메일/http-response.adoc[]
+
+=== 실패 - 중복 전화번호 입력
+
+==== Request
+include::{snippets}/user/회원가입/실패/중복_전화번호/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/회원가입/실패/중복_전화번호/http-response.adoc[]
+
+== 로그인
+
+=== 성공
+
+==== Request
+include::{snippets}/user/로그인/성공/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/로그인/성공/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 유저
+
+==== Request
+include::{snippets}/user/로그인/실패/존재하지_않는_유저/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/로그인/실패/존재하지_않는_유저/http-response.adoc[]
+
+=== 실패 - 이메일 미인증 유저
+
+==== Request
+include::{snippets}/user/로그인/실패/이메일_미인증_유저/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/로그인/실패/이메일_미인증_유저/http-response.adoc[]
+
+=== 실패 - 비밀번호 불일치
+
+==== Request
+include::{snippets}/user/로그인/실패/비밀번호_불일치/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/로그인/실패/비밀번호_불일치/http-response.adoc[]
+
+== 로그아웃
+
+=== 성공
+
+==== Request
+include::{snippets}/user/로그아웃/성공/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/로그아웃/성공/http-response.adoc[]
+
+=== 실패 - 토큰 만료
+
+==== Request
+include::{snippets}/user/로그아웃/실패/토큰_만료/http-request.adoc[]
+
+==== Response
+include::{snippets}/user/로그아웃/실패/토큰_만료/http-response.adoc[]
+
+== 유저 이메일 인증
+
+=== 성공
+
+==== Request
+include::{snippets}/user/유저_이메일_인증/성공/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/user/유저_이메일_인증/성공/path-parameters.adoc[]
+include::{snippets}/user/유저_이메일_인증/성공/query-parameters.adoc[]
+
+==== Response
+include::{snippets}/user/유저_이메일_인증/성공/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 유저
+
+==== Request
+include::{snippets}/user/유저_이메일_인증/실패/존재하지_않는_유저/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/user/유저_이메일_인증/실패/존재하지_않는_유저/path-parameters.adoc[]
+include::{snippets}/user/유저_이메일_인증/실패/존재하지_않는_유저/query-parameters.adoc[]
+
+==== Response
+include::{snippets}/user/유저_이메일_인증/실패/존재하지_않는_유저/http-response.adoc[]
+
+=== 실패 - 인증번호 불일치
+
+==== Request
+include::{snippets}/user/유저_이메일_인증/실패/인증번호_불일치/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/user/유저_이메일_인증/실패/인증번호_불일치/path-parameters.adoc[]
+include::{snippets}/user/유저_이메일_인증/실패/인증번호_불일치/query-parameters.adoc[]
+
+==== Response
+include::{snippets}/user/유저_이메일_인증/실패/인증번호_불일치/http-response.adoc[]
+
+== 유저 조회
+
+=== 성공
+
+==== Request
+include::{snippets}/user/유저_조회/성공/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/user/유저_조회/성공/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/user/유저_조회/성공/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 유저
+
+==== Request
+include::{snippets}/user/유저_조회/실패/존재하지_않는_유저/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/user/유저_조회/실패/존재하지_않는_유저/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/user/유저_조회/실패/존재하지_않는_유저/http-response.adoc[]
+
+== 유저 정보 수정
+
+=== 성공
+
+==== Request
+include::{snippets}/user/유저_정보_수정/성공/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/user/유저_정보_수정/성공/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/user/유저_정보_수정/성공/http-response.adoc[]
+
+=== 실패 - 필수 입력값 누락
+
+==== Request
+include::{snippets}/user/유저_정보_수정/실패/필수_입력값_누락/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/user/유저_정보_수정/실패/필수_입력값_누락/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/user/유저_정보_수정/실패/필수_입력값_누락/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 유저
+
+==== Request
+include::{snippets}/user/유저_정보_수정/실패/존재하지_않는_유저/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/user/유저_정보_수정/실패/존재하지_않는_유저/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/user/유저_정보_수정/실패/존재하지_않는_유저/http-response.adoc[]
+
+=== 실패 - 올바르지 않은 전화번호 형식
+
+==== Request
+include::{snippets}/user/유저_정보_수정/실패/올바르지_않은_전화번호_형식/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/user/유저_정보_수정/실패/올바르지_않은_전화번호_형식/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/user/유저_정보_수정/실패/올바르지_않은_전화번호_형식/http-response.adoc[]
+
+== 유저 비밀번호 수정
+
+=== 성공
+
+==== Request
+include::{snippets}/user/유저_비밀번호_수정/성공/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/user/유저_비밀번호_수정/성공/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/user/유저_비밀번호_수정/성공/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 유저
+
+==== Request
+include::{snippets}/user/유저_비밀번호_수정/실패/존재하지_않는_유저/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/user/유저_비밀번호_수정/실패/존재하지_않는_유저/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/user/유저_비밀번호_수정/실패/존재하지_않는_유저/http-response.adoc[]
+
+=== 실패 - 기존 비밀번호 불일치
+
+==== Request
+include::{snippets}/user/유저_비밀번호_수정/실패/기존_비밀번호_불일치/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/user/유저_비밀번호_수정/실패/기존_비밀번호_불일치/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/user/유저_비밀번호_수정/실패/기존_비밀번호_불일치/http-response.adoc[]
+
+=== 실패 - 새로운 비밀번호 불일치
+
+==== Request
+include::{snippets}/user/유저_비밀번호_수정/실패/새로운_비밀번호_불일치/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/user/유저_비밀번호_수정/실패/새로운_비밀번호_불일치/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/user/유저_비밀번호_수정/실패/새로운_비밀번호_불일치/http-response.adoc[]
+
+== 회원 탈퇴
+
+=== 성공
+
+==== Request
+include::{snippets}/user/회원_탈퇴/성공/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/user/회원_탈퇴/성공/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/user/회원_탈퇴/성공/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 유저
+
+==== Request
+include::{snippets}/user/회원_탈퇴/실패/존재하지_않는_유저/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/user/회원_탈퇴/실패/존재하지_않는_유저/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/user/회원_탈퇴/실패/존재하지_않는_유저/http-response.adoc[]
+
+=== 실패 - 미인증 유저의 삭제 시도
+
+==== Request
+include::{snippets}/user/회원_탈퇴/실패/미인증_유저의_삭제_시도/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/user/회원_탈퇴/실패/미인증_유저의_삭제_시도/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/user/회원_탈퇴/실패/미인증_유저의_삭제_시도/http-response.adoc[]
+
+=== 실패 - 비밀번호 확인 실패
+
+==== Request
+include::{snippets}/user/회원_탈퇴/실패/비밀번호_확인_실패/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/user/회원_탈퇴/실패/비밀번호_확인_실패/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/user/회원_탈퇴/실패/비밀번호_확인_실패/http-response.adoc[]
+
+=== 실패 - 접속 유저 불일치
+
+==== Request
+include::{snippets}/user/회원_탈퇴/실패/접속_유저_불일치/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/user/회원_탈퇴/실패/접속_유저_불일치/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/user/회원_탈퇴/실패/접속_유저_불일치/http-response.adoc[]

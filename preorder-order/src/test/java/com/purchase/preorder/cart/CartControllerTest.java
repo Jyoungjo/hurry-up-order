@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -22,12 +23,15 @@ import static com.purchase.preorder.exception.ExceptionCode.NOT_FOUND_USER;
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = {CartController.class})
 @AutoConfigureRestDocs
+@ActiveProfiles("test")
 public class CartControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -155,10 +159,12 @@ public class CartControllerTest {
         mockMvc.perform(put("/order-service/api/v1/carts/increase")
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("itemId", String.valueOf(itemId)))
+                        .queryParam("itemId", String.valueOf(itemId)))
                 .andExpect(status().isNoContent())
                 .andDo(print())
-                .andDo(document("cart/장바구니_물품_수량_증가/성공"));
+                .andDo(document("cart/장바구니_물품_수량_증가/성공",
+                        queryParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // UPDATE
@@ -176,11 +182,13 @@ public class CartControllerTest {
         mockMvc.perform(put("/order-service/api/v1/carts/increase")
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("itemId", String.valueOf(itemId)))
+                        .queryParam("itemId", String.valueOf(itemId)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(NOT_FOUND_USER.getMessage()))
                 .andDo(print())
-                .andDo(document("cart/장바구니_물품_수량_증가/실패/존재하지_않는_유저"));
+                .andDo(document("cart/장바구니_물품_수량_증가/실패/존재하지_않는_유저",
+                        queryParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // UPDATE
@@ -198,11 +206,13 @@ public class CartControllerTest {
         mockMvc.perform(put("/order-service/api/v1/carts/increase")
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("itemId", String.valueOf(itemId)))
+                        .queryParam("itemId", String.valueOf(itemId)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(NOT_FOUND_CART.getMessage()))
                 .andDo(print())
-                .andDo(document("cart/장바구니_물품_수량_증가/실패/존재하지_않는_장바구니"));
+                .andDo(document("cart/장바구니_물품_수량_증가/실패/존재하지_않는_장바구니",
+                        queryParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // UPDATE
@@ -219,10 +229,12 @@ public class CartControllerTest {
         mockMvc.perform(put("/order-service/api/v1/carts/decrease")
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("itemId", String.valueOf(itemId)))
+                        .queryParam("itemId", String.valueOf(itemId)))
                 .andExpect(status().isNoContent())
                 .andDo(print())
-                .andDo(document("cart/장바구니_물품_수량_감소/성공"));
+                .andDo(document("cart/장바구니_물품_수량_감소/성공",
+                        queryParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // UPDATE
@@ -240,11 +252,13 @@ public class CartControllerTest {
         mockMvc.perform(put("/order-service/api/v1/carts/decrease")
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("itemId", String.valueOf(itemId)))
+                        .queryParam("itemId", String.valueOf(itemId)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(NOT_FOUND_USER.getMessage()))
                 .andDo(print())
-                .andDo(document("cart/장바구니_물품_수량_감소/실패/존재하지_않는_유저"));
+                .andDo(document("cart/장바구니_물품_수량_감소/실패/존재하지_않는_유저",
+                        queryParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // UPDATE
@@ -262,11 +276,13 @@ public class CartControllerTest {
         mockMvc.perform(put("/order-service/api/v1/carts/decrease")
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("itemId", String.valueOf(itemId)))
+                        .queryParam("itemId", String.valueOf(itemId)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(NOT_FOUND_CART.getMessage()))
                 .andDo(print())
-                .andDo(document("cart/장바구니_물품_수량_감소/실패/존재하지_않는_장바구니"));
+                .andDo(document("cart/장바구니_물품_수량_감소/실패/존재하지_않는_장바구니",
+                        queryParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // DELETE

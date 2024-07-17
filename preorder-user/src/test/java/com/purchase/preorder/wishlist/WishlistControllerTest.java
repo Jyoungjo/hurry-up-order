@@ -21,6 +21,7 @@ import static com.purchase.preorder.exception.ExceptionCode.NOT_FOUND_WISHLIST;
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -49,10 +50,12 @@ public class WishlistControllerTest {
         mockMvc.perform(post("/user-service/api/v1/wishlists")
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("itemId", String.valueOf(itemId)))
+                        .queryParam("itemId", String.valueOf(itemId)))
                 .andExpect(status().isNoContent())
                 .andDo(print())
-                .andDo(document("wishlist/위시리스트_상품_추가/성공"));
+                .andDo(document("wishlist/위시리스트_상품_추가/성공",
+                        queryParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // CREATE
@@ -70,11 +73,13 @@ public class WishlistControllerTest {
         mockMvc.perform(post("/user-service/api/v1/wishlists")
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("itemId", String.valueOf(itemId)))
+                        .queryParam("itemId", String.valueOf(itemId)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(NOT_FOUND_USER.getMessage()))
                 .andDo(print())
-                .andDo(document("wishlist/위시리스트_상품_추가/실패/존재하지_않는_유저"));
+                .andDo(document("wishlist/위시리스트_상품_추가/실패/존재하지_않는_유저",
+                        queryParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // READ
@@ -156,10 +161,12 @@ public class WishlistControllerTest {
         mockMvc.perform(delete("/user-service/api/v1/wishlists")
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("itemId", String.valueOf(itemId)))
+                        .queryParam("itemId", String.valueOf(itemId)))
                 .andExpect(status().isNoContent())
                 .andDo(print())
-                .andDo(document("wishlist/위시리스트_상품_제거/성공"));
+                .andDo(document("wishlist/위시리스트_상품_제거/성공",
+                        queryParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // DELETE
@@ -177,11 +184,13 @@ public class WishlistControllerTest {
         mockMvc.perform(delete("/user-service/api/v1/wishlists")
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("itemId", String.valueOf(itemId)))
+                        .queryParam("itemId", String.valueOf(itemId)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(NOT_FOUND_USER.getMessage()))
                 .andDo(print())
-                .andDo(document("wishlist/위시리스트_상품_제거/실패/존재하지_않는_유저"));
+                .andDo(document("wishlist/위시리스트_상품_제거/실패/존재하지_않는_유저",
+                        queryParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // DELETE
@@ -199,11 +208,13 @@ public class WishlistControllerTest {
         mockMvc.perform(delete("/user-service/api/v1/wishlists")
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("itemId", String.valueOf(itemId)))
+                        .queryParam("itemId", String.valueOf(itemId)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(NOT_FOUND_WISHLIST.getMessage()))
                 .andDo(print())
-                .andDo(document("wishlist/위시리스트_상품_제거/실패/존재하지_않는_위시리스트"));
+                .andDo(document("wishlist/위시리스트_상품_제거/실패/존재하지_않는_위시리스트",
+                        queryParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // DELETE

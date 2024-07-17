@@ -1,0 +1,227 @@
+= ORDER API 명세서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+[[common]]
+== 공통 사항
+
+API에 관계없이 아래 사항을 지켜주셔야 합니다.
+
+=== Domain
+
+|===
+| 환경 | domain
+
+| 개발서버
+| `localhost`
+
+| 운영서버
+| `AWS EC2 - t3.large`
+|===
+
+
+=== Header
+
+|===
+| name | 설명
+
+| `Cookie`
+| accessToken : Access Token을 담고 있습니다.
+
+refreshToken : Refresh Token을 담고 있습니다.
+|===
+
+== 주문 생성
+
+=== 성공
+
+==== Request
+include::{snippets}/order/주문_생성/성공/http-request.adoc[]
+
+==== Response
+include::{snippets}/order/주문_생성/성공/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 유저
+
+==== Request
+include::{snippets}/order/주문_생성/실패/존재하지_않는_유저/http-request.adoc[]
+
+==== Response
+include::{snippets}/order/주문_생성/실패/존재하지_않는_유저/http-response.adoc[]
+
+== 주문 목록 조회
+
+=== 성공
+
+==== Request
+include::{snippets}/order/주문_목록_조회/성공/http-request.adoc[]
+
+==== Request params
+include::{snippets}/order/주문_목록_조회/성공/query-parameters.adoc[]
+
+==== Response
+include::{snippets}/order/주문_목록_조회/성공/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 유저
+
+==== Request
+include::{snippets}/order/주문_목록_조회/실패/존재하지_않는_유저/http-request.adoc[]
+
+==== Request params
+include::{snippets}/order/주문_목록_조회/실패/존재하지_않는_유저/query-parameters.adoc[]
+
+==== Response
+include::{snippets}/order/주문_목록_조회/실패/존재하지_않는_유저/http-response.adoc[]
+
+== 주문 단일 조회
+
+=== 성공
+
+==== Request
+include::{snippets}/order/주문_단일_조회/성공/http-request.adoc[]
+
+==== Request params
+include::{snippets}/order/주문_단일_조회/성공/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/order/주문_단일_조회/성공/http-response.adoc[]
+
+=== 실패 - 유저 불일치
+
+==== Request
+include::{snippets}/order/주문_단일_조회/실패/유저_불일치/http-request.adoc[]
+
+==== Request params
+include::{snippets}/order/주문_단일_조회/실패/유저_불일치/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/order/주문_단일_조회/실패/유저_불일치/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 주문
+
+==== Request
+include::{snippets}/order/주문_단일_조회/실패/존재하지_않는_주문/http-request.adoc[]
+
+==== Request params
+include::{snippets}/order/주문_단일_조회/실패/존재하지_않는_주문/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/order/주문_단일_조회/실패/존재하지_않는_주문/http-response.adoc[]
+
+== 주문 취소
+
+=== 성공
+
+==== Request
+include::{snippets}/order/주문_취소/성공/http-request.adoc[]
+
+==== Request params
+include::{snippets}/order/주문_취소/성공/path-parameters.adoc[]
+include::{snippets}/order/주문_취소/성공/query-parameters.adoc[]
+
+==== Response
+include::{snippets}/order/주문_취소/성공/http-response.adoc[]
+
+=== 실패 - 유저 불일치
+
+==== Request
+include::{snippets}/order/주문_취소/실패/유저_불일치/http-request.adoc[]
+
+==== Request params
+include::{snippets}/order/주문_취소/실패/유저_불일치/path-parameters.adoc[]
+include::{snippets}/order/주문_취소/실패/유저_불일치/query-parameters.adoc[]
+
+==== Response
+include::{snippets}/order/주문_취소/실패/유저_불일치/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 주문
+
+==== Request
+include::{snippets}/order/주문_취소/실패/존재하지_않는_주문/http-request.adoc[]
+
+==== Request params
+include::{snippets}/order/주문_취소/실패/존재하지_않는_주문/path-parameters.adoc[]
+include::{snippets}/order/주문_취소/실패/존재하지_않는_주문/query-parameters.adoc[]
+
+==== Response
+include::{snippets}/order/주문_취소/실패/존재하지_않는_주문/http-response.adoc[]
+
+== 반품 신청
+
+=== 성공
+
+==== Request
+include::{snippets}/order/반품_신청/성공/http-request.adoc[]
+
+==== Request params
+include::{snippets}/order/반품_신청/성공/path-parameters.adoc[]
+include::{snippets}/order/반품_신청/성공/query-parameters.adoc[]
+
+==== Response
+include::{snippets}/order/반품_신청/성공/http-response.adoc[]
+
+=== 실패 - 유저 불일치
+
+==== Request
+include::{snippets}/order/반품_신청/실패/유저_불일치/http-request.adoc[]
+
+==== Request params
+include::{snippets}/order/반품_신청/실패/유저_불일치/path-parameters.adoc[]
+include::{snippets}/order/반품_신청/실패/유저_불일치/query-parameters.adoc[]
+
+==== Response
+include::{snippets}/order/반품_신청/실패/유저_불일치/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 주문
+
+==== Request
+include::{snippets}/order/반품_신청/실패/존재하지_않는_주문/http-request.adoc[]
+
+==== Request params
+include::{snippets}/order/반품_신청/실패/존재하지_않는_주문/path-parameters.adoc[]
+include::{snippets}/order/반품_신청/실패/존재하지_않는_주문/query-parameters.adoc[]
+
+==== Response
+include::{snippets}/order/반품_신청/실패/존재하지_않는_주문/http-response.adoc[]
+
+== 주문 삭제
+
+=== 성공
+
+==== Request
+include::{snippets}/order/주문_삭제/성공/http-request.adoc[]
+
+==== Request params
+include::{snippets}/order/주문_삭제/성공/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/order/주문_삭제/성공/http-response.adoc[]
+
+=== 실패 - 유저 불일치
+
+==== Request
+include::{snippets}/order/주문_삭제/실패/유저_불일치/http-request.adoc[]
+
+==== Request params
+include::{snippets}/order/주문_삭제/실패/유저_불일치/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/order/주문_삭제/실패/유저_불일치/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 주문
+
+==== Request
+include::{snippets}/order/주문_삭제/실패/존재하지_않는_주문/http-request.adoc[]
+
+==== Request params
+include::{snippets}/order/주문_삭제/실패/존재하지_않는_주문/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/order/주문_삭제/실패/존재하지_않는_주문/http-response.adoc[]

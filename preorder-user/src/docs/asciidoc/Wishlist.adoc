@@ -1,0 +1,150 @@
+= WISHLIST API 명세서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+[[common]]
+== 공통 사항
+
+API에 관계없이 아래 사항을 지켜주셔야 합니다.
+
+=== Domain
+
+|===
+| 환경 | domain
+
+| 개발서버
+| `localhost`
+
+| 운영서버
+| `AWS EC2 - t3.large`
+|===
+
+
+=== Header
+
+|===
+| name | 설명
+
+| `Cookie`
+| accessToken : Access Token을 담고 있습니다.
+
+refreshToken : Refresh Token을 담고 있습니다.
+|===
+
+== 위시리스트 상품 추가
+
+=== 성공
+
+==== Request
+include::{snippets}/wishlist/위시리스트_상품_추가/성공/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/wishlist/위시리스트_상품_추가/성공/query-parameters.adoc[]
+
+==== Response
+include::{snippets}/wishlist/위시리스트_상품_추가/성공/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 유저
+
+==== Request
+include::{snippets}/wishlist/위시리스트_상품_추가/실패/존재하지_않는_유저/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/wishlist/위시리스트_상품_추가/실패/존재하지_않는_유저/query-parameters.adoc[]
+
+==== Response
+include::{snippets}/wishlist/위시리스트_상품_추가/실패/존재하지_않는_유저/http-response.adoc[]
+
+== 내 위시리스트 조회
+
+=== 성공
+
+==== Request
+include::{snippets}/wishlist/위시리스트_조회/성공/http-request.adoc[]
+
+==== Response
+include::{snippets}/wishlist/위시리스트_조회/성공/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 유저
+
+==== Request
+include::{snippets}/wishlist/위시리스트_조회/실패/존재하지_않는_유저/http-request.adoc[]
+
+==== Response
+include::{snippets}/wishlist/위시리스트_조회/실패/존재하지_않는_유저/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 위시리스트
+
+==== Request
+include::{snippets}/wishlist/위시리스트_조회/실패/존재하지_않는_위시리스트/http-request.adoc[]
+
+==== Response
+include::{snippets}/wishlist/위시리스트_조회/실패/존재하지_않는_위시리스트/http-response.adoc[]
+
+== 위시리스트 상품 제거
+
+=== 성공
+
+==== Request
+include::{snippets}/wishlist/위시리스트_상품_제거/성공/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/wishlist/위시리스트_상품_제거/성공/query-parameters.adoc[]
+
+==== Response
+include::{snippets}/wishlist/위시리스트_상품_제거/성공/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 유저
+
+==== Request
+include::{snippets}/wishlist/위시리스트_상품_제거/실패/존재하지_않는_유저/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/wishlist/위시리스트_상품_제거/실패/존재하지_않는_유저/query-parameters.adoc[]
+
+==== Response
+include::{snippets}/wishlist/위시리스트_상품_제거/실패/존재하지_않는_유저/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 위시리스트
+
+==== Request
+include::{snippets}/wishlist/위시리스트_상품_제거/실패/존재하지_않는_위시리스트/http-request.adoc[]
+
+==== Request Params
+include::{snippets}/wishlist/위시리스트_상품_제거/실패/존재하지_않는_위시리스트/query-parameters.adoc[]
+
+==== Response
+include::{snippets}/wishlist/위시리스트_상품_제거/실패/존재하지_않는_위시리스트/http-response.adoc[]
+
+== 위시리스트 비우기
+
+=== 성공
+
+==== Request
+include::{snippets}/wishlist/위시리스트_비우기/성공/http-request.adoc[]
+
+==== Response
+include::{snippets}/wishlist/위시리스트_비우기/성공/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 유저
+
+==== Request
+include::{snippets}/wishlist/위시리스트_비우기/실패/존재하지_않는_유저/http-request.adoc[]
+
+==== Response
+include::{snippets}/wishlist/위시리스트_비우기/실패/존재하지_않는_유저/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 위시리스트
+
+==== Request
+include::{snippets}/wishlist/위시리스트_비우기/실패/존재하지_않는_위시리스트/http-request.adoc[]
+
+==== Response
+include::{snippets}/wishlist/위시리스트_비우기/실패/존재하지_않는_위시리스트/http-response.adoc[]

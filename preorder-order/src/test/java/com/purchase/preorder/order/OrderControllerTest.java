@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -28,12 +29,14 @@ import static com.purchase.preorder.exception.ExceptionCode.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = {OrderController.class})
 @AutoConfigureRestDocs
+@ActiveProfiles("test")
 public class OrderControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -137,11 +140,16 @@ public class OrderControllerTest {
         mockMvc.perform(get("/order-service/api/v1/orders")
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("page", String.valueOf(page))
-                        .param("size", String.valueOf(size)))
+                        .queryParam("page", String.valueOf(page))
+                        .queryParam("size", String.valueOf(size)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("order/주문_목록_조회/성공"));
+                .andDo(document("order/주문_목록_조회/성공",
+                        queryParameters(
+                                parameterWithName("page").description("페이지 넘버"),
+                                parameterWithName("size").description("표시 개수")
+                        )
+                ));
     }
 
     // READ ALL
@@ -165,7 +173,12 @@ public class OrderControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(NOT_FOUND_USER.getMessage()))
                 .andDo(print())
-                .andDo(document("order/주문_목록_조회/실패/존재하지_않는_유저"));
+                .andDo(document("order/주문_목록_조회/실패/존재하지_않는_유저",
+                        queryParameters(
+                                parameterWithName("page").description("페이지 넘버"),
+                                parameterWithName("size").description("표시 개수")
+                        )
+                ));
     }
 
     // READ
@@ -191,12 +204,14 @@ public class OrderControllerTest {
         when(orderService.readOrder(any(HttpServletRequest.class), anyLong())).thenReturn(res);
 
         // then
-        mockMvc.perform(get("/order-service/api/v1/orders/" + orderId)
+        mockMvc.perform(get("/order-service/api/v1/orders/{orderId}", orderId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("order/주문_단일_조회/성공"));
+                .andDo(document("order/주문_단일_조회/성공",
+                        pathParameters(parameterWithName("orderId").description("주문 id"))
+                ));
     }
 
     // READ
@@ -211,13 +226,15 @@ public class OrderControllerTest {
                 .thenThrow(new BusinessException(NOT_FOUND_ORDER));
 
         // then
-        mockMvc.perform(get("/order-service/api/v1/orders/" + orderId)
+        mockMvc.perform(get("/order-service/api/v1/orders/{orderId}", orderId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(NOT_FOUND_ORDER.getMessage()))
                 .andDo(print())
-                .andDo(document("order/주문_단일_조회/실패/존재하지_않는_주문"));
+                .andDo(document("order/주문_단일_조회/실패/존재하지_않는_주문",
+                        pathParameters(parameterWithName("orderId").description("주문 id"))
+                ));
     }
 
     // READ
@@ -232,13 +249,15 @@ public class OrderControllerTest {
                 .thenThrow(new BusinessException(UNAUTHORIZED_ACCESS));
 
         // then
-        mockMvc.perform(get("/order-service/api/v1/orders/" + orderId)
+        mockMvc.perform(get("/order-service/api/v1/orders/{orderId}", orderId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value(UNAUTHORIZED_ACCESS.getMessage()))
                 .andDo(print())
-                .andDo(document("order/주문_단일_조회/실패/유저_불일치"));
+                .andDo(document("order/주문_단일_조회/실패/유저_불일치",
+                        pathParameters(parameterWithName("orderId").description("주문 id"))
+                ));
     }
 
     // UPDATE
@@ -253,13 +272,16 @@ public class OrderControllerTest {
         doNothing().when(orderService).cancelOrder(any(HttpServletRequest.class), anyLong(), anyLong());
 
         // then
-        mockMvc.perform(put("/order-service/api/v1/orders/" + orderId + "/cancel")
+        mockMvc.perform(put("/order-service/api/v1/orders/{orderId}/cancel", orderId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("itemId", String.valueOf(itemId)))
+                        .queryParam("itemId", String.valueOf(itemId)))
                 .andExpect(status().isNoContent())
                 .andDo(print())
-                .andDo(document("order/주문_취소/성공"));
+                .andDo(document("order/주문_취소/성공",
+                        pathParameters(parameterWithName("orderId").description("주문 id")),
+                        queryParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // UPDATE
@@ -275,14 +297,17 @@ public class OrderControllerTest {
                 .when(orderService).cancelOrder(any(HttpServletRequest.class), anyLong(), anyLong());
 
         // then
-        mockMvc.perform(put("/order-service/api/v1/orders/" + orderId + "/cancel")
+        mockMvc.perform(put("/order-service/api/v1/orders/{orderId}/cancel", orderId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("itemId", String.valueOf(itemId)))
+                        .queryParam("itemId", String.valueOf(itemId)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(NOT_FOUND_ORDER.getMessage()))
                 .andDo(print())
-                .andDo(document("order/주문_취소/실패/존재하지_않는_주문"));
+                .andDo(document("order/주문_취소/실패/존재하지_않는_주문",
+                        pathParameters(parameterWithName("orderId").description("주문 id")),
+                        queryParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // UPDATE
@@ -298,14 +323,17 @@ public class OrderControllerTest {
                 .when(orderService).cancelOrder(any(HttpServletRequest.class), anyLong(), anyLong());
 
         // then
-        mockMvc.perform(put("/order-service/api/v1/orders/" + orderId + "/cancel")
+        mockMvc.perform(put("/order-service/api/v1/orders/{orderId}/cancel", orderId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("itemId", String.valueOf(itemId)))
+                        .queryParam("itemId", String.valueOf(itemId)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value(UNAUTHORIZED_ACCESS.getMessage()))
                 .andDo(print())
-                .andDo(document("order/주문_취소/실패/유저_불일치"));
+                .andDo(document("order/주문_취소/실패/유저_불일치",
+                        pathParameters(parameterWithName("orderId").description("주문 id")),
+                        queryParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // UPDATE
@@ -320,13 +348,16 @@ public class OrderControllerTest {
         doNothing().when(orderService).returnOrder(any(HttpServletRequest.class), anyLong(), anyLong());
 
         // then
-        mockMvc.perform(put("/order-service/api/v1/orders/" + orderId + "/return")
+        mockMvc.perform(put("/order-service/api/v1/orders/{orderId}/return", orderId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("itemId", String.valueOf(itemId)))
+                        .queryParam("itemId", String.valueOf(itemId)))
                 .andExpect(status().isNoContent())
                 .andDo(print())
-                .andDo(document("order/반품_신청/성공"));
+                .andDo(document("order/반품_신청/성공",
+                        pathParameters(parameterWithName("orderId").description("주문 id")),
+                        queryParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // UPDATE
@@ -342,14 +373,17 @@ public class OrderControllerTest {
                 .when(orderService).returnOrder(any(HttpServletRequest.class), anyLong(), anyLong());
 
         // then
-        mockMvc.perform(put("/order-service/api/v1/orders/" + orderId + "/return")
+        mockMvc.perform(put("/order-service/api/v1/orders/{orderId}/return", orderId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("itemId", String.valueOf(itemId)))
+                        .queryParam("itemId", String.valueOf(itemId)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(NOT_FOUND_ORDER.getMessage()))
                 .andDo(print())
-                .andDo(document("order/반품_신청/실패/존재하지_않는_주문"));
+                .andDo(document("order/반품_신청/실패/존재하지_않는_주문",
+                        pathParameters(parameterWithName("orderId").description("주문 id")),
+                        queryParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // UPDATE
@@ -365,14 +399,17 @@ public class OrderControllerTest {
                 .when(orderService).returnOrder(any(HttpServletRequest.class), anyLong(), anyLong());
 
         // then
-        mockMvc.perform(put("/order-service/api/v1/orders/" + orderId + "/return")
+        mockMvc.perform(put("/order-service/api/v1/orders/{orderId}/return", orderId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("itemId", String.valueOf(itemId)))
+                        .queryParam("itemId", String.valueOf(itemId)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value(UNAUTHORIZED_ACCESS.getMessage()))
                 .andDo(print())
-                .andDo(document("order/반품_신청/실패/유저_불일치"));
+                .andDo(document("order/반품_신청/실패/유저_불일치",
+                        pathParameters(parameterWithName("orderId").description("주문 id")),
+                        queryParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // UPDATE
@@ -386,12 +423,14 @@ public class OrderControllerTest {
         doNothing().when(orderService).deleteOrder(any(HttpServletRequest.class), anyLong());
 
         // then
-        mockMvc.perform(delete("/order-service/api/v1/orders/" + orderId)
+        mockMvc.perform(delete("/order-service/api/v1/orders/{orderId}", orderId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andDo(print())
-                .andDo(document("order/주문_삭제/성공"));
+                .andDo(document("order/주문_삭제/성공",
+                        pathParameters(parameterWithName("orderId").description("주문 id"))
+                ));
     }
 
     // UPDATE
@@ -406,13 +445,15 @@ public class OrderControllerTest {
                 .when(orderService).deleteOrder(any(HttpServletRequest.class), anyLong());
 
         // then
-        mockMvc.perform(delete("/order-service/api/v1/orders/" + orderId)
+        mockMvc.perform(delete("/order-service/api/v1/orders/{orderId}", orderId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(NOT_FOUND_ORDER.getMessage()))
                 .andDo(print())
-                .andDo(document("order/주문_삭제/실패/존재하지_않는_주문"));
+                .andDo(document("order/주문_삭제/실패/존재하지_않는_주문",
+                        pathParameters(parameterWithName("orderId").description("주문 id"))
+                ));
     }
 
     // UPDATE
@@ -427,12 +468,14 @@ public class OrderControllerTest {
                 .when(orderService).deleteOrder(any(HttpServletRequest.class), anyLong());
 
         // then
-        mockMvc.perform(delete("/order-service/api/v1/orders/" + orderId)
+        mockMvc.perform(delete("/order-service/api/v1/orders/{orderId}", orderId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value(UNAUTHORIZED_ACCESS.getMessage()))
                 .andDo(print())
-                .andDo(document("order/주문_삭제/실패/유저_불일치"));
+                .andDo(document("order/주문_삭제/실패/유저_불일치",
+                        pathParameters(parameterWithName("orderId").description("주문 id"))
+                ));
     }
 }
