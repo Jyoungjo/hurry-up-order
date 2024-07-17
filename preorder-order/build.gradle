@@ -54,10 +54,12 @@ tasks.named('test') {
 
 asciidoctor {
     inputs.dir snippetsDir
+    doFirst {
+        delete file('src/main/resources/static/docs')
+    }
     configurations 'asciidoctorExt'
     dependsOn test
 }
-
 
 tasks.register('copyDocument', Copy) { // 생성된 html 파일을 옮긴다
     dependsOn asciidoctor // Gradle의 asciidoctor Task 이후 수행
@@ -72,6 +74,6 @@ build {
 bootJar {
     dependsOn asciidoctor
     from ("${asciidoctor.outputDir}") {
-        into 'static/docs'
+        into 'BOOT-INF/classes/static/docs'
     }
 }
