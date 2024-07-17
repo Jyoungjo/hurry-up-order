@@ -29,6 +29,7 @@ import static com.purchase.preorder.exception.ExceptionCode.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -89,7 +90,7 @@ public class UserControllerTest {
                 .andDo(print())
                 .andDo(document("user/회원가입/실패/필수_입력값_누락"));
     }
-    
+
     // CREATE
     @DisplayName("회원가입 실패 - 이메일 형식 오류")
     @Test
@@ -171,12 +172,14 @@ public class UserControllerTest {
         when(userService.readUser(anyLong())).thenReturn(res);
 
         // then
-        mockMvc.perform(get("/user-service/api/v1/users/" + userId)
+        mockMvc.perform(get("/user-service/api/v1/users/{userId}", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};"))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("user/유저_조회/성공"));
+                .andDo(document("user/유저_조회/성공",
+                        pathParameters(parameterWithName("userId").description("유저 id"))
+                ));
     }
 
     // READ
@@ -190,13 +193,15 @@ public class UserControllerTest {
         when(userService.readUser(anyLong())).thenThrow(new BusinessException(NOT_FOUND_USER));
 
         // then
-        mockMvc.perform(get("/user-service/api/v1/users/" + userId)
+        mockMvc.perform(get("/user-service/api/v1/users/{userId}", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(NOT_FOUND_USER.getMessage()))
                 .andDo(print())
-                .andDo(document("user/유저_조회/실패/존재하지_않는_유저"));
+                .andDo(document("user/유저_조회/실패/존재하지_않는_유저",
+                        pathParameters(parameterWithName("userId").description("유저 id"))
+                ));
     }
 
     // UPDATE INFO
@@ -218,13 +223,15 @@ public class UserControllerTest {
         when(userService.updateUserInfo(any(HttpServletRequest.class), anyLong(), any())).thenReturn(res);
 
         // then
-        mockMvc.perform(put("/user-service/api/v1/users/" + userId + "/info")
+        mockMvc.perform(put("/user-service/api/v1/users/{userId}/info", userId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("user/유저_정보_수정/성공"));
+                .andDo(document("user/유저_정보_수정/성공",
+                        pathParameters(parameterWithName("userId").description("유저 id"))
+                ));
     }
 
     // UPDATE INFO
@@ -242,14 +249,16 @@ public class UserControllerTest {
         when(userService.updateUserInfo(any(HttpServletRequest.class), anyLong(), any())).thenThrow(new BusinessException(NOT_FOUND_USER));
 
         // then
-        mockMvc.perform(put("/user-service/api/v1/users/" + userId + "/info")
+        mockMvc.perform(put("/user-service/api/v1/users/{userId}/info", userId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(NOT_FOUND_USER.getMessage()))
                 .andDo(print())
-                .andDo(document("user/유저_정보_수정/실패/존재하지_않는_유저"));
+                .andDo(document("user/유저_정보_수정/실패/존재하지_않는_유저",
+                        pathParameters(parameterWithName("userId").description("유저 id"))
+                ));
     }
 
     // UPDATE INFO
@@ -267,14 +276,16 @@ public class UserControllerTest {
         when(userService.updateUserInfo(any(HttpServletRequest.class), anyLong(), any())).thenThrow(new BusinessException(INVALID_INPUT_VALUE));
 
         // then
-        mockMvc.perform(put("/user-service/api/v1/users/" + userId + "/info")
+        mockMvc.perform(put("/user-service/api/v1/users/{userId}/info", userId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(INVALID_INPUT_VALUE.getMessage()))
                 .andDo(print())
-                .andDo(document("user/유저_정보_수정/실패/필수_입력값_누락"));
+                .andDo(document("user/유저_정보_수정/실패/필수_입력값_누락",
+                        pathParameters(parameterWithName("userId").description("유저 id"))
+                ));
     }
 
     // UPDATE INFO
@@ -292,14 +303,16 @@ public class UserControllerTest {
         when(userService.updateUserInfo(any(HttpServletRequest.class), anyLong(), any())).thenThrow(new BusinessException(INVALID_INPUT_VALUE));
 
         // then
-        mockMvc.perform(put("/user-service/api/v1/users/" + userId + "/info")
+        mockMvc.perform(put("/user-service/api/v1/users/{userId}/info", userId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(INVALID_INPUT_VALUE.getMessage()))
                 .andDo(print())
-                .andDo(document("user/유저_정보_수정/실패/올바르지_않은_전화번호_형식"));
+                .andDo(document("user/유저_정보_수정/실패/올바르지_않은_전화번호_형식",
+                        pathParameters(parameterWithName("userId").description("유저 id"))
+                ));
     }
 
     // UPDATE PASSWORD
@@ -321,13 +334,15 @@ public class UserControllerTest {
         when(userService.updateUserPassword(any(HttpServletRequest.class), anyLong(), any())).thenReturn(res);
 
         // then
-        mockMvc.perform(put("/user-service/api/v1/users/" + userId + "/password")
+        mockMvc.perform(put("/user-service/api/v1/users/{userId}/password", userId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("user/유저_비밀번호_수정/성공"));
+                .andDo(document("user/유저_비밀번호_수정/성공",
+                        pathParameters(parameterWithName("userId").description("유저 id"))
+                ));
     }
 
     // UPDATE PASSWORD
@@ -345,14 +360,16 @@ public class UserControllerTest {
         when(userService.updateUserPassword(any(HttpServletRequest.class), anyLong(), any())).thenThrow(new BusinessException(NOT_FOUND_USER));
 
         // then
-        mockMvc.perform(put("/user-service/api/v1/users/" + userId + "/password")
+        mockMvc.perform(put("/user-service/api/v1/users/{userId}/password", userId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(NOT_FOUND_USER.getMessage()))
                 .andDo(print())
-                .andDo(document("user/유저_비밀번호_수정/실패/존재하지_않는_유저"));
+                .andDo(document("user/유저_비밀번호_수정/실패/존재하지_않는_유저",
+                        pathParameters(parameterWithName("userId").description("유저 id"))
+                ));
     }
 
     // UPDATE PASSWORD
@@ -370,14 +387,16 @@ public class UserControllerTest {
         when(userService.updateUserPassword(any(HttpServletRequest.class), anyLong(), any())).thenThrow(new BusinessException(INVALID_PASSWORD));
 
         // then
-        mockMvc.perform(put("/user-service/api/v1/users/" + userId + "/password")
+        mockMvc.perform(put("/user-service/api/v1/users/{userId}/password", userId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value(INVALID_PASSWORD.getMessage()))
                 .andDo(print())
-                .andDo(document("user/유저_비밀번호_수정/실패/기존_비밀번호_불일치"));
+                .andDo(document("user/유저_비밀번호_수정/실패/기존_비밀번호_불일치",
+                        pathParameters(parameterWithName("userId").description("유저 id"))
+                        ));
     }
 
     // UPDATE PASSWORD
@@ -395,14 +414,16 @@ public class UserControllerTest {
         when(userService.updateUserPassword(any(HttpServletRequest.class), anyLong(), any())).thenThrow(new BusinessException(INVALID_PASSWORD));
 
         // then
-        mockMvc.perform(put("/user-service/api/v1/users/" + userId + "/password")
+        mockMvc.perform(put("/user-service/api/v1/users/{userId}/password", userId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value(INVALID_PASSWORD.getMessage()))
                 .andDo(print())
-                .andDo(document("user/유저_비밀번호_수정/실패/새로운_비밀번호_불일치"));
+                .andDo(document("user/유저_비밀번호_수정/실패/새로운_비밀번호_불일치",
+                        pathParameters(parameterWithName("userId").description("유저 id"))
+                ));
     }
 
     // UPDATE EMAIL VERIFICATION
@@ -412,20 +433,21 @@ public class UserControllerTest {
         // given
         long userId = 1L;
 
-        String userStr = "853i135B";
-
         ResEmailDto res = EmailDtoFactory.succeed();
 
         // when
         when(userService.updateEmailVerification(anyLong(), anyString())).thenReturn(res);
 
         // then
-        mockMvc.perform(put("/user-service/api/v1/users/" + userId + "/email-verification")
+        mockMvc.perform(put("/user-service/api/v1/users/{userId}/email-verification", userId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("userStr", userStr))
+                        .queryParam("userStr", "ABCDEFG"))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("user/유저_이메일_인증/성공"));
+                .andDo(document("user/유저_이메일_인증/성공",
+                        pathParameters(parameterWithName("userId").description("유저 id")),
+                        queryParameters(parameterWithName("userStr").description("이메일 인증 코드"))
+                ));
     }
 
     // UPDATE EMAIL VERIFICATION
@@ -435,20 +457,21 @@ public class UserControllerTest {
         // given
         long userId = 1L;
 
-        String userStr = "853i135B";
-
         // when
         when(userService.updateEmailVerification(anyLong(), anyString()))
                 .thenThrow(new BusinessException(NOT_FOUND_USER));
 
         // then
-        mockMvc.perform(put("/user-service/api/v1/users/" + userId + "/email-verification")
+        mockMvc.perform(put("/user-service/api/v1/users/{userId}/email-verification", userId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("userStr", userStr))
+                        .queryParam("userStr", "ABCDEFG"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(NOT_FOUND_USER.getMessage()))
                 .andDo(print())
-                .andDo(document("user/유저_이메일_인증/실패/존재하지_않는_유저"));
+                .andDo(document("user/유저_이메일_인증/실패/존재하지_않는_유저",
+                        pathParameters(parameterWithName("userId").description("유저 id")),
+                        queryParameters(parameterWithName("userStr").description("이메일 인증 코드"))
+                ));
     }
 
     // UPDATE EMAIL VERIFICATION
@@ -458,20 +481,21 @@ public class UserControllerTest {
         // given
         long userId = 1L;
 
-        String userStr = "853i135B";
-
         // when
         when(userService.updateEmailVerification(anyLong(), anyString()))
                 .thenThrow(new BusinessException(INVALID_VERIFICATION_NUMBER));
 
         // then
-        mockMvc.perform(put("/user-service/api/v1/users/" + userId + "/email-verification")
+        mockMvc.perform(put("/user-service/api/v1/users/{userId}/email-verification", userId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("userStr", userStr))
+                        .queryParam("userStr", "ABCDEFG"))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value(INVALID_VERIFICATION_NUMBER.getMessage()))
                 .andDo(print())
-                .andDo(document("user/유저_이메일_인증/실패/인증번호_불일치"));
+                .andDo(document("user/유저_이메일_인증/실패/인증번호_불일치",
+                        pathParameters(parameterWithName("userId").description("유저 id")),
+                        queryParameters(parameterWithName("userStr").description("이메일 인증 코드"))
+                ));
     }
 
     // DELETE
@@ -489,13 +513,15 @@ public class UserControllerTest {
         doNothing().when(userService).deleteUser(any(), anyLong(), any());
 
         // then
-        mockMvc.perform(delete("/user-service/api/v1/users/" + userId)
+        mockMvc.perform(delete("/user-service/api/v1/users/{userId}", userId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req)))
                 .andExpect(status().isNoContent())
                 .andDo(print())
-                .andDo(document("user/회원_탈퇴/성공"));
+                .andDo(document("user/회원_탈퇴/성공",
+                        pathParameters(parameterWithName("userId").description("유저 id"))
+                ));
     }
 
     // DELETE
@@ -513,14 +539,16 @@ public class UserControllerTest {
         doThrow(new BusinessException(NOT_FOUND_USER)).when(userService).deleteUser(any(), anyLong(), any());
 
         // then
-        mockMvc.perform(delete("/user-service/api/v1/users/" + userId)
+        mockMvc.perform(delete("/user-service/api/v1/users/{userId}", userId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(NOT_FOUND_USER.getMessage()))
                 .andDo(print())
-                .andDo(document("user/회원_탈퇴/실패/존재하지_않는_유저"));
+                .andDo(document("user/회원_탈퇴/실패/존재하지_않는_유저",
+                        pathParameters(parameterWithName("userId").description("유저 id"))
+                ));
     }
 
     // DELETE
@@ -538,14 +566,16 @@ public class UserControllerTest {
         doThrow(new BusinessException(UNAUTHORIZED_ACCESS)).when(userService).deleteUser(any(), anyLong(), any());
 
         // then
-        mockMvc.perform(delete("/user-service/api/v1/users/" + userId)
+        mockMvc.perform(delete("/user-service/api/v1/users/{userId}", userId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value(UNAUTHORIZED_ACCESS.getMessage()))
                 .andDo(print())
-                .andDo(document("user/회원_탈퇴/실패/미인증_유저의_삭제_시도"));
+                .andDo(document("user/회원_탈퇴/실패/미인증_유저의_삭제_시도",
+                        pathParameters(parameterWithName("userId").description("유저 id"))
+                ));
     }
 
     // DELETE
@@ -563,14 +593,16 @@ public class UserControllerTest {
         doThrow(new BusinessException(UNAUTHORIZED_ACCESS)).when(userService).deleteUser(any(), anyLong(), any());
 
         // then
-        mockMvc.perform(delete("/user-service/api/v1/users/" + userId)
+        mockMvc.perform(delete("/user-service/api/v1/users/{userId}", userId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value(UNAUTHORIZED_ACCESS.getMessage()))
                 .andDo(print())
-                .andDo(document("user/회원_탈퇴/실패/접속_유저_불일치"));
+                .andDo(document("user/회원_탈퇴/실패/접속_유저_불일치",
+                        pathParameters(parameterWithName("userId").description("유저 id"))
+                ));
     }
 
     // DELETE
@@ -588,14 +620,16 @@ public class UserControllerTest {
         doThrow(new BusinessException(INVALID_PASSWORD)).when(userService).deleteUser(any(), anyLong(), any());
 
         // then
-        mockMvc.perform(delete("/user-service/api/v1/users/" + userId)
+        mockMvc.perform(delete("/user-service/api/v1/users/{userId}", userId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(req)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value(INVALID_PASSWORD.getMessage()))
                 .andDo(print())
-                .andDo(document("user/회원_탈퇴/실패/비밀번호_확인_실패"));
+                .andDo(document("user/회원_탈퇴/실패/비밀번호_확인_실패",
+                        pathParameters(parameterWithName("userId").description("유저 id"))
+                ));
     }
 
     // LOGIN

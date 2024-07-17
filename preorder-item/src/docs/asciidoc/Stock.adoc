@@ -1,0 +1,83 @@
+= STOCK API 명세서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+[[common]]
+== 공통 사항
+
+API에 관계없이 아래 사항을 지켜주셔야 합니다.
+
+=== Domain
+
+|===
+| 환경 | domain
+
+| 개발서버
+| `localhost`
+
+| 운영서버
+| `AWS EC2 - t3.large`
+|===
+
+
+=== Header
+
+|===
+| name | 설명
+
+| `Cookie`
+| accessToken : Access Token을 담고 있습니다.
+
+refreshToken : Refresh Token을 담고 있습니다.
+|===
+
+== 재고 증가
+
+=== 성공
+
+==== Request
+include::{snippets}/stock/재고_증가/성공/http-request.adoc[]
+
+==== Response
+include::{snippets}/stock/재고_증가/성공/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 유저
+
+==== Request
+include::{snippets}/stock/재고_증가/실패/존재하지_않는_재고/http-request.adoc[]
+
+==== Response
+include::{snippets}/stock/재고_증가/실패/존재하지_않는_재고/http-response.adoc[]
+
+== 재고 감소
+
+=== 성공
+
+==== Request
+include::{snippets}/stock/재고_감소/성공/http-request.adoc[]
+
+==== Response
+include::{snippets}/stock/재고_감소/성공/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 재고
+
+==== Request
+include::{snippets}/stock/재고_감소/실패/존재하지_않는_재고/http-request.adoc[]
+
+==== Response
+include::{snippets}/stock/재고_감소/실패/존재하지_않는_재고/http-response.adoc[]
+
+=== 실패 - 충분하지 않은 재고
+
+==== Request
+include::{snippets}/stock/재고_감소/실패/충분하지_않은_재고/http-request.adoc[]
+
+==== Response
+include::{snippets}/stock/재고_감소/실패/충분하지_않은_재고/http-response.adoc[]

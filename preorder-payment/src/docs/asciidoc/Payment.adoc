@@ -1,0 +1,92 @@
+= PAYMENT API 명세서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+[[common]]
+== 공통 사항
+
+API에 관계없이 아래 사항을 지켜주셔야 합니다.
+
+=== Domain
+
+|===
+| 환경 | domain
+
+| 개발서버
+| `localhost`
+
+| 운영서버
+| `AWS EC2 - t3.large`
+|===
+
+
+=== Header
+
+|===
+| name | 설명
+
+| `Cookie`
+| accessToken : Access Token을 담고 있습니다.
+
+refreshToken : Refresh Token을 담고 있습니다.
+|===
+
+== 결제 시도
+
+=== 성공
+
+==== Request
+include::{snippets}/payment/결제_시도/성공/http-request.adoc[]
+
+==== Response
+include::{snippets}/payment/결제_시도/성공/http-response.adoc[]
+
+=== 실패 - 사용자 변심
+
+==== Request
+include::{snippets}/payment/결제_시도/실패/사용자_변심/http-request.adoc[]
+
+==== Response
+include::{snippets}/payment/결제_시도/실패/사용자_변심/http-response.adoc[]
+
+== 결제 완료
+
+=== 성공
+
+==== Request
+include::{snippets}/payment/결제_완료/성공/http-request.adoc[]
+
+==== Request params
+include::{snippets}/payment/결제_완료/성공/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/payment/결제_완료/성공/http-response.adoc[]
+
+=== 실패 - 사용자 변심
+
+==== Request
+include::{snippets}/payment/결제_완료/실패/사용자_변심/http-request.adoc[]
+
+==== Request params
+include::{snippets}/payment/결제_완료/성공/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/payment/결제_완료/실패/사용자_변심/http-response.adoc[]
+
+=== 실패 - 존재하지 않는 결제 정보
+
+==== Request
+include::{snippets}/payment/결제_완료/실패/존재하지_않는_결제_정보/http-request.adoc[]
+
+==== Request params
+include::{snippets}/payment/결제_완료/성공/path-parameters.adoc[]
+
+==== Response
+include::{snippets}/payment/결제_완료/실패/존재하지_않는_결제_정보/http-response.adoc[]

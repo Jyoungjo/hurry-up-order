@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -30,6 +31,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = {ItemController.class})
 @Import(JacksonConfig.class)
 @AutoConfigureRestDocs
+@ActiveProfiles("test")
 public class ItemControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -177,11 +180,15 @@ public class ItemControllerTest {
         // then
         mockMvc.perform(get("/item-service/api/v1/items")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("page", String.valueOf(page))
-                        .param("size", String.valueOf(size)))
+                        .queryParam("page", String.valueOf(page))
+                        .queryParam("size", String.valueOf(size)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("item/상품_목록_조회/성공"));
+                .andDo(document("item/상품_목록_조회/성공",
+                        queryParameters(
+                                parameterWithName("page").description("페이지 넘버"),
+                                parameterWithName("size").description("보여줄 개수"))
+                ));
     }
 
     // READ ONE
@@ -201,11 +208,13 @@ public class ItemControllerTest {
         when(itemService.readItem(anyLong())).thenReturn(res);
 
         // then
-        mockMvc.perform(get("/item-service/api/v1/items/" + itemId)
+        mockMvc.perform(get("/item-service/api/v1/items/{itemId}", itemId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("item/상품_단일_조회/성공"));
+                .andDo(document("item/상품_단일_조회/성공",
+                        pathParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // READ ONE
@@ -219,12 +228,14 @@ public class ItemControllerTest {
         when(itemService.readItem(anyLong())).thenThrow(new BusinessException(NOT_FOUND_ITEM));
 
         // then
-        mockMvc.perform(get("/item-service/api/v1/items/" + itemId)
+        mockMvc.perform(get("/item-service/api/v1/items/{itemId}", itemId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(NOT_FOUND_ITEM.getMessage()))
                 .andDo(print())
-                .andDo(document("item/상품_단일_조회/실패/존재하지_않는_상품"));
+                .andDo(document("item/상품_단일_조회/실패/존재하지_않는_상품",
+                        pathParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // UPDATE
@@ -248,13 +259,15 @@ public class ItemControllerTest {
         when(itemService.readItem(anyLong())).thenReturn(res);
 
         // then
-        mockMvc.perform(put("/item-service/api/v1/items/" + itemId)
+        mockMvc.perform(put("/item-service/api/v1/items/{itemId}", itemId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("item/상품_정보_수정/성공"));
+                .andDo(document("item/상품_정보_수정/성공",
+                        pathParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // UPDATE
@@ -272,14 +285,16 @@ public class ItemControllerTest {
         when(itemService.updateItem(anyLong(), any())).thenThrow(new BusinessException(INVALID_INPUT_VALUE));
 
         // then
-        mockMvc.perform(put("/item-service/api/v1/items/" + itemId)
+        mockMvc.perform(put("/item-service/api/v1/items/{itemId}", itemId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(INVALID_INPUT_VALUE.getMessage()))
                 .andDo(print())
-                .andDo(document("item/상품_정보_수정/실패/필수_입력값_누락"));
+                .andDo(document("item/상품_정보_수정/실패/필수_입력값_누락",
+                        pathParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // UPDATE
@@ -297,14 +312,16 @@ public class ItemControllerTest {
         when(itemService.updateItem(anyLong(), any())).thenThrow(new BusinessException(INVALID_INPUT_VALUE));
 
         // then
-        mockMvc.perform(put("/item-service/api/v1/items/" + itemId)
+        mockMvc.perform(put("/item-service/api/v1/items/{itemId}", itemId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(INVALID_INPUT_VALUE.getMessage()))
                 .andDo(print())
-                .andDo(document("item/상품_정보_수정/실패/글자수_부족"));
+                .andDo(document("item/상품_정보_수정/실패/글자수_부족",
+                        pathParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // UPDATE
@@ -322,14 +339,16 @@ public class ItemControllerTest {
         when(itemService.updateItem(anyLong(), any())).thenThrow(new BusinessException(INVALID_INPUT_VALUE));
 
         // then
-        mockMvc.perform(put("/item-service/api/v1/items/" + itemId)
+        mockMvc.perform(put("/item-service/api/v1/items/{itemId}", itemId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(INVALID_INPUT_VALUE.getMessage()))
                 .andDo(print())
-                .andDo(document("item/상품_정보_수정/실패/글자수_초과"));
+                .andDo(document("item/상품_정보_수정/실패/글자수_초과",
+                        pathParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // DELETE
@@ -343,12 +362,14 @@ public class ItemControllerTest {
         doNothing().when(itemService).deleteItem(anyLong());
 
         // then
-        mockMvc.perform(delete("/item-service/api/v1/items/" + itemId)
+        mockMvc.perform(delete("/item-service/api/v1/items/{itemId}",itemId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andDo(print())
-                .andDo(document("item/상품_삭제/성공"));
+                .andDo(document("item/상품_삭제/성공",
+                        pathParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 
     // DELETE
@@ -362,11 +383,13 @@ public class ItemControllerTest {
         doThrow(new BusinessException(NOT_FOUND_ITEM)).when(itemService).deleteItem(anyLong());
 
         // then
-        mockMvc.perform(delete("/item-service/api/v1/items/" + itemId)
+        mockMvc.perform(delete("/item-service/api/v1/items/{itemId}",itemId)
                         .header("Cookie", "accessToken={access_token};refreshToken={refresh_token};")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andDo(print())
-                .andDo(document("item/상품_삭제/실패/존재하지_않는_상품"));
+                .andDo(document("item/상품_삭제/실패/존재하지_않는_상품",
+                        pathParameters(parameterWithName("itemId").description("상품 id"))
+                ));
     }
 }
