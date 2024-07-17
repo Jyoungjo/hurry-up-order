@@ -65,6 +65,6 @@ build {
 bootJar {
     dependsOn asciidoctor
     from ("${asciidoctor.outputDir}") {
-        into 'static/docs'
+        into 'build/resources/main/static/docs'
     }
 }
