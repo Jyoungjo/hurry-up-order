@@ -60,6 +60,9 @@ tasks.named('test') {
 
 asciidoctor {
     inputs.dir snippetsDir
+    doFirst {
+        delete file('src/main/resources/static/docs')
+    }
     configurations 'asciidoctorExt'
     dependsOn test
 }
@@ -77,6 +80,6 @@ build {
 bootJar {
     dependsOn asciidoctor
     from ("${asciidoctor.outputDir}") {
-        into 'static/docs'
+        into 'BOOT-INF/classes/static/docs'
     }
 }
