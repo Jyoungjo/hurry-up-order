@@ -88,7 +88,7 @@ _아래 방법을 따라 프로젝트를 설치하고 실행해주세요._
 <!-- API SPECIFICATION -->
 ## API 명세
 
-API 명세의 경우 [📗API 명세서](./docs/API.html)에서 확인하실 수 있습니다.
+API 명세의 경우 [📗API 명세서](https://htmlpreview.github.io/?https://github.com/Jyoungjo/hanghae99_pre-order/blob/docs/%EB%A6%AC%EB%93%9C%EB%AF%B8_%EC%9E%91%EC%84%B1/docs/API.html)에서 확인하실 수 있습니다.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
