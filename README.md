@@ -20,7 +20,7 @@
 <!-- ABOUT THE PROJECT -->
 ## 프로젝트 소개
 
-이 프로젝트는 Spring 기반의 개인 E-Commerce 프로젝트입니다.
+이 프로젝트는 Spring 기반의 E-Commerce를 주제로 한 개인 프로젝트입니다.
 일반적인 상품 판매 기능과 함께 한정된 수량의 물품을 특정 시간에 오픈하여 선착순으로 구매할 수 있는 기능을 제공합니다.
 해당 프로젝트는 동시다발적으로 들어오는 주문 요청을 적절히 제어하고, Redis의 Atomic Operation과 Caching을 통해 재고 처리 시스템을 개발했습니다.
 
@@ -101,7 +101,7 @@ API 명세의 경우 [📗API 명세서](https://htmlpreview.github.io/?https://
 ![image](https://github.com/user-attachments/assets/99c0ec45-f4db-4cb3-b801-f563e6c8be65)
 
 ### 서비스 아키텍처
-![image](https://github.com/user-attachments/assets/6f10c01c-b6a0-4575-949f-e748bd067429)
+![image](https://github.com/user-attachments/assets/0b2dbfa8-61d0-4990-9f4a-5965f007d17f)
 
 ### 파일 구조도
 <details>
@@ -527,15 +527,18 @@ API 명세의 경우 [📗API 명세서](https://htmlpreview.github.io/?https://
 2. 상품
    - 상품 목록 페이징 조회 및 개별 조회
 3. 주문
-   - 일반 상품, 수량 한정 상품 주문
+   - **일반 상품, 수량 한정 상품 주문**
    - 주문 상품에 대한 정보 조회 및 수정
-   - 주문 취소 및 반품
+   - **주문 취소 및 반품**
    - 장바구니 조회 및 상품 추가, 삭제
-   - 장바구니에서 상품 주문
+   - **장바구니에서 상품 주문**
 4. 재고
    - 재고 조회 및 추가, 감소
 5. 결제
    - 결제 시도 및 완료
+6. 테스트
+   - 각 레이어 별 Unit Test 진행(Code Coverage 75%)
+<!-- - 동시성 테스트 코드 작성했다는거 증명하기! -->
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -543,13 +546,17 @@ API 명세의 경우 [📗API 명세서](https://htmlpreview.github.io/?https://
 
 <!-- TROUBLE SHOOTING -->
 ## 트러블 슈팅
-1️⃣ 이메일 인증 로직 속도 개선
+1. 이메일 인증 로직 속도 개선
 
-- 이메일 인증 비동기 처리를 통한 13s -> 0.69s 개선
+- 이메일 인증 비동기 처리 + Redis를 통한 13s -> 0.69s 개선
 
-<!--2️⃣ 주문 생성 로직 속도 개선-->
+2. 재고 동시성 문제 해결
+<!--동시성 테스트 코드 작성해서 증명-->
 
-[✅ 자세한 내용 보러가기](https://www.notion.so/Docs-b52e69594faf418e8be2e900024e8419?pvs=4#3873982447e94b3281cf12f2cf48af9e)
+- 기존 선착순 주문 로직 실행 시 재고 처리 부분에서 예상 재고보다 많이 감소되는 부분 확인
+- 이를 Redis의 Atomic Operation을 사용하여 동시성 문제 해결
+
+[✅ 자세한 해결방안 보러가기](https://www.notion.so/Docs-b52e69594faf418e8be2e900024e8419?pvs=4#3873982447e94b3281cf12f2cf48af9e)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -557,19 +564,19 @@ API 명세의 경우 [📗API 명세서](https://htmlpreview.github.io/?https://
 
 <!-- TROUBLE SHOOTING -->
 ## 기술적 의사결정
-1️⃣ PostgreSQL 선택 이유
+1. PostgreSQL 선택 이유
 
 -> 대용량 트래픽과 동시성 제어에 뛰어난 성능을 제공
 
-2️⃣ Feign Client 선택 이유
+2. Feign Client 선택 이유
 
 -> 간결하고 직관적인 사용법 + Spring Cloud와의 통합 용이성
 
-3️⃣ ID 간접 참조 선택 이유
+3. ID 간접 참조 선택 이유
 
 -> 데이터 독립성, 낮은 결합도, 높은 유연성
 
-4️⃣ 동시성 문제 해결을 위해 Redis를 선택한 이유
+4. 동시성 문제 해결을 위해 Redis를 선택한 이유
 
 -> 높은 성능, 확장성, 데이터 일관성
 
