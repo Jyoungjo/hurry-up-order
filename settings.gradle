@@ -1,4 +1,4 @@
-rootProject.name = 'hanghae99'
+rootProject.name = 'hurry_up_order'
 include 'preorder-user'
 include 'preorder-order'
 include 'preorder-item'
