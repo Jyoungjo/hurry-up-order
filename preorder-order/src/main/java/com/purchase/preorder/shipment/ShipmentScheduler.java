@@ -3,14 +3,14 @@ package com.purchase.preorder.shipment;
 import com.purchase.preorder.client.ItemClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.purchase.preorder.shipment.ShipmentStatus.*;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class ShipmentScheduler {
     private final ShipmentRepository shipmentRepository;

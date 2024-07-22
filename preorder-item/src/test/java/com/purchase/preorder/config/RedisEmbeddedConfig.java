@@ -4,7 +4,8 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.util.StringUtils;
 import redis.embedded.RedisServer;
 
@@ -13,9 +14,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 @Slf4j
-@TestConfiguration
+@Configuration
+@Profile("test")
 public class RedisEmbeddedConfig {
-    @Value("${spring.redis.port}")
+    @Value("${spring.data.redis.port}")
     private int redisPort;
 
     private RedisServer redisServer;
@@ -65,13 +67,16 @@ public class RedisEmbeddedConfig {
      */
     private Process executeGrepProcessCommand(int port) throws IOException {
         String OS = System.getProperty("os.name").toLowerCase();
+        String command;
+
         if (OS.contains("win")) {
-            log.info("OS is  " + OS + " " + port);
-            String command = String.format("netstat -nao | find \"LISTEN\" | find \"%d\"", port);
+            log.info("OS is " + OS + " " + port);
+            command = String.format("netstat -nao | findstr LISTEN | findstr %d", port);
             String[] shell = {"cmd.exe", "/y", "/c", command};
             return Runtime.getRuntime().exec(shell);
         }
-        String command = String.format("netstat -nat | grep LISTEN|grep %d", port);
+
+        command = String.format("netstat -nat | grep LISTEN | grep %d", port);
         String[] shell = {"/bin/sh", "-c", command};
         return Runtime.getRuntime().exec(shell);
     }
