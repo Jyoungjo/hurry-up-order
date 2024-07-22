@@ -11,8 +11,9 @@
 
 
 <!-- PROJECT LOGO -->
-<h1 align="center">선착순 예약 구매 서비스</h1>
-<h3 align="center"><a href="https://leather-hole-ee3.notion.site"><strong>Explore the docs »</strong></a></h3>
+<h1 align="center">Hurry Up Order!</h1>
+<h2 align="center">선착순 예약 구매 서비스</h2>
+<h3 align="center"><a href="https://leather-hole-ee3.notion.site"><strong>docs 확인하러 가기 »</strong></a></h3>
 <br/>
 <br/>
 
@@ -56,8 +57,8 @@ _아래 방법을 따라 프로젝트를 설치하고 실행해주세요._
 
 1. 저장소를 클론합니다.
    ```sh
-   git clone https://github.com/Jyoungjo/hanghae99_pre-order.git
-   cd hanghae99_pre-order
+   git clone https://github.com/Jyoungjo/hurry-up-order.git
+   cd hurry-up-order
    ```
 2. Docker를 사용하여 PostgreSQL과 Redis를 실행합니다.
    ```sh
@@ -108,7 +109,7 @@ API 명세의 경우 [📗API 명세서](https://htmlpreview.github.io/?https://
   <summary>파일 구조도</summary>
 
 ```bash
-📦hanghae99_pre-order
+📦hurry_up_order
  ┣ 📂gradle
  ┃ ┗ 📂wrapper
  ┃ ┃ ┣ 📜gradle-wrapper.jar
@@ -538,7 +539,7 @@ API 명세의 경우 [📗API 명세서](https://htmlpreview.github.io/?https://
    - 결제 시도 및 완료
 6. 테스트
    - 각 레이어 별 Unit Test 진행(Code Coverage 75%)
-<!-- - 동시성 테스트 코드 작성했다는거 증명하기! -->
+   - 동시성 테스트 코드 작성으로 **[동시성 제어 유효성 입증](https://www.notion.so/Docs-b52e69594faf418e8be2e900024e8419?pvs=4#d3985f8298be42959a07e83c602322eb)**
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -550,11 +551,17 @@ API 명세의 경우 [📗API 명세서](https://htmlpreview.github.io/?https://
 
 - 이메일 인증 비동기 처리 + Redis를 통한 13s -> 0.69s 개선
 
-2️⃣ 재고 동시성 문제 해결
-<!--동시성 테스트 코드 작성해서 증명-->
+2️⃣ 재고 로직 리팩토링
 
-- 기존 선착순 주문 로직 실행 시 재고 처리 부분에서 예상 재고보다 많이 감소되는 부분 확인
-- 이를 Redis의 Atomic Operation을 사용하여 동시성 문제 해결
+- 재고 조회 성능 향상
+  - Redis를 이용한 Caching 도입으로 조회 성능 약 92%(180ms → 14ms) 향상
+- 재고 동시성 문제 해결
+  - Redis의 Atomic Operation을 통한 동시성 문제 해결 (TEST 진행 완료)
+
+3️⃣ Eureka Server에서 Client 찾지 못하는 문제 해결
+
+- Eureka Server 보다 다른 서비스가 먼저 실행이 완료되어 해당 서비스들을 찾지 못하는 문제 확인
+- Eureka Server에 Actuator 도입하여 Health Check 진행 후, 완료되면 다른 컨테이너가 실행되도록 docker-compose.yml 수정
 
 [✅ 자세한 해결방안 보러가기](https://www.notion.so/Docs-b52e69594faf418e8be2e900024e8419?pvs=4#3873982447e94b3281cf12f2cf48af9e)
 
@@ -562,7 +569,7 @@ API 명세의 경우 [📗API 명세서](https://htmlpreview.github.io/?https://
 
 
 
-<!-- TROUBLE SHOOTING -->
+<!-- TECHNICAL DECISION-MAKING -->
 ## 기술적 의사결정
 1️⃣ PostgreSQL 선택 이유
 
