@@ -24,6 +24,9 @@ public class StockServiceTest {
     private StockRepository stockRepository;
 
     @Mock
+    private StockAsyncService stockAsyncService;
+
+    @Mock
     private RedisService redisService;
 
     @InjectMocks
@@ -73,7 +76,12 @@ public class StockServiceTest {
         int quantity = 1000;
 
         when(redisService.increment(anyString(), anyInt())).thenReturn(6000L);
-        when(stockRepository.findByItemId(anyLong())).thenReturn(Optional.of(stock));
+        doAnswer(invocation -> {
+            Long itId = invocation.getArgument(0);
+            int quant = invocation.getArgument(1);
+            stock.increaseQuantity(quant);
+            return null;
+        }).when(stockAsyncService).asyncIncreaseStock(anyLong(), anyInt());
 
         // when
         stockService.increaseStock(itemId, quantity);
@@ -91,7 +99,8 @@ public class StockServiceTest {
         int quantity = 1000;
 
         when(redisService.increment(anyString(), anyInt())).thenReturn(6000L);
-        when(stockRepository.findByItemId(anyLong())).thenReturn(Optional.empty());
+        doThrow(new BusinessException(NOT_FOUND_STOCK))
+                .when(stockAsyncService).asyncIncreaseStock(anyLong(), anyInt());
 
         // when
 
@@ -109,7 +118,12 @@ public class StockServiceTest {
         int quantity = 1000;
 
         when(redisService.increment(anyString(), anyInt())).thenReturn(4000L);
-        when(stockRepository.findByItemId(anyLong())).thenReturn(Optional.of(stock));
+        doAnswer(invocation -> {
+            Long itId = invocation.getArgument(0);
+            int quant = invocation.getArgument(1);
+            stock.decreaseQuantity(quant);
+            return null;
+        }).when(stockAsyncService).asyncDecreaseStock(anyLong(), anyInt());
 
         // when
         stockService.decreaseStock(item.getId(), quantity);
@@ -126,7 +140,8 @@ public class StockServiceTest {
         int quantity = 1000;
 
         when(redisService.increment(anyString(), anyInt())).thenReturn(4000L);
-        when(stockRepository.findByItemId(anyLong())).thenReturn(Optional.empty());
+        doThrow(new BusinessException(NOT_FOUND_STOCK))
+                .when(stockAsyncService).asyncDecreaseStock(anyLong(), anyInt());
 
         // when
 

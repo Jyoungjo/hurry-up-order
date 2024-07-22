@@ -17,8 +17,9 @@ import static com.purchase.preorder.exception.ExceptionCode.NOT_FOUND_STOCK;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class StockServiceImpl implements StockService {
-    private static final String STOCK_KEY_PREFIX = "stock:";
+    private static final String STOCK_KEY_PREFIX = "stockOfItem:";
     private final StockRepository stockRepository;
+    private final StockAsyncService stockAsyncService;
     private final RedisService redisService;
 
     @Override
@@ -29,10 +30,7 @@ public class StockServiceImpl implements StockService {
     @Override
     public void increaseStock(Long itemId, int quantity) {
         redisService.increment(STOCK_KEY_PREFIX + itemId, quantity);
-        Stock stock = stockRepository.findByItemId(itemId)
-                .orElseThrow(() -> new BusinessException(NOT_FOUND_STOCK));
-        stock.increaseQuantity(quantity);
-        stockRepository.save(stock);
+        stockAsyncService.asyncIncreaseStock(itemId, quantity);
     }
 
     @Override
@@ -51,10 +49,7 @@ public class StockServiceImpl implements StockService {
             redisService.increment(STOCK_KEY_PREFIX + itemId, quantity);
             throw new BusinessException(NOT_ENOUGH_STOCK);
         }
-        Stock stock = stockRepository.findByItemId(itemId)
-                        .orElseThrow(() -> new BusinessException(NOT_FOUND_STOCK));
-        stock.decreaseQuantity(quantity);
-        stockRepository.save(stock);
+        stockAsyncService.asyncDecreaseStock(itemId, quantity);
     }
 
     @Override
