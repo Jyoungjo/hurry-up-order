@@ -519,49 +519,72 @@ API 명세의 경우 [📗API 명세서](https://htmlpreview.github.io/?https://
 <!-- PROJECT FEATURES -->
 ## 프로젝트 주요 기능
 
-1. 유저
-   - 회원가입 및 로그인, 로그아웃
-   - 회원 정보 및 위시리스트 조회
-   - 회원 정보 수정 및 탈퇴
-   - 위시리스트 조회 및 상품 추가, 삭제
-   - 위시리스트에서 상품 주문
-2. 상품
-   - 상품 목록 페이징 조회 및 개별 조회
-3. 주문
-   - **일반 상품, 수량 한정 상품 주문**
-   - 주문 상품에 대한 정보 조회 및 수정
-   - **주문 취소 및 반품**
-   - 장바구니 조회 및 상품 추가, 삭제
-   - **장바구니에서 상품 주문**
-4. 재고
-   - 재고 조회 및 추가, 감소
-5. 결제
-   - 결제 시도 및 완료
-6. 테스트
-   - 각 레이어 별 Unit Test 진행(Code Coverage 75%)
-   - 동시성 테스트 코드 작성으로 **[동시성 제어 유효성 입증](https://www.notion.so/Docs-b52e69594faf418e8be2e900024e8419?pvs=4#d3985f8298be42959a07e83c602322eb)**
+1. 사용자 관리
+- 사용자 관리
+  - 유저 회원가입 시 정보 암호화 저장
+  - 로그아웃 시 refresh token 블랙리스트 저장으로 access token 탈취로 인한 토큰 재발급 방지
+  - 사용자 정보 조회, 수정 및 계정 탈퇴
+- 위시리스트 관리
+  - 위시리스트 조회, 상품 추가 및 삭제
+  - 위시리스트에서 주문 기능 활성화를 통한 사용자 쇼핑 경험 및 구매 전환율 상승
+2. 상품 관리
+- 판매자 상품 등록
+- 상품 목록 페이징 및 개별 상품 상세 조회
+3. 주문 관리
+- 주문 처리
+  - 일반 상품 및 수량 한정 상품 주문
+- 주문 내역 관리
+  - 주문 상세 정보 조회 및 수정
+  - 주문 취소 및 반품 처리
+- 장바구니 관리
+  - 장바구니 조회, 상품 추가 및 삭제
+  - 장바구니에서 상품 주문으로 사용자 쇼핑 경험 연장
+4. 재고 관리
+- 실시간 재고 관리
+  - 재고 조회, 추가 및 감소 관리를 통해 효율적인 재고 관리 및 사용자 경험 증대
+5. 테스트
+   - 각 레이어 별 Unit Test 진행(Test Coverage 75%)
+   - 동시성 테스트 코드 작성으로 **[동시성 제어 유효성 입증](https://www.notion.so/Docs-b52e69594faf418e8be2e900024e8419?pvs=4#8b002fe0ca9f497984b09b1f7bb92cf0)**
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
-<!-- TROUBLE SHOOTING -->
-## 트러블 슈팅
+<!-- IMPROVED PERFORMANCE -->
+## 성능 개선
+
 1️⃣ 이메일 인증 로직 속도 개선
 
 - 이메일 인증 비동기 처리 + Redis를 통한 13s -> 0.69s 개선
 
-2️⃣ 재고 로직 리팩토링
+2️⃣ 재고 조회 성능 개선
 
-- 재고 조회 성능 향상
-  - Redis를 이용한 Caching 도입으로 조회 성능 약 92%(180ms → 14ms) 향상
-- 재고 동시성 문제 해결
-  - Redis의 Atomic Operation을 통한 동시성 문제 해결 (TEST 진행 완료)
+- Redis를 이용한 Caching 도입으로 조회 성능 약 92%(180ms → 14ms) 향상
 
-3️⃣ Eureka Server에서 Client 찾지 못하는 문제 해결
+3️⃣ API Gateway Non-blocking 전환
+
+- Webflux 기반 Non-Blocking 서비스 전환으로 응답성과 요청 처리량 향상
+
+[✅ 자세한 개선 사항 보러가기](https://www.notion.so/Docs-b52e69594faf418e8be2e900024e8419?pvs=4#4514b232e6f3435392fcc62ca5723fc5)
+
+
+
+<!-- TROUBLE SHOOTING -->
+## 트러블 슈팅
+
+1️⃣ 재고 동시성 문제 해결
+
+- Redis의 Atomic Operation을 통한 동시성 문제 해결 (TEST 진행 완료)
+
+2️⃣ Eureka Server에서 Client 찾지 못하는 문제 해결
 
 - Eureka Server 보다 다른 서비스가 먼저 실행이 완료되어 해당 서비스들을 찾지 못하는 문제 확인
 - Eureka Server에 Actuator 도입하여 Health Check 진행 후, 완료되면 다른 컨테이너가 실행되도록 docker-compose.yml 수정
+
+3️⃣ Test 환경 Embedded Redis Port 중복 에러 해결
+
+- 기존 Context 재활용으로 인한 Port 중복 사용으로 Bean 등록 실패
+- 포트 체크 후 포트를 재지정하는 코드 작성하여 해결
 
 [✅ 자세한 해결방안 보러가기](https://www.notion.so/Docs-b52e69594faf418e8be2e900024e8419?pvs=4#3873982447e94b3281cf12f2cf48af9e)
 
