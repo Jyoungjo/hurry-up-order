@@ -57,9 +57,6 @@ public class StockServiceImpl implements StockService {
     public void decreaseStock(ReqStockDto req) {
         Stock stock = stockRepository.findByItemId(req.getItemId())
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_STOCK));
-        if (stock.getQuantity() < req.getQuantity()) {
-            throw new BusinessException(NOT_ENOUGH_STOCK);
-        }
 
         stock.decreaseQuantity(req.getQuantity());
         stockRepository.save(stock);
