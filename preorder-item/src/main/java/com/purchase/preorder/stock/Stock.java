@@ -1,6 +1,7 @@
 package com.purchase.preorder.stock;
 
 import com.purchase.preorder.common.BaseEntity;
+import com.purchase.preorder.exception.BusinessException;
 import com.purchase.preorder.item.Item;
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,6 +9,8 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
+
+import static com.purchase.preorder.exception.ExceptionCode.NOT_ENOUGH_STOCK;
 
 @Entity
 @Table(name = "TB_STOCK")
@@ -32,6 +35,10 @@ public class Stock extends BaseEntity {
     }
 
     public void decreaseQuantity(int quantity) {
+        if (this.getQuantity() - quantity < 0) {
+            throw new BusinessException(NOT_ENOUGH_STOCK);
+        }
+
         this.quantity -= quantity;
     }
 

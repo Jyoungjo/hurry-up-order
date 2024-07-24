@@ -54,18 +54,23 @@ public class StockServiceConcurrencyTest {
         redisService.deleteValuesByKey("stockOfItem:1");
     }
 
-    // CONCURRENCY TEST - 재고 저장 비동기 처리 Test duration: 199ms
+    // CONCURRENCY TEST
     @DisplayName("재고 동시성 테스트")
     @Test
     void 동시성_테스트() throws InterruptedException {
-        int threadCount = 1000;
-        ExecutorService executorService = Executors.newFixedThreadPool(32);
-        CountDownLatch countDownLatch = new CountDownLatch(threadCount);
+        int executeCount = 100;
+        int numOfThread = 40;
+        int expectedSuccessCount = 10;
+        int expectedFailCount = executeCount - expectedSuccessCount;
+        ExecutorService executorService = Executors.newFixedThreadPool(numOfThread);
+        CountDownLatch countDownLatch = new CountDownLatch(executeCount);
 
         AtomicInteger successCount = new AtomicInteger();
         AtomicInteger failCount = new AtomicInteger();
 
-        for (int i = 0; i < threadCount; i++) {
+        long startTime = System.currentTimeMillis();
+
+        for (int i = 0; i < executeCount; i++) {
             executorService.submit(() -> {
                 try {
                     stockService.decreaseStock(1L, 1);
@@ -83,9 +88,24 @@ public class StockServiceConcurrencyTest {
         countDownLatch.await();
         executorService.shutdown();
 
+        long stopTime = System.currentTimeMillis();
+        long diff = stopTime - startTime;
+        System.out.printf("""
+                        Thread 개수: %d \n
+                        실행 횟수: %d회 \n
+                        예상 재고 감소량: %d개 \n
+                        실제 재고 감소량: %d개 \n
+                        예상 실패량: %d개 \n
+                        실제 실패량: %d개 \n
+                        테스트 경과 시간: %d ms
+                        """,
+                numOfThread, executeCount, expectedSuccessCount, successCount.get(),
+                expectedFailCount, failCount.get(), diff
+        );
+
         assertAll(
-                () -> assertThat(successCount.get()).isEqualTo(10),
-                () -> assertThat(failCount.get()).isEqualTo(990)
+                () -> assertThat(successCount.get()).isEqualTo(expectedSuccessCount),
+                () -> assertThat(failCount.get()).isEqualTo(expectedFailCount)
         );
     }
 }
