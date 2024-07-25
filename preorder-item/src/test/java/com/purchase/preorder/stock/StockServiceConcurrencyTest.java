@@ -1,5 +1,6 @@
 package com.purchase.preorder.stock;
 
+import com.purchase.preorder.common.RedisCacheKey;
 import com.purchase.preorder.common.RedisService;
 import com.purchase.preorder.config.RedisEmbeddedConfig;
 import com.purchase.preorder.item.Item;
@@ -44,22 +45,22 @@ public class StockServiceConcurrencyTest {
     void createStock() {
         Item item = itemRepository.saveAndFlush(Item.builder().id(1L).build());
         stockRepository.saveAndFlush(new Stock(1L, item, 10, null));
-        redisService.setValues("stockOfItem:1", 10);
+        redisService.setValues(RedisCacheKey.STOCK_KEY_PREFIX + "1", 10);
     }
 
     @AfterEach
     void deleteAll() {
         itemRepository.deleteAll();
         stockRepository.deleteAll();
-        redisService.deleteValuesByKey("stockOfItem:1");
+        redisService.deleteValuesByKey(RedisCacheKey.STOCK_KEY_PREFIX + "1");
     }
 
     // CONCURRENCY TEST
     @DisplayName("재고 동시성 테스트")
     @Test
     void 동시성_테스트() throws InterruptedException {
-        int executeCount = 100;
-        int numOfThread = 40;
+        int executeCount = 10000;
+        int numOfThread = 32;
         int expectedSuccessCount = 10;
         int expectedFailCount = executeCount - expectedSuccessCount;
         ExecutorService executorService = Executors.newFixedThreadPool(numOfThread);
