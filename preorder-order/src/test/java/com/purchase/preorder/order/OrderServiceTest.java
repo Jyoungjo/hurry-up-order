@@ -4,6 +4,7 @@ import com.purchase.preorder.client.ItemClient;
 import com.purchase.preorder.client.PaymentClient;
 import com.purchase.preorder.client.ReqPaymentDto;
 import com.purchase.preorder.client.UserClient;
+import com.purchase.preorder.client.response.ItemResponse;
 import com.purchase.preorder.client.response.PaymentResponse;
 import com.purchase.preorder.client.response.StockResponse;
 import com.purchase.preorder.client.response.UserResponse;
@@ -57,6 +58,7 @@ public class OrderServiceTest {
     private OrderServiceImpl orderService;
 
     private UserResponse user;
+    private ItemResponse item;
     private PaymentResponse payment;
     private StockResponse stock;
     private Order order;
@@ -71,6 +73,11 @@ public class OrderServiceTest {
                 1L, "이름", "test@email.com",
                 LocalDateTime.now(), "12345", "주소",
                 "010-1234-1234", "CERTIFIED_USER", null
+        );
+
+        item = new ItemResponse(
+                1L, "상품명", "상품에 대한 설명입니다.",
+                100, LocalDateTime.now(), false, null
         );
 
         payment = new PaymentResponse(1L, true);
@@ -180,6 +187,7 @@ public class OrderServiceTest {
         request.setCookies(new MockCookie("accessToken", accessToken));
 
         when(itemClient.getStock(anyLong())).thenReturn(stock);
+        when(itemClient.getItem(anyLong())).thenReturn(item);
         cookieManager.when(() -> CustomCookieManager.getCookie(any(HttpServletRequest.class), anyString()))
                 .thenReturn(accessToken);
         jwtParser.when(() -> JwtParser.getEmail(anyString())).thenReturn("test@email.com");
@@ -188,7 +196,7 @@ public class OrderServiceTest {
         doNothing().when(itemClient).decreaseStock(anyLong(), anyInt());
         when(paymentClient.initiatePayment(any(ReqPaymentDto.class))).thenReturn(payment);
         when(paymentClient.completePayment(anyLong())).thenReturn(payment);
-        doNothing().when(orderItemService).createOrderItem(any(Order.class), any(ReqLimitedOrderDto.class));
+        doNothing().when(orderItemService).createOrderItem(any(ItemResponse.class), any(Order.class));
 
         // when
         ResOrderDto res = orderService.createOrderOfLimitedItem(req, request);
