@@ -4,7 +4,6 @@ import com.purchase.preorder.client.ItemClient;
 import com.purchase.preorder.client.response.ItemResponse;
 import com.purchase.preorder.exception.BusinessException;
 import com.purchase.preorder.order.Order;
-import com.purchase.preorder.order.dto.ReqLimitedOrderDto;
 import com.purchase.preorder.order.dto.ReqOrderItemDto;
 import com.purchase.preorder.shipment.Shipment;
 import com.purchase.preorder.shipment.ShipmentService;
@@ -36,12 +35,10 @@ public class OrderItemService {
         });
     }
 
-    public void createOrderItem(Order order, ReqLimitedOrderDto limitedOrderDto) {
-        ItemResponse foundItem = itemClient.getItem(limitedOrderDto.getItemId());
-
+    public void createOrderItem(ItemResponse item, Order order) {
         // 배송 정보 생성
         Shipment shipment = shipmentService.createShipment();
-        OrderItem orderItem = orderItemRepository.save(OrderItem.of(order, foundItem, shipment, 1));
+        OrderItem orderItem = orderItemRepository.save(OrderItem.of(order, item, shipment, 1));
 
         order.getOrderItemList().add(orderItem);
     }

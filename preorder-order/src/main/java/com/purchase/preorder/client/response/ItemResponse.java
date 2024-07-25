@@ -14,5 +14,7 @@ public class ItemResponse {
     private String name;
     private String description;
     private Integer price;
+    private LocalDateTime openTime;
+    private Boolean isReserved;
     private LocalDateTime deletedAt;
 }

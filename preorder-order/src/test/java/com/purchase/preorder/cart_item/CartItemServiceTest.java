@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +41,8 @@ public class CartItemServiceTest {
     @BeforeEach
     void init() {
         item = new ItemResponse(
-                1L, "제품명", "제품 설명", 10000, null
+                1L, "제품명", "제품 설명",
+                10000, LocalDateTime.now(), false, null
         );
 
         cart = Cart.builder()
