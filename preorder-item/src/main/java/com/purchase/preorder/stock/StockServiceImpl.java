@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.purchase.preorder.common.RedisCacheKey.STOCK_KEY_PREFIX;
 import static com.purchase.preorder.exception.ExceptionCode.NOT_ENOUGH_STOCK;
 import static com.purchase.preorder.exception.ExceptionCode.NOT_FOUND_STOCK;
 
@@ -17,7 +18,6 @@ import static com.purchase.preorder.exception.ExceptionCode.NOT_FOUND_STOCK;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class StockServiceImpl implements StockService {
-    private static final String STOCK_KEY_PREFIX = "stockOfItem:";
     private final StockRepository stockRepository;
     private final StockAsyncService stockAsyncService;
     private final RedisService redisService;
