@@ -4,10 +4,10 @@ import com.purchase.preorder.client.ItemClient;
 import com.purchase.preorder.client.PaymentClient;
 import com.purchase.preorder.client.ReqPaymentDto;
 import com.purchase.preorder.client.UserClient;
+import com.purchase.preorder.client.response.ItemResponse;
 import com.purchase.preorder.client.response.PaymentResponse;
 import com.purchase.preorder.client.response.UserResponse;
 import com.purchase.preorder.exception.BusinessException;
-import com.purchase.preorder.exception.ExceptionCode;
 import com.purchase.preorder.order.dto.ReqLimitedOrderDto;
 import com.purchase.preorder.order.dto.ReqOrderDto;
 import com.purchase.preorder.order.dto.ResOrderDto;
@@ -22,6 +22,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+
+import static com.purchase.preorder.exception.ExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -60,6 +64,12 @@ public class OrderServiceImpl implements OrderService {
         // 재고 체크
         checkQuantityOfStock(req);
 
+        // 오픈 시간 체크
+        ItemResponse foundItem = itemClient.getItem(req.getItemId());
+        if (LocalDateTime.now().isBefore(foundItem.getOpenTime())) {
+            throw new BusinessException(NOT_REACHED_OPEN_TIME);
+        }
+
         // 접속 유저 정보 불러오기
         String emailOfConnectingUser = getEmailOfAuthenticatedUser(request);
         UserResponse user = userClient.getUserByEmail(emailOfConnectingUser);
@@ -74,7 +84,7 @@ public class OrderServiceImpl implements OrderService {
         completePayment(req, initiatedPayment.getPaymentId());
 
         // OrderItem 객체 생성 및 저장 로직
-        orderItemService.createOrderItem(order, req);
+        orderItemService.createOrderItem(foundItem, order);
         Order savedOrder = orderRepository.save(order);
 
         // Order save
@@ -99,7 +109,7 @@ public class OrderServiceImpl implements OrderService {
         UserResponse user = userClient.getUserByEmail(emailOfConnectingUser);
 
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new BusinessException(ExceptionCode.NOT_FOUND_ORDER));
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
 
         checkMatchesUser(user.getId(), order.getUserId());
 
@@ -114,7 +124,7 @@ public class OrderServiceImpl implements OrderService {
         UserResponse user = userClient.getUserByEmail(emailOfConnectingUser);
 
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new BusinessException(ExceptionCode.NOT_FOUND_ORDER));
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
 
         checkMatchesUser(user.getId(), order.getUserId());
 
@@ -129,7 +139,7 @@ public class OrderServiceImpl implements OrderService {
         UserResponse user = userClient.getUserByEmail(emailOfConnectingUser);
 
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new BusinessException(ExceptionCode.NOT_FOUND_ORDER));
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
 
         checkMatchesUser(user.getId(), order.getUserId());
 
@@ -144,7 +154,7 @@ public class OrderServiceImpl implements OrderService {
         UserResponse user = userClient.getUserByEmail(emailOfConnectingUser);
 
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new BusinessException(ExceptionCode.NOT_FOUND_ORDER));
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
 
         checkMatchesUser(user.getId(), order.getUserId());
 
@@ -153,7 +163,7 @@ public class OrderServiceImpl implements OrderService {
 
     private void checkMatchesUser(Long userId, Long userIdOfConnectingUser) {
         if (!userId.equals(userIdOfConnectingUser)) {
-            throw new BusinessException(ExceptionCode.UNAUTHORIZED_ACCESS);
+            throw new BusinessException(UNAUTHORIZED_ACCESS);
         }
     }
 
@@ -170,7 +180,7 @@ public class OrderServiceImpl implements OrderService {
 
         if (!initiatedPayment.getIsSuccess()) {
             itemClient.increaseStock(req.getItemId(), 1);
-            throw new BusinessException(ExceptionCode.CANCEL_PAYMENT);
+            throw new BusinessException(CANCEL_PAYMENT);
         }
 
         return initiatedPayment;
@@ -180,14 +190,14 @@ public class OrderServiceImpl implements OrderService {
         PaymentResponse completePayment = paymentClient.completePayment(paymentId);
         if (!completePayment.getIsSuccess()) {
             itemClient.increaseStock(req.getItemId(), 1);
-            throw new BusinessException(ExceptionCode.CANCEL_PAYMENT);
+            throw new BusinessException(CANCEL_PAYMENT);
         }
     }
 
     private void checkQuantityOfStock(ReqLimitedOrderDto req) {
         int stock = itemClient.getStock(req.getItemId()).getQuantity();
         if (stock == 0) {
-            throw new BusinessException(ExceptionCode.NOT_ENOUGH_STOCK);
+            throw new BusinessException(NOT_ENOUGH_STOCK);
         }
     }
 }

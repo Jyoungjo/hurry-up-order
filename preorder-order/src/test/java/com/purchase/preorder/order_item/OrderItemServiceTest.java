@@ -47,7 +47,8 @@ public class OrderItemServiceTest {
     @BeforeEach
     void init() {
         item = new ItemResponse(
-                1L, "제품명", "제품 설명", 10000, null
+                1L, "제품명", "제품 설명",
+                10000, LocalDateTime.now(), false, null
         );
 
         order = Order.builder()

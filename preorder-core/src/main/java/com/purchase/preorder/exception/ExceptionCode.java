@@ -18,6 +18,7 @@ public enum ExceptionCode {
     ENCODING_ERROR(BAD_REQUEST.value(), "encoding error"),
     DECODING_ERROR(BAD_REQUEST.value(), "decoding error"),
     CANCEL_PAYMENT(BAD_REQUEST.value(), "결제가 취소되었습니다."),
+    NOT_REACHED_OPEN_TIME(BAD_REQUEST.value(), "결제가 취소되었습니다."),
 
     /*
      * 401
