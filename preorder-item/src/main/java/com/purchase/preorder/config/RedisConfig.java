@@ -1,6 +1,7 @@
 package com.purchase.preorder.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.purchase.preorder.item.dto.read.ResReadItemDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +12,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -51,7 +52,7 @@ public class RedisConfig {
                         .fromSerializer(new StringRedisSerializer()))
                 .serializeValuesWith(RedisSerializationContext
                         .SerializationPair
-                        .fromSerializer(new GenericJackson2JsonRedisSerializer(objectMapper)))
+                        .fromSerializer(new Jackson2JsonRedisSerializer<>(ResReadItemDto.class)))
                 .entryTtl(Duration.ofMinutes(5L));
 
         return RedisCacheManager.RedisCacheManagerBuilder

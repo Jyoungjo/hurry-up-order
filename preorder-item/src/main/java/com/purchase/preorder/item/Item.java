@@ -1,5 +1,9 @@
 package com.purchase.preorder.item;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.purchase.preorder.common.BaseEntity;
 import com.purchase.preorder.item.dto.create.ReqCreateItemDto;
 import jakarta.persistence.*;
@@ -24,6 +28,8 @@ public class Item extends BaseEntity {
     private String name;
     private String description;
     private Integer price;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime openTime;
     private Boolean isReserved;
     private LocalDateTime deletedAt;
