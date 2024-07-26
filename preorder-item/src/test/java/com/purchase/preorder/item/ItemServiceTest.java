@@ -223,10 +223,12 @@ public class ItemServiceTest {
     void succeedFindItem() {
         // given
         Long itemId = 1L;
+        ResStockDto resStockDto = new ResStockDto(100);
+
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
+        when(stockService.getStockQuantity(anyLong())).thenReturn(resStockDto);
 
         // when
-        when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
-
         ResReadItemDto foundItem = itemService.findItem(itemId);
 
         // then
