@@ -79,8 +79,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Cacheable(key = "#itemId", cacheNames = ITEM_KEY_PREFIX, cacheManager = "redisCacheManager")
-    public Item findItem(Long itemId) {
-        return itemRepository.findById(itemId)
+    public ResReadItemDto findItem(Long itemId) {
+        Item savedItem = itemRepository.findById(itemId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_ITEM));
+        return ResReadItemDto.fromEntity(savedItem, stockService.getStockQuantity(itemId).getQuantity());
     }
 }

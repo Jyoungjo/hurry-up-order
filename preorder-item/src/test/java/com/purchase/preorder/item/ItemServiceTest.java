@@ -227,7 +227,7 @@ public class ItemServiceTest {
         // when
         when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
 
-        Item foundItem = itemService.findItem(itemId);
+        ResReadItemDto foundItem = itemService.findItem(itemId);
 
         // then
         assertThat(foundItem.getId()).isEqualTo(itemId);
