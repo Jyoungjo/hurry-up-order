@@ -1,5 +1,6 @@
 package com.purchase.preorder.stock;
 
+import com.purchase.preorder.common.RedisCacheKey;
 import com.purchase.preorder.common.RedisService;
 import com.purchase.preorder.config.RedisEmbeddedConfig;
 import com.purchase.preorder.item.Item;
@@ -44,14 +45,14 @@ public class StockServiceConcurrencyTest {
     void createStock() {
         Item item = itemRepository.saveAndFlush(Item.builder().id(1L).build());
         stockRepository.saveAndFlush(new Stock(1L, item, 10, null));
-        redisService.setValues("stockOfItem:1", 10);
+        redisService.setValues(RedisCacheKey.STOCK_KEY_PREFIX+"1", 10);
     }
 
     @AfterEach
     void deleteAll() {
         itemRepository.deleteAll();
         stockRepository.deleteAll();
-        redisService.deleteValuesByKey("stockOfItem:1");
+        redisService.deleteValuesByKey(RedisCacheKey.STOCK_KEY_PREFIX+"1");
     }
 
     // CONCURRENCY TEST
