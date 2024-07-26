@@ -57,7 +57,7 @@ public class ItemController {
 
     // TODO 테스트 진행
     @GetMapping("/internal/items/{itemId}")
-    public ResponseEntity<Item> findItem(
+    public ResponseEntity<ResReadItemDto> findItem(
             @PathVariable("itemId") Long itemId
     ) {
         return ResponseEntity.ok(itemService.findItem(itemId));
