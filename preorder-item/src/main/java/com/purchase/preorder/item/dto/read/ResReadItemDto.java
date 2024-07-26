@@ -1,7 +1,12 @@
 package com.purchase.preorder.item.dto.read;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.purchase.preorder.item.Item;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +20,7 @@ public class ResReadItemDto {
     private String description;
     private Integer quantity;
     private Integer price;
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime openTime;
     private Boolean isReserved;
 
