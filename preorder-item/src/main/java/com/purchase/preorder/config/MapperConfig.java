@@ -1,5 +1,6 @@
 package com.purchase.preorder.config;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -31,7 +32,8 @@ public class MapperConfig {
                 .activateDefaultTyping(
                         BasicPolymorphicTypeValidator.builder()
                                 .allowIfBaseType(Object.class).build(),
-                        ObjectMapper.DefaultTyping.NON_FINAL
+                        ObjectMapper.DefaultTyping.NON_FINAL,
+                        JsonTypeInfo.As.WRAPPER_OBJECT
                 )
                 .registerModules(javaTimeModule, new Jdk8Module())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
