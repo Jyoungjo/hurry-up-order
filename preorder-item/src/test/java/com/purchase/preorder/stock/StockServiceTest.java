@@ -1,8 +1,10 @@
 package com.purchase.preorder.stock;
 
-import com.purchase.preorder.common.RedisService;
+import com.purchase.preorder.item_service.common.RedisService;
 import com.purchase.preorder.exception.BusinessException;
 import com.purchase.preorder.item.Item;
+import com.purchase.preorder.item_service.stock.StockAsyncService;
+import com.purchase.preorder.item_service.stock.StockServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,8 +1,9 @@
 package com.purchase.preorder.payment;
 
-import com.purchase.preorder.dto.ReqPaymentDto;
-import com.purchase.preorder.dto.ResPaymentDto;
+import com.purchase.preorder.payment_service.dto.ReqPaymentDto;
+import com.purchase.preorder.payment_service.dto.ResPaymentDto;
 import com.purchase.preorder.exception.BusinessException;
+import com.purchase.preorder.payment_service.payment.PaymentServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

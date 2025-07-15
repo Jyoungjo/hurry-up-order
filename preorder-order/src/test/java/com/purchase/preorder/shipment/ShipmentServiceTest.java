@@ -1,6 +1,7 @@
 package com.purchase.preorder.shipment;
 
 import com.purchase.preorder.exception.BusinessException;
+import com.purchase.preorder.order_service.shipment.ShipmentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,7 +1,8 @@
 package com.purchase.preorder.wishlist_item;
 
 import com.purchase.preorder.exception.BusinessException;
-import com.purchase.preorder.client.ItemClient;
+import com.purchase.preorder.user_service.client.ItemClient;
+import com.purchase.preorder.user_service.wishlist_item.WishlistItemService;
 import com.purchase.preorder.wishlist.Wishlist;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

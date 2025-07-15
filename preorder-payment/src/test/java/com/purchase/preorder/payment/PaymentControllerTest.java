@@ -1,9 +1,11 @@
 package com.purchase.preorder.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.purchase.preorder.dto.ReqPaymentDto;
-import com.purchase.preorder.dto.ResPaymentDto;
+import com.purchase.preorder.payment_service.dto.ReqPaymentDto;
+import com.purchase.preorder.payment_service.dto.ResPaymentDto;
 import com.purchase.preorder.exception.BusinessException;
+import com.purchase.preorder.payment_service.payment.PaymentController;
+import com.purchase.preorder.payment_service.payment.PaymentService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

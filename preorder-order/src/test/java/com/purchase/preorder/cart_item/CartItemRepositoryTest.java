@@ -2,7 +2,7 @@ package com.purchase.preorder.cart_item;
 
 import com.purchase.preorder.cart.Cart;
 import com.purchase.preorder.cart.CartRepository;
-import com.purchase.preorder.config.JpaConfig;
+import com.purchase.preorder.order_service.config.JpaConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
