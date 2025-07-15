@@ -1,6 +1,6 @@
 package com.purchase.preorder.payment;
 
-import com.purchase.preorder.config.JpaConfig;
+import com.purchase.preorder.payment_service.config.JpaConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package com.purchase.preorder;
 
-import com.purchase.preorder.client.ItemClient;
+import com.purchase.preorder.user_service.client.ItemClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
