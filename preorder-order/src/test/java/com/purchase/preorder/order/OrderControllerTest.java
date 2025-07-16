@@ -2,10 +2,12 @@ package com.purchase.preorder.order;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.purchase.preorder.exception.BusinessException;
-import com.purchase.preorder.order.dto.ReqOrderDto;
-import com.purchase.preorder.order.dto.ReqOrderItemDto;
-import com.purchase.preorder.order.dto.ResOrderDto;
-import com.purchase.preorder.order.dto.ResOrderItemDto;
+import com.purchase.preorder.order_service.order.OrderController;
+import com.purchase.preorder.order_service.order.OrderService;
+import com.purchase.preorder.order_service.order.dto.ReqOrderDto;
+import com.purchase.preorder.order_service.order.dto.ReqOrderItemDto;
+import com.purchase.preorder.order_service.order.dto.ResOrderDto;
+import com.purchase.preorder.order_service.order.dto.ResOrderItemDto;
 import com.purchase.preorder.shipment.ShipmentStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;

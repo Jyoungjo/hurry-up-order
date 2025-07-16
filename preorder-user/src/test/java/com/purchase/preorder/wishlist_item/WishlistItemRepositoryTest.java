@@ -1,6 +1,6 @@
 package com.purchase.preorder.wishlist_item;
 
-import com.purchase.preorder.config.JpaConfig;
+import com.purchase.preorder.user_service.config.JpaConfig;
 import com.purchase.preorder.wishlist.Wishlist;
 import com.purchase.preorder.wishlist.WishlistRepository;
 import org.junit.jupiter.api.BeforeEach;

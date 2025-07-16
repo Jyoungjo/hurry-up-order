@@ -1,13 +1,14 @@
 package com.purchase.preorder.item;
 
 import com.purchase.preorder.exception.BusinessException;
-import com.purchase.preorder.item.dto.create.ReqCreateItemDto;
-import com.purchase.preorder.item.dto.create.ResCreateItemDto;
-import com.purchase.preorder.item.dto.read.ResReadItemDto;
-import com.purchase.preorder.item.dto.update.ReqUpdateItemDto;
-import com.purchase.preorder.item.dto.update.ResUpdateItemDto;
-import com.purchase.preorder.stock.StockServiceImpl;
-import com.purchase.preorder.stock.dto.ResStockDto;
+import com.purchase.preorder.item_service.item.ItemServiceImpl;
+import com.purchase.preorder.item_service.item.dto.create.ReqCreateItemDto;
+import com.purchase.preorder.item_service.item.dto.create.ResCreateItemDto;
+import com.purchase.preorder.item_service.item.dto.read.ResReadItemDto;
+import com.purchase.preorder.item_service.item.dto.update.ReqUpdateItemDto;
+import com.purchase.preorder.item_service.item.dto.update.ResUpdateItemDto;
+import com.purchase.preorder.item_service.stock.StockServiceImpl;
+import com.purchase.preorder.item_service.stock.dto.ResStockDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

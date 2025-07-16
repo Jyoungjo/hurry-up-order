@@ -1,0 +1,28 @@
+plugins {
+    id 'java-library'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+}
+
+dependencies {
+    // Module
+    implementation project(":domain-common")
+
+    // Kafka dependencies
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // For JSON serialization/deserialization of Kafka events
+    implementation 'org.apache.commons:commons-lang3'
+}
+
+bootJar { enabled = false }
+jar { enabled = true }

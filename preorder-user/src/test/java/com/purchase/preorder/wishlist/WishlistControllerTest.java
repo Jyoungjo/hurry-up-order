@@ -1,8 +1,10 @@
 package com.purchase.preorder.wishlist;
 
 import com.purchase.preorder.exception.BusinessException;
-import com.purchase.preorder.wishlist.dto.ResWishListDto;
-import com.purchase.preorder.wishlist.dto.ResWishListItemDto;
+import com.purchase.preorder.user_service.wishlist.WishlistController;
+import com.purchase.preorder.user_service.wishlist.WishlistService;
+import com.purchase.preorder.user_service.wishlist.dto.ResWishListDto;
+import com.purchase.preorder.user_service.wishlist.dto.ResWishListItemDto;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
