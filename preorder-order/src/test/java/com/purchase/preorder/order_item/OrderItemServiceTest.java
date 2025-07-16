@@ -1,12 +1,13 @@
 package com.purchase.preorder.order_item;
 
-import com.purchase.preorder.client.ItemClient;
-import com.purchase.preorder.client.response.ItemResponse;
+import com.purchase.preorder.order_service.client.ItemClient;
+import com.purchase.preorder.order_service.client.response.ItemResponse;
 import com.purchase.preorder.exception.BusinessException;
 import com.purchase.preorder.order.Order;
-import com.purchase.preorder.order.dto.ReqOrderItemDto;
+import com.purchase.preorder.order_service.order.dto.ReqOrderItemDto;
+import com.purchase.preorder.order_service.order_item.OrderItemService;
 import com.purchase.preorder.shipment.Shipment;
-import com.purchase.preorder.shipment.ShipmentService;
+import com.purchase.preorder.order_service.shipment.ShipmentService;
 import com.purchase.preorder.shipment.ShipmentStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

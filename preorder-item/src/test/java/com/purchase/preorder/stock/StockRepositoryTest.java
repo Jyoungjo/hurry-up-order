@@ -1,6 +1,6 @@
 package com.purchase.preorder.stock;
 
-import com.purchase.preorder.config.JpaConfig;
+import com.purchase.preorder.item_service.config.JpaConfig;
 import com.purchase.preorder.item.Item;
 import com.purchase.preorder.item.ItemRepository;
 import org.assertj.core.api.Assertions;
@@ -13,8 +13,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
 @Import(JpaConfig.class)
