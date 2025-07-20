@@ -1,5 +1,6 @@
 package com.purchase.preorder.user_service.user;
 
+import com.common.domain.entity.User;
 import com.purchase.preorder.user_service.email.ResEmailDto;
 import com.purchase.preorder.user_service.user.dto.create.ReqUserCreateDto;
 import com.purchase.preorder.user_service.user.dto.create.ResUserCreateDto;
@@ -54,13 +55,6 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUserPassword(request, userId, reqDto));
     }
 
-    @PutMapping("/users/{userId}/email-verification")
-    public ResponseEntity<ResEmailDto> updateUserEmailVerification(
-            @PathVariable("userId") Long userId, @RequestParam("userStr") String userStr
-    ) throws Exception {
-        return ResponseEntity.ok(userService.updateEmailVerification(userId, userStr));
-    }
-
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<Void> deleteUser(
             HttpServletRequest request, @PathVariable("userId") Long userId, @Valid @RequestBody ReqUserDeleteDto reqDto
@@ -93,5 +87,12 @@ public class UserController {
     public ResponseEntity<Void> reissue(HttpServletRequest request, HttpServletResponse response) {
         userService.reissue(request, response);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/users/{userId}/verify-email")
+    public ResponseEntity<ResEmailDto> checkEmailVerification(
+            @PathVariable("userId") Long userId, @RequestParam String userStr
+    ) throws Exception {
+        return ResponseEntity.ok(userService.checkVerificationStr(userId, userStr));
     }
 }

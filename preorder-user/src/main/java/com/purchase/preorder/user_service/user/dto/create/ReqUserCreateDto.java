@@ -1,8 +1,8 @@
 package com.purchase.preorder.user_service.user.dto.create;
 
-import com.purchase.preorder.util.AesUtils;
-import com.purchase.preorder.user.User;
-import com.purchase.preorder.user.UserRole;
+import com.common.core.util.AesUtils;
+import com.common.domain.common.UserRole;
+import com.common.domain.entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface StockRepository extends JpaRepository<Stock, Long> {
     Optional<Stock> findByItemId(Long itemId);
     List<Stock> findByItemIdIn(List<Long> itemIds);
-    void deleteAllByItemIdInBatch(List<Long> itemIds);
+    void deleteAllByItemIdIn(List<Long> itemIds);
 }

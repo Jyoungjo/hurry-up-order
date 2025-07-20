@@ -17,8 +17,6 @@ import org.springframework.web.ErrorResponseException;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
-
 @Component
 @Slf4j
 public class AuthorizationFilter extends AbstractGatewayFilterFactory<AuthorizationFilter.Config> {
@@ -55,20 +53,21 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
     }
 
     private String getAccessTokenFromHeader(ServerWebExchange exchange) {
-        String name = "accessToken";
+        String authorizationHeader = exchange.getRequest()
+                .getHeaders()
+                .getFirst("Authorization");
 
-        return exchange.getRequest().getHeaders().getOrEmpty("Cookie").stream()
-                .flatMap(cookie -> Arrays.stream(cookie.split("; ")))
-                .filter(cookie -> cookie.startsWith(name))
-                .map(cookie -> cookie.substring(name.length() + 1))
-                .findFirst()
-                .orElseThrow(() -> new ErrorResponseException(
-                        HttpStatusCode.valueOf(401),
-                        ProblemDetail.forStatusAndDetail(
-                                HttpStatusCode.valueOf(401), "인증 정보가 존재하지 않습니다."
-                        ),
-                        null
-                ));
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            throw new ErrorResponseException(
+                    HttpStatusCode.valueOf(401),
+                    ProblemDetail.forStatusAndDetail(
+                            HttpStatusCode.valueOf(401), "인증 정보가 존재하지 않습니다."
+                    ),
+                    null
+            );
+        }
+
+        return authorizationHeader.substring("Bearer ".length());
     }
 
     private boolean checkAccessToken(String accessToken) {
