@@ -1,23 +1,25 @@
 package com.purchase.preorder.payment_service.dto;
 
-import com.purchase.preorder.payment.Payment;
+import com.common.domain.common.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ResPaymentDto {
     private Long paymentId;
-    private Boolean isSuccess;
+    private Long orderId;
+    private int totalPrice;
+    private PaymentStatus status;
 
-    public static ResPaymentDto fromEntity(Payment payment) {
+    public static ResPaymentDto of(Long paymentId, Long orderId, int totalPrice, PaymentStatus status) {
         return ResPaymentDto.builder()
-                .paymentId(payment.getId())
-                .isSuccess(true)
+                .paymentId(paymentId)
+                .orderId(orderId)
+                .totalPrice(totalPrice)
+                .status(status)
                 .build();
     }
 }
