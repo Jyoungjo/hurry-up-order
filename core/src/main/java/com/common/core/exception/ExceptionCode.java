@@ -18,6 +18,7 @@ public enum ExceptionCode {
     DECODING_ERROR(BAD_REQUEST, "decoding error"),
     CANCEL_PAYMENT(BAD_REQUEST, "결제가 취소되었습니다."),
     NOT_REACHED_OPEN_TIME(BAD_REQUEST, "결제가 취소되었습니다."),
+    INVALID_EMAIL_VERIFICATION(BAD_REQUEST, "인증 번호가 일치하지 않습니다."),
 
     /*
      * 401

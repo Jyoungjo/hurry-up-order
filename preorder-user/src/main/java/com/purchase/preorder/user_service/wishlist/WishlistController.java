@@ -6,27 +6,27 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user-service/api/v1/wishlists")
 public class WishlistController {
     private final WishlistService wishListService;
 
-    @PostMapping
+    @PostMapping("/wishlist/items")
     public ResponseEntity<Void> addItemToWishList(
-            HttpServletRequest request,
-            @RequestParam("itemId") Long itemId
+            HttpServletRequest request, @RequestBody List<Long> itemIds
     ) throws Exception {
-        wishListService.addItemToWishList(request, itemId);
+        wishListService.addItemToWishList(request, itemIds);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping
+    @DeleteMapping("/wishlist/items")
     public ResponseEntity<Void> removeItemFromWishList(
-            HttpServletRequest request,
-            @RequestParam("itemId") Long itemId
+            HttpServletRequest request, @RequestBody List<Long> itemIds
     ) throws Exception {
-        wishListService.removeItemFromWishList(request, itemId);
+        wishListService.removeItemFromWishList(request, itemIds);
         return ResponseEntity.noContent().build();
     }
 

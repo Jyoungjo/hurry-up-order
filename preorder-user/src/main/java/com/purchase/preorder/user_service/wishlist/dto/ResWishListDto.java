@@ -1,6 +1,6 @@
 package com.purchase.preorder.user_service.wishlist.dto;
 
-import com.purchase.preorder.wishlist.Wishlist;
+import com.common.domain.entity.Wishlist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

@@ -1,7 +1,6 @@
 package com.purchase.preorder.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.purchase.preorder.user_service.email.EmailDtoFactory;
 import com.purchase.preorder.user_service.email.ResEmailDto;
 import com.purchase.preorder.exception.BusinessException;
 import com.purchase.preorder.user_service.user.UserController;

@@ -1,5 +1,6 @@
 package com.purchase.preorder.user_service.user;
 
+import com.common.domain.entity.User;
 import com.purchase.preorder.user_service.email.ResEmailDto;
 import com.purchase.preorder.user_service.user.dto.create.ReqUserCreateDto;
 import com.purchase.preorder.user_service.user.dto.create.ResUserCreateDto;
@@ -19,10 +20,10 @@ public interface UserService {
     ResUserInfoDto readUser(Long userId);
     ResUserUpdateDto updateUserInfo(HttpServletRequest request, Long userId, ReqUserInfoUpdateDto reqDto) throws Exception;
     ResUserPwUpdateDto updateUserPassword(HttpServletRequest request, Long userId, ReqUserPasswordUpdateDto reqDto) throws Exception;
-    ResEmailDto updateEmailVerification(Long userId, String userStr) throws Exception;
     void deleteUser(HttpServletRequest request, Long userId, ReqUserDeleteDto reqDto) throws Exception;
     ResLoginDto login(HttpServletResponse response, ReqLoginDto reqDto) throws Exception;
     void logout(HttpServletRequest request, HttpServletResponse response);
     User findUserByEmail(String email);
     void reissue(HttpServletRequest request, HttpServletResponse response);
+    ResEmailDto checkVerificationStr(Long userId, String verificationCode) throws Exception;
 }
