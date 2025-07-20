@@ -1,13 +1,16 @@
 package com.purchase.preorder.payment_service.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReqPaymentDto {
-    private Long orderId;
-    private Integer totalPrice;
+@Builder
+public class NicePaymentRequest {
+    private String tid;
+    private String orderId;
+    private int amount;
 }

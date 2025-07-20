@@ -1,6 +1,5 @@
 package com.purchase.preorder.user;
 
-import com.purchase.preorder.common.JwtUtils;
 import com.purchase.preorder.user_service.common.RedisService;
 import com.purchase.preorder.user_service.email.EmailService;
 import com.purchase.preorder.user_service.email.ResEmailDto;

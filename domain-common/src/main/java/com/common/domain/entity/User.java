@@ -41,6 +41,8 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private UserRole role;
 
+    private LocalDateTime deletedAt;
+
     public void changeContactInfo(String phoneNumber, String address) {
         this.phoneNumber = phoneNumber;
         this.address = address;

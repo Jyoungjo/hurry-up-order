@@ -1,7 +1,9 @@
 package com.purchase.preorder.payment_service.payment;
 
-import com.purchase.preorder.payment_service.dto.ReqPaymentDto;
+import com.purchase.preorder.payment_service.dto.NicePaymentRequest;
+import com.purchase.preorder.payment_service.dto.ReqPaymentInitiateDto;
 import com.purchase.preorder.payment_service.dto.ResPaymentDto;
+import com.purchase.preorder.payment_service.dto.TossPaymentConfirmRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,12 +15,17 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping
-    public ResponseEntity<ResPaymentDto> initiatePayment(@RequestBody ReqPaymentDto req) {
+    public ResponseEntity<Long> initiatePayment(@RequestBody ReqPaymentInitiateDto req) {
         return ResponseEntity.ok(paymentService.initiatePayment(req));
     }
 
-    @PutMapping("/{paymentId}")
-    public ResponseEntity<ResPaymentDto> completePayment(@PathVariable("paymentId") Long paymentId) {
-        return ResponseEntity.ok(paymentService.completePayment(paymentId));
+    @PostMapping("/toss/confirm")
+    public ResponseEntity<ResPaymentDto> confirmPayment(@RequestBody TossPaymentConfirmRequest req) {
+        return ResponseEntity.ok(paymentService.confirmPayment(req));
+    }
+
+    @PostMapping("/nice/confirm")
+    public ResponseEntity<ResPaymentDto> confirmPayment(@RequestBody NicePaymentRequest req) {
+        return ResponseEntity.ok(paymentService.confirmNicePayment(req));
     }
 }

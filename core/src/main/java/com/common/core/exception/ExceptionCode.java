@@ -72,7 +72,12 @@ public enum ExceptionCode {
     /*
      * 500
      */
-    INTERNAL_SERVER_ERROR(SERVER_ERROR, "internal server error");
+    INTERNAL_SERVER_ERROR(SERVER_ERROR, "internal server error"),
+
+    /*
+     * 503
+     */
+    SERVICE_UNAVAILABLE(SERVICE_FAILURE, "서비스 이용이 일시적으로 불가능합니다.");
 
     private final int status;
     private final String message;
