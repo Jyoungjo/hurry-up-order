@@ -74,7 +74,7 @@ public class PaymentServiceTest {
                 .status("paid")
                 .build();
 
-        payment = Payment.of(10000, "order123", "uuid-key");
+        payment = Payment.of(1L, 10000, "order123", "uuid-key");
     }
 
     // CREATE
@@ -82,7 +82,7 @@ public class PaymentServiceTest {
     @Test
     void 결제_시도_기능_성공() {
         // given
-        ReqPaymentInitiateDto req = new ReqPaymentInitiateDto("order123", 10000);
+        ReqPaymentInitiateDto req = new ReqPaymentInitiateDto(1L, "order123", 10000);
         when(paymentRepository.save(any(Payment.class))).thenReturn(payment);
 
         // when

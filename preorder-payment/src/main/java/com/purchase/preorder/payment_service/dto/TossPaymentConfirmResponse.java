@@ -1,5 +1,6 @@
 package com.purchase.preorder.payment_service.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,6 +16,7 @@ public class TossPaymentConfirmResponse {
     private String type;
     private String orderId;
     private String orderName;
+    @JsonProperty("mId")
     private String mId;
     private String currency;
     private String method;

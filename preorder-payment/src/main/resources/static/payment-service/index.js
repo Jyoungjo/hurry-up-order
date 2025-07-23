@@ -17,6 +17,7 @@ async function requestPayment() {
 }
 
 const orderId = generateRandomString();
+const ordId = 1;
 
 async function requestTossPayment() {
   // ------  SDK 초기화 ------
@@ -42,6 +43,7 @@ async function requestTossPayment() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
+      ordId,
       orderId,
       amount: amount.value,
     }),
@@ -77,6 +79,7 @@ async function requestNicePayment() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
+      ordId,
       orderId,
       amount: 10000,
     }),

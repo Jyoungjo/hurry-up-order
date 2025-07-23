@@ -9,6 +9,7 @@ import com.purchase.preorder.payment_service.api.external.NicePaymentsClient;
 import com.purchase.preorder.payment_service.api.external.TossPaymentsClient;
 import com.purchase.preorder.payment_service.common.RedisService;
 import com.purchase.preorder.payment_service.dto.*;
+import com.purchase.preorder.payment_service.event.PaymentEventPublisher;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final TossPaymentsClient tossPaymentsClient;
     private final NicePaymentsClient nicePaymentsClient;
+    private final PaymentEventPublisher eventPublisher;
     private final RedisService redisService;
 
     @Override
@@ -38,6 +40,7 @@ public class PaymentServiceImpl implements PaymentService {
          * 프론트단에서 만드는 paymentKey는 UUID로 대체
          */
         Payment payment = Payment.of(
+                req.getOrdId(),
                 req.getAmount(),
                 req.getOrderId(),
                 UUID.randomUUID().toString());
@@ -128,6 +131,7 @@ public class PaymentServiceImpl implements PaymentService {
                     data.getAmount(),
                     data.getTransactionId()
             );
+            eventPublisher.publishPaymentSucceedEventAfterCommit(payment);
         } catch (Exception e) {
             log.warn("결제 응답 성공, DB 저장 실패", e);
             throw new BusinessException(ExceptionCode.INTERNAL_SERVER_ERROR);
