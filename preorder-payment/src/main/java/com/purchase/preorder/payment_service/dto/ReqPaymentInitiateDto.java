@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReqPaymentInitiateDto {
+    private Long ordId;
     @NotBlank
     private String orderId;
     @Min(value = 1, message = "결제 금액은 1 이상이어야 합니다.")

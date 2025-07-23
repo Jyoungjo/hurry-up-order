@@ -56,8 +56,9 @@ public class Payment extends BaseEntity {
     private LocalDateTime deletedAt;
 
     // 생성 시점에 INITIATED 상태, retryCount = 0
-    public static Payment of(int paymentPrice, String pgOrderId, String pgTransactionId) {
+    public static Payment of(Long orderId, int paymentPrice, String pgOrderId, String pgTransactionId) {
         return Payment.builder()
+                .orderId(orderId)
                 .paymentPrice(paymentPrice)
                 .pgOrderId(pgOrderId)
                 .pgTransactionId(pgTransactionId)

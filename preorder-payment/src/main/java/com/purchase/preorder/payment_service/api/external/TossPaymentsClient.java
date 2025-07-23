@@ -8,7 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "tossPaymentsClient", url = "${tossPayments.base-url}", configuration = TossFeignConfig.class)
+@FeignClient(name = "tossPaymentsClient", url = "${tossPayments.payments.base-url}", configuration = TossFeignConfig.class)
 public interface TossPaymentsClient {
     @PostMapping(value = "/confirm", consumes = MediaType.APPLICATION_JSON_VALUE)
     TossPaymentConfirmResponse confirmPayment(@RequestBody TossPaymentConfirmRequest tossPaymentConfirmRequest);
