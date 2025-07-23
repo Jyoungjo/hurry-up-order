@@ -1,15 +1,19 @@
 package com.purchase.preorder.user_service.wishlist_item;
 
-import com.purchase.preorder.exception.BusinessException;
-import com.purchase.preorder.exception.ExceptionCode;
+import com.common.core.exception.ExceptionCode;
+import com.common.domain.entity.Wishlist;
+import com.common.domain.entity.WishlistItem;
+import com.common.domain.repository.WishlistItemRepository;
+import com.common.web.exception.BusinessException;
 import com.purchase.preorder.user_service.client.ItemClient;
 import com.purchase.preorder.user_service.client.ItemResponse;
 import com.purchase.preorder.user_service.wishlist.dto.ResWishListItemDto;
-import com.purchase.preorder.wishlist.Wishlist;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,40 +21,37 @@ public class WishlistItemService {
     private final WishlistItemRepository wishListItemRepository;
     private final ItemClient itemClient;
 
-    public void createWishListItem(Wishlist wishlist, Long itemId) {
-        wishlist.getWishlistItems().stream()
-                .filter(wishlistItem -> wishlistItem.getItemId().equals(itemId))
-                .findFirst()
-                .ifPresentOrElse(
-                        wishlistItem -> {
-                            throw new BusinessException(ExceptionCode.ALREADY_EXISTS_ITEM);
-                        }, () -> {
-                            WishlistItem newWishlistItem = WishlistItem.of(itemId, wishlist);
-                            wishListItemRepository.save(newWishlistItem);
-                        }
-                );
+    public void createWishListItem(Wishlist wishlist, List<Long> itemIds) {
+        Set<Long> existingItemIds = wishlist.getWishlistItems().stream()
+                .map(WishlistItem::getItemId)
+                .collect(Collectors.toSet());
+
+        List<WishlistItem> wishlistItems = itemIds.stream()
+                .filter(itemId -> !existingItemIds.contains(itemId))
+                .map(WishlistItem::of)
+                .toList();
+
+        wishlistItems.forEach(wishlist::addWishlistItem); // 연관관계 설정
+        wishListItemRepository.saveAll(wishlistItems);
     }
 
-    public void deleteWishListItem(Wishlist wishlist, Long itemId) {
-        WishlistItem wishlistItem = wishListItemRepository.findByWishlistAndItemId(wishlist, itemId)
-                .orElseThrow(() -> new BusinessException(ExceptionCode.NOT_FOUND_WISHLIST_ITEM));
 
-        wishListItemRepository.delete(wishlistItem);
-    }
+    public void deleteWishListItem(Wishlist wishlist, List<Long> itemIds) {
+        List<WishlistItem> wishlistItems = wishListItemRepository.findAllByWishlistAndItemIdIn(wishlist, itemIds);
 
-    public ResWishListItemDto fromEntity(WishlistItem wishlistItem) {
-        ItemResponse itemResponse = itemClient.getItem(wishlistItem.getItemId());
+        if (wishlistItems.isEmpty()) {
+            throw new BusinessException(ExceptionCode.NOT_FOUND_WISHLIST_ITEM);
+        }
 
-        return ResWishListItemDto.builder()
-                .itemId(wishlistItem.getItemId())
-                .name(itemResponse.getName())
-                .price(itemResponse.getPrice())
-                .build();
+        wishListItemRepository.deleteAllInBatch(wishlistItems);
     }
 
     public List<ResWishListItemDto> fromEntities(List<WishlistItem> wishlistItems) {
-        return wishlistItems.stream()
-                .map(this::fromEntity)
+        List<Long> itemIds = wishlistItems.stream().map(WishlistItem::getItemId).toList();
+        List<ItemResponse> items = itemClient.getItems(itemIds);
+
+        return items.stream()
+                .map(ResWishListItemDto::from)
                 .toList();
     }
 }

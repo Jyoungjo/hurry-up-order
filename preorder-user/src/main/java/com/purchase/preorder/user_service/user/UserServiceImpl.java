@@ -1,12 +1,16 @@
 package com.purchase.preorder.user_service.user;
 
-import com.purchase.preorder.common.JwtUtils;
+import com.common.core.exception.ExceptionCode;
+import com.common.core.util.AesUtils;
+import com.common.domain.common.UserRole;
+import com.common.domain.entity.User;
+import com.common.domain.repository.UserRepository;
+import com.common.web.auth.AuthUtils;
+import com.common.web.auth.JwtUtils;
+import com.common.web.exception.BusinessException;
 import com.purchase.preorder.user_service.common.RedisService;
-import com.purchase.preorder.user_service.email.EmailDtoFactory;
-import com.purchase.preorder.user_service.email.EmailService;
+import com.purchase.preorder.user_service.email.EmailSender;
 import com.purchase.preorder.user_service.email.ResEmailDto;
-import com.purchase.preorder.exception.BusinessException;
-import com.purchase.preorder.exception.ExceptionCode;
 import com.purchase.preorder.user_service.user.dto.create.ReqUserCreateDto;
 import com.purchase.preorder.user_service.user.dto.create.ResUserCreateDto;
 import com.purchase.preorder.user_service.user.dto.delete.ReqUserDeleteDto;
@@ -17,9 +21,6 @@ import com.purchase.preorder.user_service.user.dto.update.ReqUserInfoUpdateDto;
 import com.purchase.preorder.user_service.user.dto.update.ReqUserPasswordUpdateDto;
 import com.purchase.preorder.user_service.user.dto.update.ResUserPwUpdateDto;
 import com.purchase.preorder.user_service.user.dto.update.ResUserUpdateDto;
-import com.purchase.preorder.util.AesUtils;
-import com.purchase.preorder.util.CustomCookieManager;
-import com.purchase.preorder.util.JwtParser;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -34,15 +35,17 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.common.core.exception.ExceptionCode.INVALID_EMAIL_VERIFICATION;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
-    private final JwtUtils jwtProvider;
+    private final JwtUtils jwtUtils;
+    private final EmailSender emailSender;
     private final RedisService redisService;
 
     @Override
@@ -51,12 +54,22 @@ public class UserServiceImpl implements UserService{
         checkDuplicateEmail(reqDto.getEmail());
         checkDuplicatePhoneNumber(reqDto.getPhoneNumber());
 
-        User user = reqDto.toEntity(passwordEncoder);
+        // 암호화 후 Entity 생성
+        String encEmail = AesUtils.aesCBCEncode(reqDto.getEmail());
+        String encPassword = passwordEncoder.encode(reqDto.getPassword());
+        String encName = AesUtils.aesCBCEncode(reqDto.getName());
 
-        emailService.sendMail(reqDto.getEmail());
+        User user = User.of(encName, encEmail, encPassword);
+
+        String encAddress = AesUtils.aesCBCEncode(reqDto.getAddress());
+        String encPhone = AesUtils.aesCBCEncode(reqDto.getPhoneNumber());
+        user.changeContactInfo(encPhone, encAddress);
+
+        emailSender.sendMail(reqDto.getEmail());
 
         return ResUserCreateDto.fromEntity(userRepository.save(user));
     }
+
 
     @Override
     public ResUserInfoDto readUser(Long userId) {
@@ -77,25 +90,28 @@ public class UserServiceImpl implements UserService{
     public ResUserUpdateDto updateUserInfo(
             HttpServletRequest request, Long userId, ReqUserInfoUpdateDto reqDto
     ) throws Exception {
-        String emailOfConnectingUser = getEmailOfAuthenticatedUser(request);
+        String emailOfConnectingUser = AuthUtils.getUserEmail(request, jwtUtils);
 
         User savedUser = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.NOT_FOUND_USER));
 
         verifyAccessedUser(emailOfConnectingUser, savedUser.getEmail());
 
-        savedUser.updateUserInfo(
-                AesUtils.aesCBCEncode(reqDto.getPhoneNumber()), AesUtils.aesCBCEncode(reqDto.getAddress())
+        savedUser.changeContactInfo(
+                AesUtils.aesCBCEncode(reqDto.getPhoneNumber()),
+                AesUtils.aesCBCEncode(reqDto.getAddress())
         );
-        return ResUserUpdateDto.fromEntity(userRepository.save(savedUser));
+
+        return ResUserUpdateDto.fromEntity(savedUser);
     }
+
 
     @Override
     @Transactional
     public ResUserPwUpdateDto updateUserPassword(
             HttpServletRequest request, Long userId, ReqUserPasswordUpdateDto reqDto
-    ) throws Exception {
-        String emailOfConnectingUser = getEmailOfAuthenticatedUser(request);
+    ) {
+        String emailOfConnectingUser = AuthUtils.getUserEmail(request, jwtUtils);
 
         User savedUser = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.NOT_FOUND_USER));
@@ -105,29 +121,15 @@ public class UserServiceImpl implements UserService{
         verifyExistingPassword(reqDto.getOriginalPassword(), savedUser.getPassword());
         verifyPassword(reqDto.getNewPassword(), reqDto.getNewPassword2());
 
-        savedUser.updatePassword(passwordEncoder.encode(reqDto.getNewPassword()));
+        savedUser.changePassword(passwordEncoder.encode(reqDto.getNewPassword()));
+
         return ResUserPwUpdateDto.fromEntity(userRepository.save(savedUser));
     }
 
     @Override
     @Transactional
-    public ResEmailDto updateEmailVerification(Long userId, String userStr) throws Exception {
-        User savedUser = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ExceptionCode.NOT_FOUND_USER));
-
-        if (!emailService.checkVerificationStr(AesUtils.aesCBCDecode(savedUser.getEmail()), userStr)) {
-            return EmailDtoFactory.fail();
-        }
-
-        savedUser.updateEmailVerification();
-        userRepository.save(savedUser);
-        return EmailDtoFactory.succeed();
-    }
-
-    @Override
-    @Transactional
-    public void deleteUser(HttpServletRequest request, Long userId, ReqUserDeleteDto reqDto) throws Exception {
-        String emailOfConnectingUser = getEmailOfAuthenticatedUser(request);
+    public void deleteUser(HttpServletRequest request, Long userId, ReqUserDeleteDto reqDto) {
+        String emailOfConnectingUser = AuthUtils.getUserEmail(request, jwtUtils);
 
         User savedUser = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.NOT_FOUND_USER));
@@ -162,70 +164,75 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public void logout(HttpServletRequest request, HttpServletResponse response) {
-        String accessToken = CustomCookieManager.getCookie(request, CustomCookieManager.ACCESS_TOKEN);
+        String accessToken = jwtUtils.resolveToken(request.getHeader(JwtUtils.AUTHORIZATION));
 
-        Claims claims = jwtProvider.getClaims(accessToken);
-        if (claims == null) {
-            throw new BusinessException(ExceptionCode.EXPIRED_JWT);
-        }
+        Claims claims = jwtUtils.getClaims(accessToken);
+        if (claims == null) throw new BusinessException(ExceptionCode.EXPIRED_JWT);
 
-        deleteTokenAndAddBlacklist(response, claims);
+        deleteTokenAndAddBlacklist(claims);
     }
 
+    // 토큰 내 claims 에 있는 이메일 기반 유저 조회
     @Override
-    @Transactional
     public User findUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new BusinessException(ExceptionCode.NOT_FOUND_USER));
+        try {
+            String encryptedEmail = AesUtils.aesCBCEncode(email);
+            return userRepository.findByEmail(encryptedEmail)
+                    .orElseThrow(() -> new BusinessException(ExceptionCode.NOT_FOUND_USER));
+        } catch (Exception e) {
+            throw new BusinessException(ExceptionCode.ENCODING_ERROR);
+        }
     }
 
     @Override
     public void reissue(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = CustomCookieManager.getCookie(request, CustomCookieManager.REFRESH_TOKEN);
+        String refreshToken = jwtUtils.resolveToken(request.getHeader(JwtUtils.REFRESH_TOKEN_HEADER));
 
-        if (checkRefreshToken(refreshToken)) {
-            throw new BusinessException(ExceptionCode.UNAUTHORIZED_ACCESS);
-        }
+        if (checkRefreshToken(refreshToken)) throw new BusinessException(ExceptionCode.UNAUTHORIZED_ACCESS);
 
-        Claims claims = jwtProvider.getClaims(refreshToken);
-        String newAccessToken = jwtProvider.createAccessToken(claims);
+        Claims claims = jwtUtils.getClaims(refreshToken);
+        String newAccessToken = jwtUtils.createAccessToken(claims);
 
-        CustomCookieManager.setCookie(
-                response, newAccessToken,
-                CustomCookieManager.ACCESS_TOKEN, jwtProvider.getAccessTokenExpirationPeriod()
-        );
+        response.setHeader(JwtUtils.AUTHORIZATION, JwtUtils.BEARER + newAccessToken);
+    }
+
+    @Override
+    public ResEmailDto checkVerificationStr(Long userId, String verificationCode) throws Exception {
+        User savedUser = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ExceptionCode.NOT_FOUND_USER));
+
+        String decodedEmail = AesUtils.aesCBCDecode(savedUser.getEmail());
+        String storedString = getVerificationNumber(decodedEmail);
+
+        if (!storedString.equals(verificationCode)) throw new BusinessException(INVALID_EMAIL_VERIFICATION);
+
+        savedUser.verifyEmail();
+        return ResEmailDto.of(decodedEmail);
     }
 
     private void createTokenAndSet(HttpServletResponse response, String decodedEmail) {
         Map<String, Object> claims = new HashMap<>();
         claims.put(JwtUtils.EMAIL_CLAIM, decodedEmail);
 
-        String accessToken = jwtProvider.createAccessToken(claims);
-        String refreshToken = jwtProvider.createRefreshToken(claims);
+        String accessToken = jwtUtils.createAccessToken(claims);
+        String refreshToken = jwtUtils.createRefreshToken();
 
-        CustomCookieManager.setCookie(
-                response, accessToken, CustomCookieManager.ACCESS_TOKEN, jwtProvider.getAccessTokenExpirationPeriod()
-        );
-        CustomCookieManager.setCookie(
-                response, refreshToken, CustomCookieManager.REFRESH_TOKEN, jwtProvider.getRefreshTokenExpirationPeriod()
-        );
+        response.setHeader(JwtUtils.AUTHORIZATION, JwtUtils.BEARER + accessToken);
+        response.setHeader(JwtUtils.REFRESH_TOKEN_HEADER, JwtUtils.BEARER + refreshToken);
 
         redisService.setValues(
-                decodedEmail, refreshToken, Duration.ofMillis(jwtProvider.getRefreshTokenExpirationPeriod())
+                decodedEmail, refreshToken, Duration.ofMillis(jwtUtils.getRefreshTokenExpirationPeriod())
         );
     }
 
-    private void deleteTokenAndAddBlacklist(HttpServletResponse response, Claims claims) {
+    private void deleteTokenAndAddBlacklist(Claims claims) {
         String email = claims.get("email", String.class);
         String redisRefreshToken = redisService.getValues(email);
 
-        CustomCookieManager.deleteCookie(response, CustomCookieManager.ACCESS_TOKEN);
-        CustomCookieManager.deleteCookie(response, CustomCookieManager.REFRESH_TOKEN);
-
-        if (redisService.checkExistsValue(redisRefreshToken)) {
+        if (redisService.getValues(redisRefreshToken) != null) {
             redisService.deleteValuesByKey(email);
 
-            long refreshTokenExpirationMillis = jwtProvider.getAccessTokenExpirationPeriod();
+            long refreshTokenExpirationMillis = jwtUtils.getAccessTokenExpirationPeriod();
             redisService.setValues(redisRefreshToken, email, Duration.ofMillis(refreshTokenExpirationMillis));
         }
     }
@@ -260,18 +267,17 @@ public class UserServiceImpl implements UserService{
         }
     }
 
-    private String getEmailOfAuthenticatedUser(HttpServletRequest request) throws Exception {
-        String accessToken = CustomCookieManager.getCookie(request, CustomCookieManager.ACCESS_TOKEN);
-        return AesUtils.aesCBCEncode(JwtParser.getEmail(accessToken));
-    }
-
     private boolean checkRefreshToken(String refreshToken) {
         return StringUtils.hasText(refreshToken) &&
-                jwtProvider.isTokenValid(refreshToken) &&
+                jwtUtils.isTokenValid(refreshToken) &&
                 getLogoutInfo(refreshToken);
     }
 
     private boolean getLogoutInfo(String refreshToken) {
         return redisService.getValues(refreshToken).equals("false");
+    }
+
+    private String getVerificationNumber(String email) {
+        return redisService.getValues(email);
     }
 }

@@ -1,13 +1,14 @@
 package com.purchase.preorder.user_service.wishlist;
 
-import com.purchase.preorder.exception.BusinessException;
-import com.purchase.preorder.user.User;
-import com.purchase.preorder.user.UserRepository;
+import com.common.core.util.JwtParser;
+import com.common.domain.entity.User;
+import com.common.domain.entity.Wishlist;
+import com.common.domain.repository.WishlistRepository;
+import com.common.web.auth.JwtUtils;
+import com.common.web.exception.BusinessException;
+import com.purchase.preorder.user_service.user.UserService;
 import com.purchase.preorder.user_service.wishlist.dto.ResWishListDto;
 import com.purchase.preorder.user_service.wishlist.dto.ResWishListItemDto;
-import com.purchase.preorder.util.AesUtils;
-import com.purchase.preorder.util.CustomCookieManager;
-import com.purchase.preorder.util.JwtParser;
 import com.purchase.preorder.user_service.wishlist_item.WishlistItemService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -16,56 +17,41 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.purchase.preorder.exception.ExceptionCode.*;
+import static com.common.core.exception.ExceptionCode.NOT_FOUND_WISHLIST;
+import static com.common.core.exception.ExceptionCode.UNAUTHORIZED_ACCESS;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class WishlistServiceImpl implements WishlistService {
-    private final UserRepository userRepository;
+
+    private final UserService userService;
     private final WishlistRepository wishListRepository;
     private final WishlistItemService wishListItemService;
+    private final JwtUtils jwtUtils;
 
     @Override
     @Transactional
-    public void addItemToWishList(HttpServletRequest request, Long itemId) throws Exception {
-        String emailOfConnectingUser = getEmailOfAuthenticatedUser(request);
+    public void addItemToWishList(HttpServletRequest request, List<Long> itemIds) {
+        User user = getUserByRequest(request);
 
-        User user = userRepository.findByEmail(emailOfConnectingUser)
-                .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
+        Wishlist wishlist = wishListRepository.findByUserId(user.getId())
+                .orElseGet(() -> wishListRepository.save(Wishlist.of(user.getId())));
 
-        Wishlist wishlist = wishListRepository.findByUser(user)
-                .orElseGet(() -> {
-                    Wishlist newWishlist = Wishlist.of(user);
-                    return wishListRepository.save(newWishlist);
-                });
-
-        wishListItemService.createWishListItem(wishlist, itemId);
+        wishListItemService.createWishListItem(wishlist, itemIds);
     }
 
     @Override
     @Transactional
-    public void removeItemFromWishList(HttpServletRequest request, Long itemId) throws Exception {
-        String emailOfConnectingUser = getEmailOfAuthenticatedUser(request);
+    public void removeItemFromWishList(HttpServletRequest request, List<Long> itemIds) {
+        Wishlist wishlist = getWishlistByRequest(request);
 
-        User user = userRepository.findByEmail(emailOfConnectingUser)
-                .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
-
-        Wishlist wishlist = wishListRepository.findByUser(user)
-                .orElseThrow(() -> new BusinessException(NOT_FOUND_WISHLIST));
-
-        wishListItemService.deleteWishListItem(wishlist, itemId);
+        wishListItemService.deleteWishListItem(wishlist, itemIds);
     }
 
     @Override
-    public ResWishListDto readMyWishList(HttpServletRequest request) throws Exception {
-        String emailOfConnectingUser = getEmailOfAuthenticatedUser(request);
-
-        User user = userRepository.findByEmail(emailOfConnectingUser)
-                .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
-
-        Wishlist wishlist = wishListRepository.findByUser(user)
-                .orElseThrow(() -> new BusinessException(NOT_FOUND_WISHLIST));
+    public ResWishListDto readMyWishList(HttpServletRequest request) {
+        Wishlist wishlist = getWishlistByRequest(request);
 
         List<ResWishListItemDto> resWishListItemDtoList = wishListItemService.fromEntities(wishlist.getWishlistItems());
 
@@ -74,29 +60,35 @@ public class WishlistServiceImpl implements WishlistService {
 
     @Override
     @Transactional
-    public void clearWishlist(HttpServletRequest request) throws Exception {
-        String emailOfConnectingUser = getEmailOfAuthenticatedUser(request);
+    public void clearWishlist(HttpServletRequest request) {
+        User user = getUserByRequest(request);
 
-        User user = userRepository.findByEmail(emailOfConnectingUser)
-                .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
-
-        Wishlist wishlist = wishListRepository.findByUser(user)
+        Wishlist wishlist = wishListRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_WISHLIST));
 
-        checkAccount(wishlist.getUser().getEmail(), emailOfConnectingUser);
+        checkAccount(wishlist.getUserId(), user.getId());
 
         wishlist.getWishlistItems().clear();
-        wishListRepository.save(wishlist);
     }
 
-    private void checkAccount(String email, String myEmail) {
-        if (!email.equals(myEmail)) {
-            throw new BusinessException(UNAUTHORIZED_ACCESS);
-        }
+    private Wishlist getWishlistByRequest(HttpServletRequest request) {
+        User user = getUserByRequest(request);
+
+        return wishListRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_WISHLIST));
     }
 
-    private String getEmailOfAuthenticatedUser(HttpServletRequest request) throws Exception {
-        String accessToken = CustomCookieManager.getCookie(request, CustomCookieManager.ACCESS_TOKEN);
-        return AesUtils.aesCBCEncode(JwtParser.getEmail(accessToken));
+    private User getUserByRequest(HttpServletRequest request) {
+        String email = getEmailOfAuthenticatedUser(request);
+        return userService.findUserByEmail(email);
+    }
+
+    private void checkAccount(Long expected, Long actual) {
+        if (!expected.equals(actual)) throw new BusinessException(UNAUTHORIZED_ACCESS);
+    }
+
+    private String getEmailOfAuthenticatedUser(HttpServletRequest request) {
+        String accessToken = jwtUtils.resolveToken(request.getHeader(JwtUtils.AUTHORIZATION));
+        return JwtParser.getEmail(accessToken);
     }
 }

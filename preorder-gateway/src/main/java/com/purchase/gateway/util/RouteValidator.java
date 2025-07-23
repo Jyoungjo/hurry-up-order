@@ -13,7 +13,8 @@ public class RouteValidator {
             "/user-service/api/v1/users",
             "/user-service/api/v1/users/login",
             "/item-service/errorful/", // 장애 상황 테스트
-            "/user-service/error/" // 장애 상황 테스트
+            "/user-service/error/", // 장애 상황 테스트
+            "/payment-service/"
     );
 
     public Predicate<ServerHttpRequest> isSecured =

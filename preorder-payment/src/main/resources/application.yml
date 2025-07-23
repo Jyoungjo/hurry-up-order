@@ -33,6 +33,37 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
 
+resilience4j:
+  retry:
+    instances:
+      confirmPayment:
+        maxAttempts: 3  # 최대 3번 재시도
+        waitDuration: 500ms  # 재시도 사이의 대기 시간
+        retry-exceptions:
+          - com.common.web.exception.BusinessException
+      onCircuitOpen:
+        maxAttempts: 3
+        waitDuration: 500ms
+        retry-exceptions:
+          - com.common.web.exception.BusinessException
+
+  circuitbreaker:
+    instances:
+      confirmPayment:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 100
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        record-exceptions:
+          - com.common.web.exception.BusinessException
+
+logging:
+  level:
+    com.purchase.preorder.payment_service.api.external.TossPaymentsClient: DEBUG
+
 ---
 spring:
   config:
@@ -47,6 +78,16 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka
 
+feign:
+  client:
+    config:
+      tossPaymentsClient:
+        connect-timeout: 1000
+        read-timeout: 1500
+      nicePaymentsClient:
+        connect-timeout: 1000
+        read-timeout: 1500
+
 ---
 spring:
   config:
@@ -60,6 +101,16 @@ eureka:
   client:
     service-url:
       defaultZone: http://eureka-server:8761/eureka
+
+feign:
+  client:
+    config:
+      tossPaymentsClient:
+        connect-timeout: 1000
+        read-timeout: 1500
+      nicePaymentsClient:
+        connect-timeout: 1000
+        read-timeout: 1500
 
 ---
 spring:
@@ -80,3 +131,35 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
         show_sql: true
+  cloud:
+    gateway:
+      enabled: false
+
+eureka:
+  client:
+    enabled: false
+
+feign:
+  client:
+    config:
+      tossPaymentsClient:
+        connect-timeout: 1000
+        read-timeout: 1500
+      nicePaymentsClient:
+        connect-timeout: 1000
+        read-timeout: 1500
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      confirmPayment:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+  retry:
+    instances:
+      confirmPayment:
+        maxAttempts: 3
+        waitDuration: 1s

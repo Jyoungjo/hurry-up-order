@@ -18,6 +18,7 @@ public enum ExceptionCode {
     DECODING_ERROR(BAD_REQUEST, "decoding error"),
     CANCEL_PAYMENT(BAD_REQUEST, "결제가 취소되었습니다."),
     NOT_REACHED_OPEN_TIME(BAD_REQUEST, "결제가 취소되었습니다."),
+    INVALID_EMAIL_VERIFICATION(BAD_REQUEST, "인증 번호가 일치하지 않습니다."),
 
     /*
      * 401
@@ -71,7 +72,12 @@ public enum ExceptionCode {
     /*
      * 500
      */
-    INTERNAL_SERVER_ERROR(SERVER_ERROR, "internal server error");
+    INTERNAL_SERVER_ERROR(SERVER_ERROR, "internal server error"),
+
+    /*
+     * 503
+     */
+    SERVICE_UNAVAILABLE(SERVICE_FAILURE, "서비스 이용이 일시적으로 불가능합니다.");
 
     private final int status;
     private final String message;

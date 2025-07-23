@@ -32,18 +32,18 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testRuntimeOnly 'com.h2database:h2'
 
-//    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-//    testImplementation 'com.github.codemonstur:embedded-redis:1.4.3'
-
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 
-//    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.2'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    testImplementation 'com.github.codemonstur:embedded-redis:1.4.3'
+
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.2'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
-//    implementation "io.github.resilience4j:resilience4j-spring-boot3"
-//    implementation "org.springframework.boot:spring-boot-starter-actuator"
-//    implementation "org.springframework.boot:spring-boot-starter-aop"
+    implementation "io.github.resilience4j:resilience4j-spring-boot3"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-aop"
 }
 
 dependencyManagement {

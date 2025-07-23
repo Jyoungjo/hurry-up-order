@@ -9,4 +9,5 @@ public interface HttpStatusCode {
     int NOT_ALLOW_METHOD = 405;
     int CONFLICT = 409;
     int SERVER_ERROR = 500;
+    int SERVICE_FAILURE = 503;
 }
