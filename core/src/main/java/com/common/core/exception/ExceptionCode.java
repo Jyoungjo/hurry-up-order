@@ -52,6 +52,8 @@ public enum ExceptionCode {
     NOT_FOUND_STOCK(NOT_FOUND, "재고가 존재하지 않습니다."),
     NOT_FOUND_SHIPMENT(NOT_FOUND, "배송 정보가 존재하지 않습니다."),
     NOT_FOUND_PAYMENT(NOT_FOUND, "결제 정보가 존재하지 않습니다."),
+    NOT_FOUND_SETTLEMENT(NOT_FOUND, "정산 정보가 존재하지 않습니다."),
+    NOT_FOUND_OUTBOX(NOT_FOUND, "아웃 박스가 존재하지 않습니다."),
 
     /*
      * 405

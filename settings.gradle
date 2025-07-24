@@ -9,4 +9,6 @@ include 'kafka-common'
 include 'web-common'
 include 'core'
 include 'domain-common'
+include 'event-common'
+include 'front'
 

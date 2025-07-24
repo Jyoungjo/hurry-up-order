@@ -2,7 +2,7 @@ package com.purchase.preorder.cart_item;
 
 import com.purchase.preorder.cart.Cart;
 import com.purchase.preorder.cart.CartRepository;
-import com.purchase.preorder.order_service.config.JpaConfig;
+import com.purchase.preorder.order_service_common.config.JpaConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,8 +12,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @Import(JpaConfig.class)

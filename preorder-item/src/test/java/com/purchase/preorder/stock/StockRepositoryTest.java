@@ -1,8 +1,8 @@
 package com.purchase.preorder.stock;
 
-import com.purchase.preorder.item_service.config.JpaConfig;
 import com.purchase.preorder.item.Item;
 import com.purchase.preorder.item.ItemRepository;
+import com.purchase.preorder.item_service_common.config.JpaConfig;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

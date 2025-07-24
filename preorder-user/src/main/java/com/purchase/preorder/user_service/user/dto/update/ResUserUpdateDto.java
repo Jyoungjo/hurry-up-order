@@ -1,6 +1,5 @@
 package com.purchase.preorder.user_service.user.dto.update;
 
-import com.common.domain.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,11 +14,11 @@ public class ResUserUpdateDto {
     private String address;
     private String phoneNumber;
 
-    public static ResUserUpdateDto fromEntity(User user) {
+    public static ResUserUpdateDto of(Long userId, String address, String phoneNumber) {
         return ResUserUpdateDto.builder()
-                .id(user.getId())
-                .address(user.getAddress())
-                .phoneNumber(user.getPhoneNumber())
+                .id(userId)
+                .address(address)
+                .phoneNumber(phoneNumber)
                 .build();
     }
 }

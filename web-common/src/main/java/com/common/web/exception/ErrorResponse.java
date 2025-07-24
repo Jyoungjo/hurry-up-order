@@ -21,6 +21,12 @@ public class ErrorResponse {
     private String message;
     private List<FieldError> errors;
 
+    private ErrorResponse(final int status, final String message, final List<FieldError> errors) {
+        this.status = status;
+        this.message = message;
+        this.errors = Collections.unmodifiableList(errors);
+    }
+
     private ErrorResponse(final ExceptionCode code, final List<FieldError> errors) {
         this.status = code.getStatus();
         this.message = code.getMessage();
@@ -29,6 +35,10 @@ public class ErrorResponse {
 
     private ErrorResponse(final ExceptionCode code) {
         this(code, Collections.emptyList());
+    }
+
+    private ErrorResponse(final int status, final String message) {
+        this(status, message, Collections.emptyList());
     }
 
     // Static factory methods
@@ -56,6 +66,10 @@ public class ErrorResponse {
 
     public static ErrorResponse of(final ExceptionCode code, final List<FieldError> errors) {
         return new ErrorResponse(code, errors);
+    }
+
+    public static ErrorResponse of(final int status, final String message) {
+        return new ErrorResponse(status, message);
     }
 
     @Getter

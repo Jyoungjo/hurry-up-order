@@ -4,5 +4,6 @@ public enum SettlementStatus {
     PENDING,
     COMPLETED,
     FAILED,
-    MISMATCHED
+    MISMATCHED,
+    REVERSED,
 }

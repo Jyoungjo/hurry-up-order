@@ -1,7 +1,10 @@
 package com.purchase.preorder.item_service.item.dto.create;
 
-import com.purchase.preorder.item.Item;
-import lombok.*;
+import com.common.domain.entity.item.Item;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
@@ -14,7 +17,7 @@ public class ResCreateItemDto {
     private Integer stock;
     private Integer price;
 
-    public static ResCreateItemDto fromEntity(Item item, int stock) {
+    public static ResCreateItemDto of(Item item, int stock) {
         return ResCreateItemDto.builder()
                 .id(item.getId())
                 .name(item.getName())

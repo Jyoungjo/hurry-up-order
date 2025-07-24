@@ -1,164 +1,308 @@
 package com.purchase.preorder.order_service.order;
 
-import com.purchase.preorder.order_service.client.ItemClient;
-import com.purchase.preorder.order_service.client.PaymentClient;
-import com.purchase.preorder.order_service.client.ReqPaymentDto;
-import com.purchase.preorder.order_service.client.UserClient;
-import com.purchase.preorder.order_service.client.response.ItemResponse;
-import com.purchase.preorder.order_service.client.response.PaymentResponse;
-import com.purchase.preorder.order_service.client.response.UserResponse;
-import com.purchase.preorder.exception.BusinessException;
-import com.purchase.preorder.order_service.order.dto.ReqLimitedOrderDto;
-import com.purchase.preorder.order_service.order.dto.ReqOrderDto;
-import com.purchase.preorder.order_service.order.dto.ResOrderDto;
-import com.purchase.preorder.order_service.order_item.OrderItemService;
-import com.purchase.preorder.util.AesUtils;
-import com.purchase.preorder.util.CustomCookieManager;
-import com.purchase.preorder.util.JwtParser;
+import com.common.core.util.JwtParser;
+import com.common.domain.common.OrderStatus;
+import com.common.domain.entity.order.Order;
+import com.common.domain.entity.order.OrderItem;
+import com.common.domain.entity.order.projection.OrderPaidInfo;
+import com.common.domain.repository.order.OrderRepository;
+import com.common.event_common.domain_event_vo.order.*;
+import com.common.event_common.domain_event_vo.payment.PaymentCancelRequestedByCancelDomainEvent;
+import com.common.event_common.domain_event_vo.payment.PaymentCancelRequestedByReturnDomainEvent;
+import com.common.event_common.domain_event_vo.payment.PaymentCancelRequestedByRollbackDomainEvent;
+import com.common.event_common.domain_event_vo.stock.StockRollbackRequestedDomainEvent;
+import com.common.event_common.mapper.OrderDomainEventMapper;
+import com.common.event_common.publisher.DomainEventPublisher;
+import com.common.kafka.event_vo.payment.CancelReason;
+import com.common.web.auth.JwtUtils;
+import com.common.web.exception.BusinessException;
+import com.purchase.preorder.order_service.api.internal.ItemClient;
+import com.purchase.preorder.order_service.api.internal.dto.ItemResponse;
+import com.purchase.preorder.order_service.order.dto.*;
+import com.purchase.preorder.order_service.order_item.service.OrderItemService;
+import com.purchase.preorder.shipment_service.shipment.service.ShipmentService;
+import feign.FeignException;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.Executor;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-import static com.purchase.preorder.exception.ExceptionCode.*;
+import static com.common.core.exception.ExceptionCode.*;
 
+@Slf4j
 @Service
-@RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
-    private final UserClient userClient;
-    private final PaymentClient paymentClient;
+
     private final ItemClient itemClient;
     private final OrderRepository orderRepository;
     private final OrderItemService orderItemService;
+    private final JwtUtils jwtUtils;
+    private final OrderDomainEventMapper mapper;
+    private final DomainEventPublisher publisher;
+    private final Executor executor;
 
-    // 일반 상품들의 결제 프로세스는 우선 제외한다.
-    @Override
-    @Transactional
-    public ResOrderDto createOrder(ReqOrderDto req, HttpServletRequest request) throws Exception {
-        // TODO 주문할 때, 재고 없으면 주문 못하도록 막기 + 결제 API 호출하기
-        String emailOfConnectingUser = getEmailOfAuthenticatedUser(request);
+    // TODO 배송 서비스 분리할 경우 삭제
+    private final ShipmentService shipmentService;
 
-        UserResponse user = userClient.getUserByEmail(emailOfConnectingUser);
-
-        // Order 객체 생성
-        int totalPrice = req.getOrderItemList().stream().mapToInt(oi -> oi.getItemCount() * oi.getPrice()).sum();
-        Order order = orderRepository.save(Order.of(user.getId(), totalPrice));
-
-        // OrderItem 객체 생성 및 저장 로직
-        orderItemService.createOrderItem(order, req.getOrderItemList());
-        Order savedOrder = orderRepository.save(order);
-
-        // Order save
-        return ResOrderDto.fromEntity(savedOrder);
+    public OrderServiceImpl(ItemClient itemClient,
+                            OrderRepository orderRepository,
+                            OrderItemService orderItemService,
+                            JwtUtils jwtUtils,
+                            OrderDomainEventMapper mapper,
+                            @Qualifier("orderDomainEventPublisher") DomainEventPublisher publisher,
+                            @Qualifier("feignClientTaskExecutor") Executor executor,
+                            ShipmentService shipmentService) {
+        this.itemClient = itemClient;
+        this.orderRepository = orderRepository;
+        this.orderItemService = orderItemService;
+        this.jwtUtils = jwtUtils;
+        this.mapper = mapper;
+        this.publisher = publisher;
+        this.executor = executor;
+        this.shipmentService = shipmentService;
     }
 
     @Override
-    @Transactional
-    public ResOrderDto createOrderOfLimitedItem(ReqLimitedOrderDto req, HttpServletRequest request) throws Exception {
-        // 재고 체크
-        checkQuantityOfStock(req);
+    public ResOrderDto createOrder(ReqOrderDto req, HttpServletRequest request) {
+        // 1. 유저 인증 (JWT로 이메일 가져오기)
+        Long userId = getUserIdOfAuthenticatedUser(request);
 
-        // 오픈 시간 체크
-        ItemResponse foundItem = itemClient.getItem(req.getItemId());
-        if (LocalDateTime.now().isBefore(foundItem.getOpenTime())) {
-            throw new BusinessException(NOT_REACHED_OPEN_TIME);
+        List<Long> orderRequestedItemIds = req.getOrderItemList().stream()
+                .map(ReqOrderItemDto::getItemId)
+                .distinct()
+                .toList();
+
+        // 2. 재고 조회 및 재고 임시 차감
+        List<ReqReserveStockDto> reserveStockDtos = req.getOrderItemList().stream()
+                .map(oi -> ReqReserveStockDto.of(oi.getItemId(), oi.getItemCount()))
+                .toList();
+
+        // 3. 상품 조회 비동기 진행
+        CompletableFuture<List<ItemResponse>> itemFut = CompletableFuture
+                .supplyAsync(() -> itemClient.getItems(orderRequestedItemIds), executor);
+
+        // 4. 재고 선점은 동기 처리
+        try {
+            itemClient.reserveStocks(userId, reserveStockDtos);
+        } catch (FeignException ex) {
+            // 실패 시 조회 중인 future 취소
+            itemFut.cancel(true);
+            log.error("[ORDER-SERVICE] 재고 선점 실패 - 원인: {}", ex.getMessage());
+            throw ex;
         }
 
-        // 접속 유저 정보 불러오기
-        String emailOfConnectingUser = getEmailOfAuthenticatedUser(request);
-        UserResponse user = userClient.getUserByEmail(emailOfConnectingUser);
+        // 4. 상품 조회 결과 기다리기
+        List<ItemResponse> items;
+        try {
+            items = itemFut.join();
+        } catch (CompletionException ce) {
+            throw new BusinessException(ce.getMessage(), INTERNAL_SERVER_ERROR);
+        }
 
-        // Order 객체 생성
-        Order order = orderRepository.save(Order.of(user.getId(), req.getPrice()));
-
-        // 결제 시도
-        PaymentResponse initiatedPayment = initiatePayment(req, order);
-
-        // 결제 완료
-        completePayment(req, initiatedPayment.getPaymentId());
-
-        // OrderItem 객체 생성 및 저장 로직
-        orderItemService.createOrderItem(foundItem, order);
-        Order savedOrder = orderRepository.save(order);
-
-        // Order save
-        return ResOrderDto.fromEntity(savedOrder);
+        // 6. DB 저장 및 리턴
+        return saveOrderTransactionally(req, userId, items);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ResOrderDto> readAllOrder(HttpServletRequest request, Integer page, Integer size) throws Exception {
-        String emailOfConnectingUser = getEmailOfAuthenticatedUser(request);
-
-        UserResponse user = userClient.getUserByEmail(emailOfConnectingUser);
+        Long userId = getUserIdOfAuthenticatedUser(request);
 
         Pageable pageable = PageRequest.of(page, size);
-
-        return orderRepository.findByUserId(user.getId(), pageable).map(ResOrderDto::fromEntity);
+        return orderRepository.findByUserId(userId, pageable).map(ResOrderDto::fromEntity);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResOrderDto readOrder(HttpServletRequest request, Long orderId) throws Exception {
-        String emailOfConnectingUser = getEmailOfAuthenticatedUser(request);
-
-        UserResponse user = userClient.getUserByEmail(emailOfConnectingUser);
+        Long userId = getUserIdOfAuthenticatedUser(request);
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
 
-        checkMatchesUser(user.getId(), order.getUserId());
+        checkMatchesUser(userId, order.getUserId());
 
         return ResOrderDto.fromEntity(order);
     }
 
     @Override
     @Transactional
-    public void deleteOrder(HttpServletRequest request, Long orderId) throws Exception {
-        String emailOfConnectingUser = getEmailOfAuthenticatedUser(request);
+    public void deleteOrder(Long userId) {
+        List<Order> orders = orderRepository.findAllByUserId(userId);
+        if (orders.isEmpty()) throw new BusinessException(NOT_FOUND_ORDER);
 
-        UserResponse user = userClient.getUserByEmail(emailOfConnectingUser);
+        orderRepository.deleteAll(orders);
 
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
-
-        checkMatchesUser(user.getId(), order.getUserId());
-
-        orderRepository.delete(order);
+        for (Order order : orders) {
+            List<Long> orderItemIds = order.getOrderItemList().stream().map(OrderItem::getId).toList();
+            OrderDeletedDomainEvent event = mapper.toOrderDeletedEvent(userId, order.getId(), orderItemIds);
+            publisher.publishWithOutboxAfterCommit(event);
+        }
     }
 
     @Override
     @Transactional
-    public void cancelOrder(HttpServletRequest request, Long orderId, Long itemId) throws Exception {
-        String emailOfConnectingUser = getEmailOfAuthenticatedUser(request);
-
-        UserResponse user = userClient.getUserByEmail(emailOfConnectingUser);
-
+    public void updateStatus(Long orderId, OrderStatus status) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
 
-        checkMatchesUser(user.getId(), order.getUserId());
+        orderItemService.updateStatus(order.getOrderItemList(), status.toString());
+        order.updateStatus(status);
+        log.info("주문 상태 변경 - 상태: {}", status);
 
-        orderItemService.cancelOrder(order, itemId);
+        if (status == OrderStatus.CANCELED || status == OrderStatus.RETURNED) {
+            Map<Long, Integer> stockMap = order.getOrderItemList().stream()
+                    .collect(Collectors.toMap(OrderItem::getItemId, OrderItem::getQuantity));
+            StockRollbackRequestedDomainEvent event = mapper.toStockRollbackRequestedEvent(order.getId(), stockMap);
+            publisher.publishWithOutboxAfterCommit(event);
+        } else if (status == OrderStatus.PAID) {
+            List<Long> orderItemIds = order.getOrderItemList().stream().map(OrderItem::getId).toList();
+            OrderCompletedDomainEvent event = mapper.toOrderCompletedEvent(orderId, orderItemIds);
+            publisher.publishOnlySpringEventAfterCommit(event);
+        }
     }
 
     @Override
     @Transactional
-    public void returnOrder(HttpServletRequest request, Long orderId, Long itemId) throws Exception {
-        String emailOfConnectingUser = getEmailOfAuthenticatedUser(request);
+    public void updateStatusByRollback(Long orderId, OrderStatus status) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
 
-        UserResponse user = userClient.getUserByEmail(emailOfConnectingUser);
+        orderItemService.updateStatus(order.getOrderItemList(), status.toString());
+        order.updateStatus(status);
+        log.info("주문 상태 변경 - 상태: {}", status);
+
+        OrderCompensationCompletedDomainEvent event = mapper.toOrderCompensationCompletedEvent(
+                orderId, order.getOrderItemList().stream().map(OrderItem::getId).toList()
+        );
+        publisher.publishOnlySpringEventAfterCommit(event);
+    }
+
+    @Override
+    @Transactional
+    public void assignShipments(Long orderId, Map<Long, Long> shipmentMap) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
+
+        orderItemService.assignShipments(order.getOrderItemList(), shipmentMap);
+    }
+
+    @Override
+    @Transactional
+    public void cancelOrder(HttpServletRequest request, Long orderId, ReqCancelOrderDto req) throws Exception {
+        Long userId = getUserIdOfAuthenticatedUser(request);
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
 
-        checkMatchesUser(user.getId(), order.getUserId());
+        checkMatchesUser(userId, order.getUserId());
 
-        orderItemService.requestReturnOrder(order, itemId);
+        if (shipmentService.validateCancelable(order.getOrderItemList().stream().map(OrderItem::getId).toList())) {
+            throw new BusinessException(ALREADY_SHIPPING);
+        }
+
+        orderItemService.requestCancel(req.getOrderItemIds());
+        order.updateStatus(OrderStatus.CANCEL_REQUESTED);
+
+        OrderCancelRequestedDomainEvent event = mapper.toOrderCancelRequestedEvent(order.getId(), req.getOrderItemIds(), req.getCancelReason());
+        publisher.publishOnlySpringEventAfterCommit(event);
+    }
+
+    @Override
+    @Transactional
+    public void returnOrder(HttpServletRequest request, Long orderId, List<Long> orderItemIds) throws Exception {
+        Long userId = getUserIdOfAuthenticatedUser(request);
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
+
+        checkMatchesUser(userId, order.getUserId());
+
+        if (shipmentService.validateReturnable(order.getOrderItemList().stream().map(OrderItem::getId).toList())) {
+            throw new BusinessException(NO_RETURN);
+        }
+
+        orderItemService.requestReturn(orderItemIds);
+        order.updateStatus(OrderStatus.RETURN_REQUESTED);
+
+        OrderReturnRequestedDomainEvent event = mapper.toOrderReturnRequestedEvent(order.getId(), orderItemIds);
+        publisher.publishOnlySpringEventAfterCommit(event);
+    }
+
+    @Override
+    @Transactional
+    public void onPaymentSucceed(Long orderId) {
+        OrderPaidInfo orderPaidInfo = orderRepository.findOrderPaidInfoById(orderId)
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
+
+        OrderPaidDomainEvent domainEvent = mapper.toOrderPaidEvent(orderPaidInfo);
+        publisher.publishWithOutboxAfterCommit(domainEvent);
+    }
+
+    @Override
+    @Transactional
+    public void onPaymentFailure(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
+
+        order.updateStatus(OrderStatus.PAYMENT_FAILED);
+        orderItemService.updateStatus(order.getOrderItemList(), OrderStatus.PAYMENT_FAILED.name());
+
+        OrderPaymentFailedDomainEvent domainEvent = mapper.toOrderPaymentFailedEvent(order);
+        publisher.publishWithOutboxAfterCommit(domainEvent);
+    }
+
+    @Override
+    @Transactional
+    public void onShipmentCancel(Long orderId, String cancelReason) {
+        PaymentCancelRequestedByCancelDomainEvent event = mapper.toPaymentCancelRequestedByCancelEvent(orderId, cancelReason);
+        publisher.publishWithOutboxAfterCommit(event);
+    }
+
+    @Override
+    @Transactional
+    public void onShipmentReturn(Long shipmentId, Long orderItemId, String cancelReason) {
+        Long orderId = orderItemService.findOrderIdByOrderItemId(orderItemId);
+        PaymentCancelRequestedByReturnDomainEvent event = mapper.toPaymentCancelRequestedByReturnEvent(shipmentId, orderId, cancelReason);
+        publisher.publishWithOutboxAfterCommit(event);
+    }
+
+    @Override
+    @Transactional
+    public void onRedisRolledBack(Long orderId) {
+        PaymentCancelRequestedByRollbackDomainEvent event = mapper.toPaymentCancelRequestedByRollbackEvent(
+                orderId, CancelReason.INTERNAL_SERVER_ISSUE.getLabel());
+        publisher.publishWithOutboxAfterCommit(event);
+    }
+
+    @Override
+    @Transactional
+    public void updateStatusByShipment(Long shipmentId, String status) {
+        Long orderId = orderItemService.updateStatusByShipment(shipmentId, status);
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_ORDER));
+
+        OrderStatus newStatus;
+        try {
+            newStatus = OrderStatus.valueOf(status);
+        } catch (IllegalArgumentException ex) {
+            log.warn("무효한 status - 원인: {}", ex.getMessage());
+            throw new IllegalArgumentException(ex);
+        }
+
+        if (!order.getStatus().equals(newStatus)) order.updateStatus(newStatus);
     }
 
     private void checkMatchesUser(Long userId, Long userIdOfConnectingUser) {
@@ -167,37 +311,24 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
-    private String getEmailOfAuthenticatedUser(HttpServletRequest request) throws Exception {
-        String accessToken = CustomCookieManager.getCookie(request, CustomCookieManager.ACCESS_TOKEN);
-        return AesUtils.aesCBCEncode(JwtParser.getEmail(accessToken));
+    private Long getUserIdOfAuthenticatedUser(HttpServletRequest request) {
+        String accessToken = jwtUtils.resolveToken(request.getHeader(JwtUtils.AUTHORIZATION));
+        return JwtParser.getUserId(accessToken);
     }
 
-    private PaymentResponse initiatePayment(ReqLimitedOrderDto req, Order order) {
-        itemClient.decreaseStock(req.getItemId(), 1);
+    @Transactional
+    public ResOrderDto saveOrderTransactionally(ReqOrderDto req, Long userId, List<ItemResponse> items) {
+        Map<Long, ItemResponse> itemMap = items.stream()
+                .collect(Collectors.toMap(ItemResponse::getId, Function.identity()));
+        int totalPrice = req.getOrderItemList().stream()
+                .mapToInt(oi -> itemMap.get(oi.getItemId()).getPrice() * oi.getItemCount())
+                .sum();
 
-        PaymentResponse initiatedPayment = paymentClient.initiatePayment(
-                new ReqPaymentDto(order.getId(), req.getPrice()));
+        Order order = orderRepository.save(Order.of(userId, totalPrice));
 
-        if (!initiatedPayment.getIsSuccess()) {
-            itemClient.increaseStock(req.getItemId(), 1);
-            throw new BusinessException(CANCEL_PAYMENT);
-        }
+        List<OrderItem> orderItems = orderItemService.createOrderItems(order, req.getOrderItemList(), itemMap);
+        order.addAllOrderItems(orderItems);
 
-        return initiatedPayment;
-    }
-
-    private void completePayment(ReqLimitedOrderDto req, Long paymentId) {
-        PaymentResponse completePayment = paymentClient.completePayment(paymentId);
-        if (!completePayment.getIsSuccess()) {
-            itemClient.increaseStock(req.getItemId(), 1);
-            throw new BusinessException(CANCEL_PAYMENT);
-        }
-    }
-
-    private void checkQuantityOfStock(ReqLimitedOrderDto req) {
-        int stock = itemClient.getStock(req.getItemId()).getQuantity();
-        if (stock == 0) {
-            throw new BusinessException(NOT_ENOUGH_STOCK);
-        }
+        return ResOrderDto.fromEntity(order);
     }
 }

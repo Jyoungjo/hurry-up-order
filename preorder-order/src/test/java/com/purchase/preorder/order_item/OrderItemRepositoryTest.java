@@ -1,8 +1,8 @@
 package com.purchase.preorder.order_item;
 
-import com.purchase.preorder.order_service.config.JpaConfig;
 import com.purchase.preorder.order.Order;
 import com.purchase.preorder.order.OrderRepository;
+import com.purchase.preorder.order_service_common.config.JpaConfig;
 import com.purchase.preorder.shipment.Shipment;
 import com.purchase.preorder.shipment.ShipmentRepository;
 import com.purchase.preorder.shipment.ShipmentStatus;

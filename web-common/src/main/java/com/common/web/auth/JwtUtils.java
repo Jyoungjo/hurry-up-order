@@ -32,6 +32,7 @@ public class JwtUtils {
     public static final String REFRESH_TOKEN_HEADER = "Refresh-Token";
     public static final String ACCESS_TOKEN_SUBJECT = "AccessToken";
     public static final String REFRESH_TOKEN_SUBJECT = "RefreshToken";
+    public static final String USER_ID_CLAIM = "userId";
     public static final String EMAIL_CLAIM = "email";
     public static final String ROLE_CLAIM = "role";
     public static final String CERTIFIED_USER = "인증 유저";

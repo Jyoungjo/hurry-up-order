@@ -2,8 +2,8 @@
 //
 //import com.fasterxml.jackson.databind.ObjectMapper;
 //import com.purchase.preorder.payment_service.dto.ReqPaymentInitiateDto;
-//import com.purchase.preorder.payment_service.payment.PaymentController;
-//import com.purchase.preorder.payment_service.payment.PaymentService;
+//import com.purchase.preorder.payment_service.payment.controller.PaymentController;
+//import com.purchase.preorder.payment_service.payment.service.PaymentService;
 //import org.junit.jupiter.api.DisplayName;
 //import org.junit.jupiter.api.Test;
 //import org.springframework.beans.factory.annotation.Autowired;

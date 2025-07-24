@@ -27,4 +27,12 @@ public class JwtParser {
                 .parseClaimsJws(token)
                 .getBody().get("email", String.class);
     }
+
+    public static Long getUserId(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody().get("userId", Long.class);
+    }
 }

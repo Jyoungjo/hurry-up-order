@@ -1,6 +1,7 @@
 package com.common.web.exception;
 
 import com.common.core.exception.ExceptionCode;
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +42,21 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(
                 ErrorResponse.of(e.getExceptionCode(), e.getErrors()),
                 HttpStatus.valueOf(e.getExceptionCode().getStatus())
+        );
+    }
+
+    @ExceptionHandler
+    protected ResponseEntity<ErrorResponse> handleFeignException(FeignException e) {
+        HttpStatus status;
+        try {
+            status = HttpStatus.valueOf(e.status());
+        } catch (IllegalArgumentException ex) {
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        return new ResponseEntity<>(
+                ErrorResponse.of(e.status(), e.getMessage()),
+                HttpStatus.valueOf(status.value())
         );
     }
 
