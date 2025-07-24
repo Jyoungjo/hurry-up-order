@@ -1,10 +1,8 @@
 package com.purchase.preorder.user;
 
-import com.purchase.preorder.user_service.common.RedisService;
-import com.purchase.preorder.user_service.email.EmailService;
-import com.purchase.preorder.user_service.email.ResEmailDto;
+import com.purchase.preorder.email_service.email.EmailService;
+import com.purchase.preorder.email_service.email.ResEmailDto;
 import com.purchase.preorder.exception.BusinessException;
-import com.purchase.preorder.user_service.user.UserServiceImpl;
 import com.purchase.preorder.user_service.user.dto.create.ReqUserCreateDto;
 import com.purchase.preorder.user_service.user.dto.create.ResUserCreateDto;
 import com.purchase.preorder.user_service.user.dto.delete.ReqUserDeleteDto;
@@ -14,6 +12,8 @@ import com.purchase.preorder.user_service.user.dto.read.ResUserInfoDto;
 import com.purchase.preorder.user_service.user.dto.update.ReqUserInfoUpdateDto;
 import com.purchase.preorder.user_service.user.dto.update.ReqUserPasswordUpdateDto;
 import com.purchase.preorder.user_service.user.dto.update.ResUserUpdateDto;
+import com.purchase.preorder.user_service.user.service.UserServiceImpl;
+import com.purchase.preorder.user_service_common.util.RedisService;
 import com.purchase.preorder.util.AesUtils;
 import com.purchase.preorder.util.CustomCookieManager;
 import com.purchase.preorder.util.JwtParser;

@@ -1,6 +1,6 @@
 package com.purchase.preorder.item_service.item.dto.update;
 
-import com.purchase.preorder.item.Item;
+import com.common.domain.entity.item.Item;
 import lombok.*;
 
 @Getter

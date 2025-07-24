@@ -1,7 +1,6 @@
 package com.purchase.preorder.order_service.order.dto;
 
-import com.purchase.preorder.order_item.OrderItem;
-import com.purchase.preorder.shipment.ShipmentStatus;
+import com.common.domain.entity.order.OrderItem;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +15,6 @@ public class ResOrderItemDto {
     private Integer quantity;
     private Integer unitPrice;
     private Integer totalSum;
-    private ShipmentStatus status;
 
     public static ResOrderItemDto fromEntity(OrderItem orderItem) {
         return ResOrderItemDto.builder()
@@ -24,7 +22,6 @@ public class ResOrderItemDto {
                 .quantity(orderItem.getQuantity())
                 .unitPrice(orderItem.getUnitPrice())
                 .totalSum(orderItem.getTotalSum())
-                .status(orderItem.getShipment().getStatus())
                 .build();
     }
 }

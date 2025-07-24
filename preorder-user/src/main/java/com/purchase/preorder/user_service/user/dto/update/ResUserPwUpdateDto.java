@@ -1,6 +1,5 @@
 package com.purchase.preorder.user_service.user.dto.update;
 
-import com.common.domain.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,15 +10,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class ResUserPwUpdateDto {
-    private Long id;
-    private String name;
-    private String email;
+    private static final String MESSAGE = "비밀번호가 변경되었습니다.";
 
-    public static ResUserPwUpdateDto fromEntity(User user) {
+    private Long id;
+    private String message;
+
+    public static ResUserPwUpdateDto fromEntity(Long userId) {
         return ResUserPwUpdateDto.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
+                .id(userId)
+                .message(MESSAGE)
                 .build();
     }
 }

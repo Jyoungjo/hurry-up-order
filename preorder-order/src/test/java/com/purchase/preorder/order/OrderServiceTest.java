@@ -1,20 +1,14 @@
 package com.purchase.preorder.order;
 
-import com.purchase.preorder.order_service.client.ItemClient;
-import com.purchase.preorder.order_service.client.PaymentClient;
-import com.purchase.preorder.order_service.client.ReqPaymentDto;
-import com.purchase.preorder.order_service.client.UserClient;
-import com.purchase.preorder.order_service.client.response.ItemResponse;
-import com.purchase.preorder.order_service.client.response.PaymentResponse;
-import com.purchase.preorder.order_service.client.response.StockResponse;
-import com.purchase.preorder.order_service.client.response.UserResponse;
 import com.purchase.preorder.exception.BusinessException;
+import com.purchase.preorder.order_service.api.internal.ItemClient;
+import com.purchase.preorder.order_service.api.internal.dto.*;
 import com.purchase.preorder.order_service.order.OrderServiceImpl;
 import com.purchase.preorder.order_service.order.dto.ReqLimitedOrderDto;
 import com.purchase.preorder.order_service.order.dto.ReqOrderDto;
 import com.purchase.preorder.order_service.order.dto.ReqOrderItemDto;
 import com.purchase.preorder.order_service.order.dto.ResOrderDto;
-import com.purchase.preorder.order_service.order_item.OrderItemService;
+import com.purchase.preorder.order_service.order_item.service.OrderItemServiceImpl;
 import com.purchase.preorder.util.AesUtils;
 import com.purchase.preorder.util.CustomCookieManager;
 import com.purchase.preorder.util.JwtParser;
@@ -53,7 +47,7 @@ public class OrderServiceTest {
     @Mock
     private OrderRepository orderRepository;
     @Mock
-    private OrderItemService orderItemService;
+    private OrderItemServiceImpl orderItemService;
 
     @InjectMocks
     private OrderServiceImpl orderService;

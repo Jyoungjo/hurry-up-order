@@ -1,6 +1,6 @@
 package com.purchase.preorder.order_service.order;
 
-import com.purchase.preorder.order_service.order.dto.ReqLimitedOrderDto;
+import com.purchase.preorder.order_service.order.dto.ReqCancelOrderDto;
 import com.purchase.preorder.order_service.order.dto.ReqOrderDto;
 import com.purchase.preorder.order_service.order.dto.ResOrderDto;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -22,13 +24,6 @@ public class OrderController {
             @RequestBody ReqOrderDto req, HttpServletRequest request
     ) throws Exception {
         return ResponseEntity.status(CREATED).body(orderService.createOrder(req, request));
-    }
-
-    @PostMapping("/limited")
-    public ResponseEntity<ResOrderDto> createOrderOfLimitedItem(
-            @RequestBody ReqLimitedOrderDto req, HttpServletRequest request
-    ) throws Exception {
-        return ResponseEntity.status(CREATED).body(orderService.createOrderOfLimitedItem(req, request));
     }
 
     @GetMapping
@@ -47,25 +42,17 @@ public class OrderController {
 
     @PutMapping("/{orderId}/cancel")
     public ResponseEntity<Void> cancelOrder(
-            HttpServletRequest request, @RequestParam("itemId") Long itemId, @PathVariable("orderId") Long orderId
+            HttpServletRequest request, @RequestBody ReqCancelOrderDto req, @PathVariable("orderId") Long orderId
     ) throws Exception {
-        orderService.cancelOrder(request, orderId, itemId);
+        orderService.cancelOrder(request, orderId, req);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{orderId}/return")
     public ResponseEntity<Void> returnOrder(
-            HttpServletRequest request, @RequestParam("itemId") Long itemId, @PathVariable("orderId") Long orderId
+            HttpServletRequest request, @RequestBody List<Long> orderItemIds, @PathVariable("orderId") Long orderId
     ) throws Exception {
-        orderService.returnOrder(request, orderId, itemId);
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/{orderId}")
-    public ResponseEntity<Void> deleteOrder(
-            HttpServletRequest request, @PathVariable("orderId") Long orderId
-    ) throws Exception {
-        orderService.deleteOrder(request, orderId);
+        orderService.returnOrder(request, orderId, orderItemIds);
         return ResponseEntity.noContent().build();
     }
 }

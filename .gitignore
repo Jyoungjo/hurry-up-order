@@ -229,10 +229,24 @@ gradle-app.setting
 *.hprof
 
 preorder-item/src/main/resources/application-secret.yml
+preorder-item/docker-compose.yml
+preorder-item/generate_sentinel_confs.sh
+preorder-item/sentinel
 preorder-order/src/main/resources/application-secret.yml
+preorder-order/docker-compose.yml
+preorder-order/generate_sentinel_confs.sh
+preorder-order/sentinel
 preorder-user/src/main/resources/application-secret.yml
+preorder-user/docker-compose.yml
+preorder-user/generate_sentinel_confs.sh
+preorder-user/sentinel
 preorder-payment/src/main/resources/application-secret.yml
+preorder-payment/docker-compose.yml
+preorder-payment/generate_sentinel_confs.sh
+preorder-payment/sentinel
 preorder-core/src/main/resources/application-secret.yml
 preorder-gateway/src/main/resources/application-secret.yml
+front/**
+logs
 
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij,windows,macos,gradle

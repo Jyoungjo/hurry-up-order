@@ -1,13 +1,13 @@
 package com.purchase.preorder.payment;
 
 import com.common.domain.common.PaymentStatus;
-import com.common.domain.entity.Payment;
-import com.common.domain.repository.PaymentRepository;
-import com.purchase.preorder.payment_service.api.external.TossPaymentsClient;
-import com.purchase.preorder.payment_service.dto.ResPaymentDto;
-import com.purchase.preorder.payment_service.dto.TossPaymentConfirmRequest;
-import com.purchase.preorder.payment_service.dto.TossPaymentConfirmResponse;
-import com.purchase.preorder.payment_service.payment.PaymentService;
+import com.common.domain.entity.payment.Payment;
+import com.common.domain.repository.payment.PaymentRepository;
+import com.purchase.preorder.payment_service.api.external.pg.TossPaymentsClient;
+import com.purchase.preorder.payment_service.api.external.pg.dto.toss.TossPaymentConfirmRequest;
+import com.purchase.preorder.payment_service.api.external.pg.dto.toss.TossPaymentResponse;
+import com.purchase.preorder.payment_service.payment.dto.ResPaymentDto;
+import com.purchase.preorder.payment_service.payment.service.PaymentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,7 +56,7 @@ public class TossPaymentsResilience4jTest {
     @DisplayName("서킷브레이커 CLOSED 상태 정상 처리")
     void 서킷브레이커_CLOSED_성공() {
         // given
-        TossPaymentConfirmResponse res = TossPaymentConfirmResponse.builder()
+        TossPaymentResponse res = TossPaymentResponse.builder()
                 .status("DONE")
                 .orderId("ORD123")
                 .requestedAt("2025-07-22T17:50:07.000+09:00")
@@ -78,7 +78,7 @@ public class TossPaymentsResilience4jTest {
     @DisplayName("리트라이 후 성공하는 케이스")
     void 리트라이_후_성공() {
         // given
-        TossPaymentConfirmResponse res = TossPaymentConfirmResponse.builder()
+        TossPaymentResponse res = TossPaymentResponse.builder()
                 .status("DONE")
                 .orderId("ORD123")
                 .requestedAt("2025-07-22T17:50:07.000+09:00")

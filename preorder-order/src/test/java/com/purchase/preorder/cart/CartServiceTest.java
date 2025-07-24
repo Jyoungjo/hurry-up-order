@@ -1,13 +1,12 @@
 package com.purchase.preorder.cart;
 
-import com.purchase.preorder.order_service.cart.CartServiceImpl;
-import com.purchase.preorder.order_service.cart.dto.ReqCartDto;
-import com.purchase.preorder.order_service.cart.dto.ResCartDto;
-import com.purchase.preorder.order_service.cart.dto.ResCartItemDto;
-import com.purchase.preorder.order_service.cart_item.CartItemService;
-import com.purchase.preorder.order_service.client.UserClient;
-import com.purchase.preorder.order_service.client.response.UserResponse;
+import com.purchase.preorder.cart_service.cart.dto.ReqCartDto;
+import com.purchase.preorder.cart_service.cart.dto.ResCartDto;
+import com.purchase.preorder.cart_service.cart.dto.ResCartItemDto;
+import com.purchase.preorder.cart_service.cart.service.CartServiceImpl;
+import com.purchase.preorder.cart_service.cart_item.CartItemService;
 import com.purchase.preorder.exception.BusinessException;
+import com.purchase.preorder.order_service.api.internal.dto.UserResponse;
 import com.purchase.preorder.util.AesUtils;
 import com.purchase.preorder.util.CustomCookieManager;
 import com.purchase.preorder.util.JwtParser;

@@ -28,7 +28,6 @@ subprojects {
 
 	dependencies {
 		implementation 'org.springframework.boot:spring-boot-starter-validation' // 전체
-		developmentOnly 'org.springframework.boot:spring-boot-devtools' // 전체
 		compileOnly 'org.projectlombok:lombok' // 전체
 		annotationProcessor 'org.projectlombok:lombok' // 전체
 	}

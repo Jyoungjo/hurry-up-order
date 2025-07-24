@@ -1,6 +1,6 @@
 package com.purchase.preorder.order_service.order.dto;
 
-import com.purchase.preorder.order.Order;
+import com.common.domain.entity.order.Order;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package com.purchase.preorder.order;
 
-import com.purchase.preorder.order_service.config.JpaConfig;
+import com.purchase.preorder.order_service_common.config.JpaConfig;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

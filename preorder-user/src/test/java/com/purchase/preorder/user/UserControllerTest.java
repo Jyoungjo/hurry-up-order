@@ -1,10 +1,9 @@
 package com.purchase.preorder.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.purchase.preorder.user_service.email.ResEmailDto;
+import com.purchase.preorder.email_service.email.ResEmailDto;
 import com.purchase.preorder.exception.BusinessException;
-import com.purchase.preorder.user_service.user.UserController;
-import com.purchase.preorder.user_service.user.UserService;
+import com.purchase.preorder.user_service.user.controller.UserController;
 import com.purchase.preorder.user_service.user.dto.create.ReqUserCreateDto;
 import com.purchase.preorder.user_service.user.dto.create.ResUserCreateDto;
 import com.purchase.preorder.user_service.user.dto.delete.ReqUserDeleteDto;
@@ -15,6 +14,7 @@ import com.purchase.preorder.user_service.user.dto.update.ReqUserInfoUpdateDto;
 import com.purchase.preorder.user_service.user.dto.update.ReqUserPasswordUpdateDto;
 import com.purchase.preorder.user_service.user.dto.update.ResUserPwUpdateDto;
 import com.purchase.preorder.user_service.user.dto.update.ResUserUpdateDto;
+import com.purchase.preorder.user_service.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

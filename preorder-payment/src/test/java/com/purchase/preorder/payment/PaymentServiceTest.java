@@ -1,14 +1,20 @@
 package com.purchase.preorder.payment;
 
 import com.common.domain.common.PaymentStatus;
-import com.common.domain.entity.Payment;
-import com.common.domain.repository.PaymentRepository;
+import com.common.domain.entity.payment.Payment;
+import com.common.domain.repository.payment.PaymentRepository;
 import com.common.web.exception.BusinessException;
-import com.purchase.preorder.payment_service.api.external.NicePaymentsClient;
-import com.purchase.preorder.payment_service.api.external.TossPaymentsClient;
-import com.purchase.preorder.payment_service.common.RedisService;
-import com.purchase.preorder.payment_service.dto.*;
-import com.purchase.preorder.payment_service.payment.PaymentServiceImpl;
+import com.purchase.preorder.payment_service.api.external.pg.NicePaymentsClient;
+import com.purchase.preorder.payment_service.api.external.pg.TossPaymentsClient;
+import com.purchase.preorder.payment_service.api.external.pg.dto.nice.NicePaymentConfirmRequest;
+import com.purchase.preorder.payment_service.api.external.pg.dto.nice.NicePaymentRequest;
+import com.purchase.preorder.payment_service.api.external.pg.dto.nice.NicePaymentResponse;
+import com.purchase.preorder.payment_service.api.external.pg.dto.toss.TossPaymentConfirmRequest;
+import com.purchase.preorder.payment_service.api.external.pg.dto.toss.TossPaymentResponse;
+import com.purchase.preorder.payment_service.payment.dto.ReqPaymentInitiateDto;
+import com.purchase.preorder.payment_service.payment.dto.ResPaymentDto;
+import com.purchase.preorder.payment_service.payment.service.PaymentServiceImpl;
+import com.purchase.preorder.payment_service_common.util.RedisService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,15 +52,15 @@ public class PaymentServiceTest {
 
     private Payment payment;
     private TossPaymentConfirmRequest tossRequest;
-    private TossPaymentConfirmResponse tossResponse;
+    private TossPaymentResponse tossResponse;
     private NicePaymentRequest niceReq;
     private NicePaymentConfirmRequest niceRequest;
-    private NicePaymentConfirmResponse niceResponse;
+    private NicePaymentResponse niceResponse;
 
     @BeforeEach
     void init() {
         tossRequest = new TossPaymentConfirmRequest("paymentKey", "order123", 10000);
-        tossResponse = TossPaymentConfirmResponse.builder()
+        tossResponse = TossPaymentResponse.builder()
                 .orderId("order123")
                 .paymentKey("paymentKey")
                 .requestedAt("2025-07-22T18:33:09.000+09:00")
@@ -65,7 +71,7 @@ public class PaymentServiceTest {
                 .build();
         niceReq = new NicePaymentRequest("paymentKey", "order123", 10000);
         niceRequest = new NicePaymentConfirmRequest(10000);
-        niceResponse = NicePaymentConfirmResponse.builder()
+        niceResponse = NicePaymentResponse.builder()
                 .orderId("order123")
                 .tid("paymentKey")
                 .ediDate("2025-07-22T18:33:09.000+0900")
@@ -98,9 +104,9 @@ public class PaymentServiceTest {
     void 토스_결제_확인_기능_성공() {
         // given
         when(paymentRepository.findByPgOrderId(anyString())).thenReturn(Optional.of(payment));
-        when(redisService.getValues(anyString(), eq(TossPaymentConfirmResponse.class))).thenReturn(null);
+        when(redisService.getValues(anyString(), eq(TossPaymentResponse.class))).thenReturn(null);
         when(tossPaymentsClient.confirmPayment(any(TossPaymentConfirmRequest.class))).thenReturn(tossResponse);
-        doNothing().when(redisService).setValues(anyString(), any(TossPaymentConfirmResponse.class));
+        doNothing().when(redisService).setValues(anyString(), any(TossPaymentResponse.class));
 
         // when
         ResPaymentDto res = paymentService.confirmPayment(tossRequest);
@@ -131,7 +137,7 @@ public class PaymentServiceTest {
     void 토스_결제_확인_기능_성공_Redis_캐시() {
         // given
         when(paymentRepository.findByPgOrderId(anyString())).thenReturn(Optional.of(payment));
-        when(redisService.getValues(anyString(), eq(TossPaymentConfirmResponse.class))).thenReturn(tossResponse);
+        when(redisService.getValues(anyString(), eq(TossPaymentResponse.class))).thenReturn(tossResponse);
 
         // when
         ResPaymentDto res = paymentService.confirmPayment(tossRequest);
@@ -194,9 +200,9 @@ public class PaymentServiceTest {
     void 나이스_결제_확인_기능_성공() {
         // given
         when(paymentRepository.findByPgOrderId(anyString())).thenReturn(Optional.of(payment));
-        when(redisService.getValues(anyString(), eq(NicePaymentConfirmResponse.class))).thenReturn(null);
+        when(redisService.getValues(anyString(), eq(NicePaymentResponse.class))).thenReturn(null);
         when(nicePaymentsClient.confirmPayment(anyString(), any(NicePaymentConfirmRequest.class))).thenReturn(niceResponse);
-        doNothing().when(redisService).setValues(anyString(), any(NicePaymentConfirmResponse.class));
+        doNothing().when(redisService).setValues(anyString(), any(NicePaymentResponse.class));
 
         // when
         ResPaymentDto res = paymentService.confirmNicePayment(niceReq);
@@ -227,7 +233,7 @@ public class PaymentServiceTest {
     void 나이스_결제_확인_기능_성공_Redis_캐시() {
         // given
         when(paymentRepository.findByPgOrderId(anyString())).thenReturn(Optional.of(payment));
-        when(redisService.getValues(anyString(), eq(NicePaymentConfirmResponse.class))).thenReturn(niceResponse);
+        when(redisService.getValues(anyString(), eq(NicePaymentResponse.class))).thenReturn(niceResponse);
 
         // when
         ResPaymentDto res = paymentService.confirmNicePayment(niceReq);

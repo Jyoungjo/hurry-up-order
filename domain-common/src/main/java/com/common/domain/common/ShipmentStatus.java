@@ -1,12 +1,11 @@
 package com.common.domain.common;
 
 public enum ShipmentStatus {
-    PENDING,
     ACCEPTANCE,
     READY,
     SHIPPING,
-    DELIVERED,
+    RETURN_REQUESTED,
+    SHIPPED,
     CANCELED,
-    RETURNING,
     RETURNED
 }

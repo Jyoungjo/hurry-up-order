@@ -13,16 +13,18 @@ spring:
   config:
     activate:
       on-profile: common
-  devtools:
-    livereload:
-      enabled: true
-    restart:
-      enabled: true
+
   jpa:
     hibernate:
       ddl-auto: update
     database: postgresql
     show-sql: true
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 100
+        order_inserts: true
+        order_updates: true
 
 eureka:
   instance:
@@ -38,14 +40,13 @@ resilience4j:
     instances:
       confirmPayment:
         maxAttempts: 3  # 최대 3번 재시도
-        waitDuration: 500ms  # 재시도 사이의 대기 시간
+        waitDuration: 700ms  # 재시도 사이의 대기 시간
         retry-exceptions:
+          - java.io.IOException
+          - org.springframework.web.client.ResourceAccessException
+        ignore-exceptions:
           - com.common.web.exception.BusinessException
-      onCircuitOpen:
-        maxAttempts: 3
-        waitDuration: 500ms
-        retry-exceptions:
-          - com.common.web.exception.BusinessException
+          - com.fasterxml.jackson.core.JsonProcessingException
 
   circuitbreaker:
     instances:
@@ -57,13 +58,14 @@ resilience4j:
         waitDurationInOpenState: 30s
         permittedNumberOfCallsInHalfOpenState: 3
         automaticTransitionFromOpenToHalfOpenEnabled: true
-        record-exceptions:
+        ignore-exceptions:
           - com.common.web.exception.BusinessException
 
 logging:
   level:
     com.purchase.preorder.payment_service.api.external.TossPaymentsClient: DEBUG
     com.purchase.preorder.settlement_service.api.external.TossSettlementClient: DEBUG
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG
 
 ---
 spring:

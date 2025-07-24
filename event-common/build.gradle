@@ -1,0 +1,25 @@
+bootJar { enabled = false }
+jar { enabled = true }
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // 공통 로직 의존성
+    implementation project(":core")
+    implementation project(":web-common")
+    implementation project(":domain-common")
+
+    // lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    implementation 'org.springframework:spring-tx'
+
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    // 테스트용
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+}

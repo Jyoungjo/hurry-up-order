@@ -1,8 +1,8 @@
 package com.purchase.preorder.wishlist;
 
-import com.purchase.preorder.user_service.config.JpaConfig;
 import com.purchase.preorder.user.User;
 import com.purchase.preorder.user.UserRepository;
+import com.purchase.preorder.user_service_common.config.JpaConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -32,37 +32,6 @@ jwt:
     expiration: 86400000 #  1일
     header: Authorization-refresh
 
-resilience4j:
-  circuitbreaker:
-    configs:
-      default:
-        registerHealthIndicator: true
-        slidingWindowSize: 10
-        permittedNumberOfCallsInHalfOpenState: 3
-        waitDurationInOpenState: 10000
-        ringBufferSizeInClosedState: 10
-        ringBufferSizeInHalfOpenState: 5
-    instances:
-      case1:
-        baseConfig: default
-        failureRateThreshold: 10  # 10% 실패율에 서킷 브레이커가 열림
-      case2:
-        baseConfig: default
-        failureRateThreshold: 20  # 타임아웃 실패율을 감지할 경우 사용
-      case3:
-        baseConfig: default
-        failureRateThreshold: 50  # 특정 시간대에 50% 이상의 실패율에 서킷 브레이커가 열림
-  retry:
-    instances:
-      case1:
-        maxAttempts: 3  # 최대 3번 재시도
-        waitDuration: 1s  # 재시도 사이의 대기 시간
-      case2:
-        maxAttempts: 3
-        waitDuration: 1s
-      case3:
-        maxAttempts: 3
-        waitDuration: 1s
 ---
 spring:
   config:
@@ -73,11 +42,7 @@ spring:
       ddl-auto: update
     database: postgresql
     show-sql: true
-  devtools:
-    livereload:
-      enabled: true
-    restart:
-      enabled: true
+
 server:
   port: 8887
 
@@ -110,11 +75,7 @@ spring:
       ddl-auto: update
     database: postgresql
     show-sql: true
-  devtools:
-    livereload:
-      enabled: true
-    restart:
-      enabled: true
+
 server:
   port: 8080
 

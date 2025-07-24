@@ -1,7 +1,7 @@
 package com.purchase.preorder.user_service.user.dto.read;
 
 import com.common.core.util.AesUtils;
-import com.common.domain.entity.User;
+import com.common.domain.entity.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

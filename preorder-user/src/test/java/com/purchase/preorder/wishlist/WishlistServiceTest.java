@@ -3,12 +3,12 @@ package com.purchase.preorder.wishlist;
 import com.purchase.preorder.exception.BusinessException;
 import com.purchase.preorder.user.User;
 import com.purchase.preorder.user.UserRepository;
-import com.purchase.preorder.user_service.wishlist.WishlistServiceImpl;
 import com.purchase.preorder.util.AesUtils;
 import com.purchase.preorder.util.CustomCookieManager;
 import com.purchase.preorder.util.JwtParser;
-import com.purchase.preorder.user_service.wishlist.dto.ResWishListDto;
-import com.purchase.preorder.user_service.wishlist_item.WishlistItemService;
+import com.purchase.preorder.wishlist_service.wishlist.dto.ResWishListDto;
+import com.purchase.preorder.wishlist_service.wishlist.service.WishlistServiceImpl;
+import com.purchase.preorder.wishlist_service.wishlist_item.WishlistItemServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +40,7 @@ public class WishlistServiceTest {
     private WishlistRepository wishlistRepository;
 
     @Mock
-    private WishlistItemService wishlistItemService;
+    private WishlistItemServiceImpl wishlistItemService;
 
     @InjectMocks
     private WishlistServiceImpl wishlistService;

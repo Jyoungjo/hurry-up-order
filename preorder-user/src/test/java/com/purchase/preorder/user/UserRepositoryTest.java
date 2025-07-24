@@ -1,7 +1,7 @@
 package com.purchase.preorder.user;
 
-import com.purchase.preorder.user_service.config.JpaConfig;
 import com.purchase.preorder.config.PasswordEncoderTestConfig;
+import com.purchase.preorder.user_service_common.config.JpaConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

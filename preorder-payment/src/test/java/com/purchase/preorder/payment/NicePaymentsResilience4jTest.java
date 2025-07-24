@@ -1,12 +1,16 @@
 package com.purchase.preorder.payment;
 
 import com.common.domain.common.PaymentStatus;
-import com.common.domain.entity.Payment;
-import com.common.domain.repository.PaymentRepository;
-import com.purchase.preorder.payment_service.api.external.NicePaymentsClient;
-import com.purchase.preorder.payment_service.api.external.TossPaymentsClient;
-import com.purchase.preorder.payment_service.dto.*;
-import com.purchase.preorder.payment_service.payment.PaymentService;
+import com.common.domain.entity.payment.Payment;
+import com.common.domain.repository.payment.PaymentRepository;
+import com.purchase.preorder.payment_service.api.external.pg.NicePaymentsClient;
+import com.purchase.preorder.payment_service.api.external.pg.TossPaymentsClient;
+import com.purchase.preorder.payment_service.api.external.pg.dto.nice.NicePaymentConfirmRequest;
+import com.purchase.preorder.payment_service.api.external.pg.dto.nice.NicePaymentRequest;
+import com.purchase.preorder.payment_service.api.external.pg.dto.nice.NicePaymentResponse;
+import com.purchase.preorder.payment_service.api.external.pg.dto.toss.TossPaymentConfirmRequest;
+import com.purchase.preorder.payment_service.payment.dto.ResPaymentDto;
+import com.purchase.preorder.payment_service.payment.service.PaymentService;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import org.junit.jupiter.api.BeforeEach;
@@ -99,7 +103,7 @@ public class NicePaymentsResilience4jTest {
     @DisplayName("서킷브레이커가 OPEN 상태일 때, 나이스 페이먼츠 정상 처리")
     void 나이스_페이먼츠_정상_처리() {
         // given
-        NicePaymentConfirmResponse res = NicePaymentConfirmResponse.builder()
+        NicePaymentResponse res = NicePaymentResponse.builder()
                 .status("paid")
                 .amount(10000)
                 .ediDate("2025-07-22T17:50:07.000+0900")
@@ -120,7 +124,7 @@ public class NicePaymentsResilience4jTest {
     @Test
     @DisplayName("리트라이 후 성공하는 케이스")
     void 리트라이_후_성공() {
-        NicePaymentConfirmResponse res = NicePaymentConfirmResponse.builder()
+        NicePaymentResponse res = NicePaymentResponse.builder()
                 .status("paid")
                 .amount(10000)
                 .ediDate("2025-07-22T17:50:07.000+0900")
