@@ -12,20 +12,31 @@
 
 <!-- PROJECT LOGO -->
 <h1 align="center">Hurry Up Order!</h1>
-<h2 align="center">선착순 예약 구매 서비스</h2>
+<h2 align="center">E-Commerce MSA 프로젝트</h2>
 <h3 align="center"><a href="https://leather-hole-ee3.notion.site"><strong>docs 확인하러 가기 »</strong></a></h3>
 <br/>
 <br/>
 
 
 <!-- ABOUT THE PROJECT -->
-## 프로젝트 소개
+## 📌 프로젝트 소개
 
-이 프로젝트는 Spring 기반의 E-Commerce를 주제로 한 개인 프로젝트입니다.
-일반적인 상품 판매 기능과 함께 한정된 수량의 물품을 특정 시간에 오픈하여 선착순으로 구매할 수 있는 기능을 제공합니다.
-해당 프로젝트는 동시다발적으로 들어오는 주문 요청을 적절히 제어하고, Redis의 Atomic Operation과 Caching을 통해 재고 처리 시스템을 개발했습니다.
+### 이 프로젝트는 Spring Boot 기반의 E-Commerce 쇼핑몰 구현을 목표로 한 개인 프로젝트입니다.
+### 상품 조회부터 주문, 결제까지 일반적인 커머스 기능을 제공하며, 실제 PG사 API 연동을 통한 결제 테스트도 포함되어 있습니다.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+### 서비스는 MSA + 이벤트 기반 아키텍처(EDA) 로 구성되었으며, 고트래픽/장애 상황에서도 안정적인 동작을 목표로 다음을 설계했습니다:
+
+- #### Kafka 기반 비동기 이벤트 처리를 통한 서비스 간 결합도 최소화
+
+- #### Redis + Lua Script 기반 재고 선점 및 동시성 제어
+
+- #### Redis Sentinel을 통한 고가용성 확보
+
+- #### Outbox 패턴 + Kafka 재시도 + DLQ 처리로 메시지 손실 방지
+
+- #### PG사 장애 대응을 위한 Circuit Breaker 및 Retry 기반 회복 탄력성 확보
+
+### ➡ 실제 장애 상황(Redis 다운, Kafka 이벤트 유실, PG API 오류 등)에 대비하여, 확장성·복원력·일관성을 고려한 백엔드 설계를 학습하고 구현한 프로젝트입니다
 
 
 
@@ -37,10 +48,9 @@
 * ![Docker]
 * ![AWS EC2]
 * ![AWS RDS]
+* ![KAFKA]
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
+---
 
 <!-- GETTING STARTED -->
 ## 시작하기
@@ -84,7 +94,7 @@ _아래 방법을 따라 프로젝트를 설치하고 실행해주세요._
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
+---
 
 <!-- API SPECIFICATION -->
 ## API 명세
@@ -93,529 +103,116 @@ API 명세의 경우 [📗API 명세서](https://htmlpreview.github.io/?https://
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
+---
 
 <!-- ARCHITECTURE -->
 ## 프로젝트 아키텍처
 
 ### ERD
-![image](https://github.com/user-attachments/assets/99c0ec45-f4db-4cb3-b801-f563e6c8be65)
+![image](https://github.com/user-attachments/assets/a1a792ce-546e-470e-b88d-0f4414eae526)
 
-### 서비스 아키텍처
-![image](https://github.com/user-attachments/assets/0b2dbfa8-61d0-4990-9f4a-5965f007d17f)
+### 프로젝트 아키텍처
+![Image](https://github.com/user-attachments/assets/ace03da8-4476-42bd-99e7-74727853731c)
 
-### 파일 구조도
-<details>
-  <summary>파일 구조도</summary>
+### CI/CD Flow
+![Image](https://github.com/user-attachments/assets/31c3d673-d6b8-46ed-9fa1-9bcbcc5acfcb)
 
-```bash
-📦hurry_up_order
- ┣ 📂gradle
- ┃ ┗ 📂wrapper
- ┃ ┃ ┣ 📜gradle-wrapper.jar
- ┃ ┃ ┗ 📜gradle-wrapper.properties
- ┣ 📂preorder-core
- ┃ ┣ 📂src
- ┃ ┃ ┣ 📂main
- ┃ ┃ ┃ ┣ 📂generated
- ┃ ┃ ┃ ┣ 📂java
- ┃ ┃ ┃ ┃ ┗ 📂com
- ┃ ┃ ┃ ┃ ┃ ┗ 📂purchase
- ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂preorder
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂exception
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜BusinessException.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ErrorResponse.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ExceptionCode.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜GlobalExceptionHandler.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂util
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜AesUtils.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜CustomCookieManager.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜JwtParser.java
- ┃ ┃ ┃ ┗ 📂resources
- ┃ ┃ ┃ ┃ ┗ 📜application-secret.yml
- ┃ ┣ 📜application-secret.yml.txt
- ┃ ┗ 📜build.gradle
- ┣ 📂preorder-eureka
- ┃ ┣ 📂src
- ┃ ┃ ┣ 📂main
- ┃ ┃ ┃ ┣ 📂generated
- ┃ ┃ ┃ ┣ 📂java
- ┃ ┃ ┃ ┃ ┗ 📂com
- ┃ ┃ ┃ ┃ ┃ ┗ 📂purchase
- ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜EurekaServerApplication.java
- ┃ ┃ ┃ ┗ 📂resources
- ┃ ┃ ┃ ┃ ┗ 📜application.yml
- ┃ ┣ 📜build.gradle
- ┃ ┗ 📜Dockerfile
- ┣ 📂preorder-gateway
- ┃ ┣ 📂src
- ┃ ┃ ┣ 📂main
- ┃ ┃ ┃ ┣ 📂generated
- ┃ ┃ ┃ ┣ 📂java
- ┃ ┃ ┃ ┃ ┗ 📂com
- ┃ ┃ ┃ ┃ ┃ ┗ 📂purchase
- ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂hanghae99_gateway
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂config
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ErrorExceptionConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂exception
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜CustomErrorResponse.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜GlobalExceptionHandler.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂filter
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜AuthorizationFilter.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂util
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜JwtValidator.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜RouteValidator.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜GatewayApplication.java
- ┃ ┃ ┃ ┗ 📂resources
- ┃ ┃ ┃ ┃ ┣ 📜application-secret.yml
- ┃ ┃ ┃ ┃ ┗ 📜application.yml
- ┃ ┣ 📜application-secret.yml.txt
- ┃ ┣ 📜build.gradle
- ┃ ┗ 📜Dockerfile
- ┣ 📂preorder-item
- ┃ ┣ 📂src
- ┃ ┃ ┣ 📂docs
- ┃ ┃ ┃ ┗ 📂asciidoc
- ┃ ┃ ┃ ┃ ┣ 📜item.adoc
- ┃ ┃ ┃ ┃ ┗ 📜stock.adoc
- ┃ ┃ ┣ 📂main
- ┃ ┃ ┃ ┣ 📂generated
- ┃ ┃ ┃ ┣ 📂java
- ┃ ┃ ┃ ┃ ┗ 📂com
- ┃ ┃ ┃ ┃ ┃ ┗ 📂purchase
- ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂preorder
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂common
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜BaseEntity.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜RedisService.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂config
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜AsyncConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜JpaConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜RedisConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂item
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂dto
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂create
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ReqCreateItemDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ResCreateItemDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂delete
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂read
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ResReadItemDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂update
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ReqUpdateItemDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ResUpdateItemDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜Item.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ItemController.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ItemRepository.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ItemService.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ItemServiceImpl.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂stock
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂dto
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ReqStockDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ResStockDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜Stock.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜StockController.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜StockRepository.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜StockService.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜StockServiceImpl.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ErrorfulController.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ItemServiceApplication.java
- ┃ ┃ ┃ ┗ 📂resources
- ┃ ┃ ┃ ┃ ┣ 📂static
- ┃ ┃ ┃ ┃ ┃ ┗ 📂docs
- ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜item.html
- ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜stock.html
- ┃ ┃ ┃ ┃ ┣ 📜application-secret.yml
- ┃ ┃ ┃ ┃ ┗ 📜application.yml
- ┃ ┃ ┗ 📂test
- ┃ ┃ ┃ ┣ 📂generated_tests
- ┃ ┃ ┃ ┣ 📂java
- ┃ ┃ ┃ ┃ ┗ 📂com
- ┃ ┃ ┃ ┃ ┃ ┗ 📂purchase
- ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂preorder
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂config
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜JacksonConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜PasswordEncoderTestConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜RedisEmbeddedConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜RedisRepositoryConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂item
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ItemControllerTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ItemRepositoryTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ItemServiceTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂stock
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜StockControllerTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜StockRepositoryTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜StockServiceTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ItemServiceApplicationTests.java
- ┃ ┃ ┃ ┗ 📂resources
- ┃ ┣ 📜application-secret.yml.txt
- ┃ ┣ 📜build.gradle
- ┃ ┗ 📜Dockerfile
- ┣ 📂preorder-order
- ┃ ┣ 📂src
- ┃ ┃ ┣ 📂docs
- ┃ ┃ ┃ ┗ 📂asciidoc
- ┃ ┃ ┃ ┃ ┣ 📜cart.adoc
- ┃ ┃ ┃ ┃ ┗ 📜order.adoc
- ┃ ┃ ┣ 📂main
- ┃ ┃ ┃ ┣ 📂generated
- ┃ ┃ ┃ ┣ 📂java
- ┃ ┃ ┃ ┃ ┗ 📂com
- ┃ ┃ ┃ ┃ ┃ ┗ 📂purchase
- ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂preorder
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂cart
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂dto
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ReqCartDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ResCartDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ResCartItemDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜Cart.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜CartController.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜CartRepository.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜CartService.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜CartServiceImpl.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂cart_item
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜CartItem.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜CartItemRepository.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜CartItemService.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂client
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂response
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ItemResponse.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜PaymentResponse.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜StockResponse.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜UserResponse.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ItemClient.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜PaymentClient.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ReqPaymentDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜UserClient.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂common
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜BaseEntity.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜RedisService.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂config
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜AsyncConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜JpaConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜RedisConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜SchedulingConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂order
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂dto
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ReqLimitedOrderDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ReqOrderDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ReqOrderItemDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ResOrderDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ResOrderItemDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜Order.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜OrderController.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜OrderRepository.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜OrderService.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜OrderServiceImpl.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂order_item
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜OrderItem.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜OrderItemRepository.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜OrderItemService.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂shipment
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜Shipment.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ShipmentRepository.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ShipmentScheduler.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ShipmentService.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ShipmentStatus.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜OrderServiceApplication.java
- ┃ ┃ ┃ ┗ 📂resources
- ┃ ┃ ┃ ┃ ┣ 📂static
- ┃ ┃ ┃ ┃ ┃ ┗ 📂docs
- ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜cart.html
- ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜order.html
- ┃ ┃ ┃ ┃ ┣ 📜application-secret.yml
- ┃ ┃ ┃ ┃ ┗ 📜application.yml
- ┃ ┃ ┗ 📂test
- ┃ ┃ ┃ ┣ 📂generated_tests
- ┃ ┃ ┃ ┣ 📂java
- ┃ ┃ ┃ ┃ ┗ 📂com
- ┃ ┃ ┃ ┃ ┃ ┗ 📂purchase
- ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂preorder
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂cart
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜CartControllerTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜CartRepositoryTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜CartServiceTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂cart_item
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜CartItemRepositoryTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜CartItemServiceTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂config
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜PasswordEncoderTestConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜RedisEmbeddedConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜RedisRepositoryConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂order
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜OrderControllerTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜OrderRepositoryTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜OrderServiceConcurrencyTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜OrderServiceTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂order_item
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜OrderItemRepositoryTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜OrderItemServiceTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂shipment
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ShipmentRepositoryTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ShipmentServiceTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜OrderServiceApplicationTests.java
- ┃ ┃ ┃ ┗ 📂resources
- ┃ ┣ 📜application-secret.yml.txt
- ┃ ┣ 📜build.gradle
- ┃ ┗ 📜Dockerfile
- ┣ 📂preorder-payment
- ┃ ┣ 📂src
- ┃ ┃ ┣ 📂docs
- ┃ ┃ ┃ ┗ 📂asciidoc
- ┃ ┃ ┃ ┃ ┗ 📜payment.adoc
- ┃ ┃ ┣ 📂main
- ┃ ┃ ┃ ┣ 📂generated
- ┃ ┃ ┃ ┣ 📂java
- ┃ ┃ ┃ ┃ ┗ 📂com
- ┃ ┃ ┃ ┃ ┃ ┗ 📂purchase
- ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂preorder
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂common
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜BaseEntity.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂config
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜AppConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜JpaConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂dto
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ReqPaymentDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ResPaymentDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂payment
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜Payment.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜PaymentController.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜PaymentRepository.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜PaymentService.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜PaymentServiceImpl.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜PaymentStatus.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜PaymentServiceApplication.java
- ┃ ┃ ┃ ┗ 📂resources
- ┃ ┃ ┃ ┃ ┣ 📂static
- ┃ ┃ ┃ ┃ ┃ ┗ 📂docs
- ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜payment.html
- ┃ ┃ ┃ ┃ ┣ 📜application-secret.yml
- ┃ ┃ ┃ ┃ ┗ 📜application.yml
- ┃ ┃ ┗ 📂test
- ┃ ┃ ┃ ┣ 📂generated_tests
- ┃ ┃ ┃ ┣ 📂java
- ┃ ┃ ┃ ┃ ┗ 📂com
- ┃ ┃ ┃ ┃ ┃ ┗ 📂purchase
- ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂preorder
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂payment
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜PaymentControllerTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜PaymentRepositoryTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜PaymentServiceTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜PaymentServiceApplicationTests.java
- ┃ ┃ ┃ ┗ 📂resources
- ┃ ┣ 📜application-secret.yml.txt
- ┃ ┣ 📜build.gradle
- ┃ ┗ 📜Dockerfile
- ┣ 📂preorder-user
- ┃ ┣ 📂src
- ┃ ┃ ┣ 📂docs
- ┃ ┃ ┃ ┗ 📂asciidoc
- ┃ ┃ ┃ ┃ ┣ 📜user.adoc
- ┃ ┃ ┃ ┃ ┗ 📜wishlist.adoc
- ┃ ┃ ┣ 📂main
- ┃ ┃ ┃ ┣ 📂java
- ┃ ┃ ┃ ┃ ┗ 📂com
- ┃ ┃ ┃ ┃ ┃ ┗ 📂purchase
- ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂preorder
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂client
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ItemClient.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ItemResponse.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂common
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜BaseEntity.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜JwtUtils.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜RedisService.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂config
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜AsyncConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜JpaConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜PasswordEncoderConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜RedisConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂email
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜EmailController.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜EmailDtoFactory.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜EmailService.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ResEmailDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂user
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂dto
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂create
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ReqUserCreateDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ResUserCreateDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂delete
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ReqUserDeleteDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂login
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ReqLoginDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ResLoginDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂read
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ResUserInfoDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂update
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ReqUserInfoUpdateDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ReqUserPasswordUpdateDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ResUserPwUpdateDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ResUserUpdateDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜User.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜UserController.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜UserRepository.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜UserRole.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜UserService.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜UserServiceImpl.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂wishlist
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂dto
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ResWishListDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜ResWishListItemDto.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜Wishlist.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜WishlistController.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜WishlistRepository.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜WishlistService.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜WishlistServiceImpl.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂wishlist_item
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜WishlistItem.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜WishlistItemRepository.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜WishlistItemService.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜ErrorTestController.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜UserServiceApplication.java
- ┃ ┃ ┃ ┗ 📂resources
- ┃ ┃ ┃ ┃ ┣ 📂static
- ┃ ┃ ┃ ┃ ┃ ┗ 📂docs
- ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜user.html
- ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜wishlist.html
- ┃ ┃ ┃ ┃ ┣ 📜application-secret.yml
- ┃ ┃ ┃ ┃ ┗ 📜application.yml
- ┃ ┃ ┗ 📂test
- ┃ ┃ ┃ ┣ 📂generated_tests
- ┃ ┃ ┃ ┣ 📂java
- ┃ ┃ ┃ ┃ ┗ 📂com
- ┃ ┃ ┃ ┃ ┃ ┗ 📂purchase
- ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📂preorder
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂config
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜PasswordEncoderTestConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜RedisEmbeddedConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜RedisRepositoryConfig.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂user
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜UserControllerTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜UserRepositoryTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜UserServiceTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂wishlist
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜WishlistControllerTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜WishlistRepositoryTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜WishlistServiceTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📂wishlist_item
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ 📜WishlistItemRepositoryTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜WishlistItemServiceTest.java
- ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ 📜UserServiceApplicationTests.java
- ┃ ┃ ┃ ┗ 📂resources
- ┃ ┣ 📜application-secret.yml.txt
- ┃ ┣ 📜build.gradle
- ┃ ┗ 📜Dockerfile
- ┣ 📜.gitignore
- ┣ 📜build.gradle
- ┣ 📜gradlew
- ┣ 📜gradlew.bat
- ┣ 📜README.md
- ┗ 📜settings.gradle
-```
-</details>
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
+---
 
 <!-- PROJECT FEATURES -->
-## 프로젝트 주요 기능
+## 🎯 주요 기능 요약
 
-1. 사용자 관리
-- 사용자 관리
-  - 유저 회원가입 시 정보 암호화 저장
-  - 로그아웃 시 refresh token 블랙리스트 저장으로 access token 탈취로 인한 토큰 재발급 방지
-  - 사용자 정보 조회, 수정 및 계정 탈퇴
-- 위시리스트 관리
-  - 위시리스트 조회, 상품 추가 및 삭제
-  - 위시리스트에서 주문 기능 활성화를 통한 사용자 쇼핑 경험 및 구매 전환율 상승
-2. 상품 관리
-- 판매자 상품 등록
-- 상품 목록 페이징 및 개별 상품 상세 조회
-3. 주문 관리
-- 주문 처리
-  - 일반 상품 및 수량 한정 상품 주문
-- 주문 내역 관리
-  - 주문 상세 정보 조회 및 수정
-  - 주문 취소 및 반품 처리
-- 장바구니 관리
-  - 장바구니 조회, 상품 추가 및 삭제
-  - 장바구니에서 상품 주문으로 사용자 쇼핑 경험 연장
-4. 재고 관리
-- 실시간 재고 관리
-  - 재고 조회, 추가 및 감소 관리를 통해 효율적인 재고 관리 및 사용자 경험 증대
-5. 테스트
-   - 각 레이어 별 Unit Test 진행(Test Coverage 75%)
-   - 동시성 테스트 코드 작성으로 **[동시성 제어 유효성 입증](https://www.notion.so/Docs-b52e69594faf418e8be2e900024e8419?pvs=4#8b002fe0ca9f497984b09b1f7bb92cf0)**
+👤 사용자 관리
+- 회원가입 시 정보 암호화 저장
+- 로그아웃 시 refresh token 블랙리스트 처리로 재발급 차단
+- 사용자 정보 조회, 수정, 탈퇴 기능
+- 위시리스트 추가/삭제 및 위시리스트에서 바로 주문 가능
+
+🛒 상품/주문/장바구니 관리
+
+- 판매자 상품 등록 및 페이징/상세 조회
+- 일반 상품 및 수량 한정 상품 주문 처리
+- 주문 내역 조회, 취소 및 반품 처리
+- 장바구니 기능 + 장바구니에서 바로 주문 연결
+
+📦 재고 관리
+- 실시간 재고 조회, 증가/차감
+- Redis + Lua Script를 통한 동시성 제어
+
+💳 결제 및 정산 처리
+- TossPayments / NicePayments API 연동
+- Circuit Breaker + Retry로 장애 시 복원력 확보
+- 결제 실패 시 Kafka 기반 보상 트랜잭션 처리
+- 결제 완료 후 정산 저장 및 스케줄링 처리
+
+✅ 테스트
+- 각 레이어별 Unit Test (Coverage 75%)
+- 동시성 테스트 코드로 **[재고 제어 유효성 입증](https://www.notion.so/Docs-b52e69594faf418e8be2e900024e8419?pvs=4#8b002fe0ca9f497984b09b1f7bb92cf0)**
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
+---
 
 <!-- IMPROVED PERFORMANCE -->
 ## 성능 개선
 
-1️⃣ 이메일 인증 로직 속도 개선
+|         항목          |                     처리 내용                      | 개선 전  | 개선 후  |           향상도           |
+|:-------------------:|:----------------------------------------------:|:-----:|:-----:|:-----------------------:|
+|       이메일 인증        |                   비동기 이벤트 처리                   |  13s  | 0.69s | ✅ 약 18.8배 향상 / 94.6% 감소 |
+|     상품 및 재고 조회      |                 Redis Caching                  | 180ms | 14ms  | ✅ 약 13배 향상 / 약 92.2% 감소 |
+|         로그인         |        로컬 Cache + Interface Projection         | 1.3s  |  8ms  | ✅ 약 162배 향상 / 99.4% 감소  |
+| 주문 생성 (상품 1000건 기준) | Batch INSERT + 외부 API 병렬 호출(CompletableFuture) | 5.3s  | 1.23s | ✅ 약 4.3배 향상 / 76.8% 감소  |
 
-- 이메일 인증 비동기 처리 + Redis를 통한 13s -> 0.69s 개선
-
-2️⃣ 재고 조회 성능 개선
-
-- Redis를 이용한 Caching 도입으로 조회 성능 약 92%(180ms → 14ms) 향상
-
-3️⃣ API Gateway Non-blocking 전환
-
-- Webflux 기반 Non-Blocking 서비스 전환으로 응답성과 요청 처리량 향상
-
-[✅ 자세한 개선 사항 보러가기](https://www.notion.so/Docs-b52e69594faf418e8be2e900024e8419?pvs=4#4514b232e6f3435392fcc62ca5723fc5)
+[🔗 📄 성능 개선 상세 보기](https://www.notion.so/Docs-b52e69594faf418e8be2e900024e8419?pvs=4#4514b232e6f3435392fcc62ca5723fc5)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
+---
 
 <!-- TROUBLE SHOOTING -->
 ## 트러블 슈팅
 
-1️⃣ 재고 동시성 문제 해결
+|             문제              |        원인 및 현상         |            해결 방법             |            효과             |
+|:---------------------------:|:----------------------:|:----------------------------:|:-------------------------:|
+|          재고 동시성 문제          |   트랜잭션 충돌로 초과 판매 발생    |    Redis + Lua + 낙관적 락 적용    |       ✅ 재고 초과 0건 달성       |
+|        Eureka 등록 누락         | Eureka 기동 전 다른 서비스 실행  | HealthCheck + Compose 의존성 설정 |       ✅ 서비스 인식 안정화        |
+| Test 환경 내 Embedded Redis 충돌 |      테스트 중 포트 중복       |       빈 포트 동적 할당 로직 도입       | ✅ 해당 문제로 인한 테스트 실패율 0% 달성 |
+|          Redis 장애           | 단일 Redis 장애 시 전체 주문 실패 |   Redis Sentinel + 커넥션 재시도   |    ✅ 주문 실패율 100% → 0%     |
+|       Kafka 이벤트 소비 누락       |   중복/장애 시 이벤트 재처리 불가   | ProcessedEvent 테이블 + DLQ 처리  |       ✅ 데이터 정합성 확보        |
+|          주문 롤백 불가           |   결제 실패 시 재고가 복구 안됨    |     SAGA 패턴 + 보상 이벤트 도입      |      ✅ 전체 흐름 복원력 강화       |
 
-- Redis의 Atomic Operation을 통한 동시성 문제 해결 (TEST 진행 완료)
-
-2️⃣ Eureka Server에서 Client 찾지 못하는 문제 해결
-
-- Eureka Server 보다 다른 서비스가 먼저 실행이 완료되어 해당 서비스들을 찾지 못하는 문제 확인
-- Eureka Server에 Actuator 도입하여 Health Check 진행 후, 완료되면 다른 컨테이너가 실행되도록 docker-compose.yml 수정
-
-3️⃣ Test 환경 Embedded Redis Port 중복 에러 해결
-
-- 기존 Context 재활용으로 인한 Port 중복 사용으로 Bean 등록 실패
-- 포트 체크 후 포트를 재지정하는 코드 작성하여 해결
-
-[✅ 자세한 해결방안 보러가기](https://www.notion.so/Docs-b52e69594faf418e8be2e900024e8419?pvs=4#3873982447e94b3281cf12f2cf48af9e)
+[🔗 📄 트러블 슈팅 상세 보기](https://www.notion.so/Docs-b52e69594faf418e8be2e900024e8419?pvs=4#3873982447e94b3281cf12f2cf48af9e)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
+---
 
 <!-- TECHNICAL DECISION-MAKING -->
-## 기술적 의사결정
-1️⃣ PostgreSQL 선택 이유
+## 🧠 기술적 의사결정
 
--> 대용량 트래픽과 동시성 제어에 뛰어난 성능을 제공
+### 📦 데이터 저장 및 일관성
+- **PostgreSQL** → 대용량 트래픽과 동시성 제어에 강함
+- **ID 간접 참조** → 낮은 결합도, 높은 유연성 확보
+- **Outbox 패턴** → DB 트랜잭션과 Kafka 이벤트의 정합성 보장
 
-2️⃣ Feign Client 선택 이유
+### 🔗 서비스 간 통신 구조
+- **Feign Client** → 직관적이며 Spring Cloud와 통합 용이
+- **Kafka 메시징** → 비동기 처리 및 장애 격리에 유리
 
--> 간결하고 직관적인 사용법 + Spring Cloud와의 통합 용이성
+### 🚀 성능 최적화 / 병렬 처리
+- **Redis** → 빠른 응답성과 데이터 일관성 확보
+- **Batch Insert** → 주문 처리 I/O 최소화
+- **CompletableFuture** → 외부 서비스 병목 제거
 
-3️⃣ ID 간접 참조 선택 이유
+### 🛡 장애 대응 및 회복 탄력성
+- **Circuit Breaker** → 외부 결제 API 장애 전파 방지
+- **Redis Sentinel + Docker** → 자동 Failover 구성으로 고가용성 확보
 
--> 데이터 독립성, 낮은 결합도, 높은 유연성
-
-4️⃣ 동시성 문제 해결을 위해 Redis를 선택한 이유
-
--> 높은 성능, 확장성, 데이터 일관성
-
-[✅ 자세한 선택 이유 보러가기](https://www.notion.so/Docs-b52e69594faf418e8be2e900024e8419?pvs=4#6249be082a524b159d9e1d69d1028edb)
+[✅ 기술 의사결정 상세 보기](https://www.notion.so/Docs-b52e69594faf418e8be2e900024e8419?pvs=4#6249be082a524b159d9e1d69d1028edb)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+---
 
 
 <!-- CONTRIBUTING -->
@@ -631,7 +228,7 @@ API 명세의 경우 [📗API 명세서](https://htmlpreview.github.io/?https://
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
+---
 
 <!-- CONTACT -->
 ## 연락처
@@ -653,3 +250,4 @@ Project Link: [https://github.com/Jyoungjo/hanghae99_pre-order](https://github.c
 [Docker]: https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white
 [AWS EC2]: https://img.shields.io/badge/amazon_ec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white
 [AWS RDS]: https://img.shields.io/badge/amazon_rds-527FFF?style=for-the-badge&logo=amazonrds&logoColor=white
+[KAFKA]: https://img.shields.io/badge/apache_kafka-231F20?style=for-the-badge&logo=apachekafka&logoColor=white
