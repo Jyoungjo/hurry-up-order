@@ -2,7 +2,9 @@ package com.purchase.preorder.stock;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.purchase.preorder.exception.BusinessException;
-import com.purchase.preorder.stock.dto.ReqStockDto;
+import com.purchase.preorder.stock_service.stock.controller.StockController;
+import com.purchase.preorder.stock_service.stock.dto.ReqStockDto;
+import com.purchase.preorder.stock_service.stock.service.StockService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import static com.purchase.preorder.exception.ExceptionCode.NOT_ENOUGH_STOCK;
 import static com.purchase.preorder.exception.ExceptionCode.NOT_FOUND_STOCK;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;

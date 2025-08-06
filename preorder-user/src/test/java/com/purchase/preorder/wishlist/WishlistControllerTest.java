@@ -1,8 +1,10 @@
 package com.purchase.preorder.wishlist;
 
 import com.purchase.preorder.exception.BusinessException;
-import com.purchase.preorder.wishlist.dto.ResWishListDto;
-import com.purchase.preorder.wishlist.dto.ResWishListItemDto;
+import com.purchase.preorder.wishlist_service.wishlist.controller.WishlistController;
+import com.purchase.preorder.wishlist_service.wishlist.dto.ResWishListDto;
+import com.purchase.preorder.wishlist_service.wishlist.dto.ResWishListItemDto;
+import com.purchase.preorder.wishlist_service.wishlist.service.WishlistService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +23,8 @@ import static com.purchase.preorder.exception.ExceptionCode.NOT_FOUND_WISHLIST;
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
-import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

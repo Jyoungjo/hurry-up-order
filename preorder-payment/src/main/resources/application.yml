@@ -13,16 +13,18 @@ spring:
   config:
     activate:
       on-profile: common
-  devtools:
-    livereload:
-      enabled: true
-    restart:
-      enabled: true
+
   jpa:
     hibernate:
       ddl-auto: update
     database: postgresql
     show-sql: true
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 100
+        order_inserts: true
+        order_updates: true
 
 eureka:
   instance:
@@ -32,6 +34,38 @@ eureka:
     disable-delta: true
     register-with-eureka: true
     fetch-registry: true
+
+resilience4j:
+  retry:
+    instances:
+      confirmPayment:
+        maxAttempts: 3  # 최대 3번 재시도
+        waitDuration: 700ms  # 재시도 사이의 대기 시간
+        retry-exceptions:
+          - java.io.IOException
+          - org.springframework.web.client.ResourceAccessException
+        ignore-exceptions:
+          - com.common.web.exception.BusinessException
+          - com.fasterxml.jackson.core.JsonProcessingException
+
+  circuitbreaker:
+    instances:
+      confirmPayment:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 100
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        ignore-exceptions:
+          - com.common.web.exception.BusinessException
+
+logging:
+  level:
+    com.purchase.preorder.payment_service.api.external.TossPaymentsClient: DEBUG
+    com.purchase.preorder.settlement_service.api.external.TossSettlementClient: DEBUG
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG
 
 ---
 spring:
@@ -47,6 +81,22 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka
 
+feign:
+  client:
+    config:
+      tossPaymentsClient:
+        connect-timeout: 1000
+        read-timeout: 1500
+      nicePaymentsClient:
+        connect-timeout: 1000
+        read-timeout: 1500
+      tossSettlementClient:
+        connect-timeout: 60000
+        read-timeout: 60000
+#      niceSettlementClient:
+#        connect-timeout: 60000
+#        read-timeout: 60000
+
 ---
 spring:
   config:
@@ -60,6 +110,22 @@ eureka:
   client:
     service-url:
       defaultZone: http://eureka-server:8761/eureka
+
+feign:
+  client:
+    config:
+      tossPaymentsClient:
+        connect-timeout: 1000
+        read-timeout: 1500
+      nicePaymentsClient:
+        connect-timeout: 1000
+        read-timeout: 1500
+      tossSettlementClient:
+        connect-timeout: 60000
+        read-timeout: 60000
+#      niceSettlementClient:
+#        connect-timeout: 60000
+#        read-timeout: 60000
 
 ---
 spring:
@@ -80,3 +146,41 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
         show_sql: true
+  cloud:
+    gateway:
+      enabled: false
+
+eureka:
+  client:
+    enabled: false
+
+feign:
+  client:
+    config:
+      tossPaymentsClient:
+        connect-timeout: 1000
+        read-timeout: 1500
+      nicePaymentsClient:
+        connect-timeout: 1000
+        read-timeout: 1500
+      tossSettlementClient:
+        connect-timeout: 60000
+        read-timeout: 60000
+#      niceSettlementClient:
+#        connect-timeout: 60000
+#        read-timeout: 60000
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      confirmPayment:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+  retry:
+    instances:
+      confirmPayment:
+        maxAttempts: 3
+        waitDuration: 1s

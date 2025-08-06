@@ -1,6 +1,7 @@
 package com.purchase.preorder.shipment;
 
 import com.purchase.preorder.exception.BusinessException;
+import com.purchase.preorder.shipment_service.shipment.service.ShipmentServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,8 +15,9 @@ import java.time.LocalDateTime;
 import static com.purchase.preorder.exception.ExceptionCode.ALREADY_SHIPPING;
 import static com.purchase.preorder.exception.ExceptionCode.NO_RETURN;
 import static com.purchase.preorder.shipment.ShipmentStatus.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ShipmentServiceTest {
@@ -23,7 +25,7 @@ public class ShipmentServiceTest {
     private ShipmentRepository shipmentRepository;
 
     @InjectMocks
-    private ShipmentService shipmentService;
+    private ShipmentServiceImpl shipmentService;
 
     private Shipment shipment;
 

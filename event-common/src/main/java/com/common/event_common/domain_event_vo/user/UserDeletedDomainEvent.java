@@ -1,0 +1,30 @@
+package com.common.event_common.domain_event_vo.user;
+
+import com.common.event_common.domain_event_vo.DomainEvent;
+import com.common.event_common.domain_event_vo.DomainEventType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UserDeletedDomainEvent implements DomainEvent {
+    private String eventId;
+    private Long userId;
+    private LocalDateTime occurredAt;
+
+    @Override
+    public String getDomainEventType() {
+        return DomainEventType.USER_DELETED.name();
+    }
+
+    @Override
+    public String getAggregateId() {
+        return String.valueOf(this.userId);
+    }
+}

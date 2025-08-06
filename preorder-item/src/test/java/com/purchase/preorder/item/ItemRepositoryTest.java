@@ -1,6 +1,6 @@
 package com.purchase.preorder.item;
 
-import com.purchase.preorder.config.JpaConfig;
+import com.purchase.preorder.item_service_common.config.JpaConfig;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,8 +14,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @Import(JpaConfig.class)

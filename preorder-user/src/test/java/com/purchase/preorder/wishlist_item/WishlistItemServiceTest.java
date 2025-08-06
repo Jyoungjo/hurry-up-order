@@ -1,8 +1,9 @@
 package com.purchase.preorder.wishlist_item;
 
 import com.purchase.preorder.exception.BusinessException;
-import com.purchase.preorder.client.ItemClient;
+import com.purchase.preorder.user_service.api.internal.ItemClient;
 import com.purchase.preorder.wishlist.Wishlist;
+import com.purchase.preorder.wishlist_service.wishlist_item.WishlistItemServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,6 @@ import java.util.Optional;
 
 import static com.purchase.preorder.exception.ExceptionCode.ALREADY_EXISTS_ITEM;
 import static com.purchase.preorder.exception.ExceptionCode.NOT_FOUND_WISHLIST_ITEM;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
@@ -33,7 +33,7 @@ public class WishlistItemServiceTest {
     private ItemClient itemClient;
 
     @InjectMocks
-    private WishlistItemService wishlistItemService;
+    private WishlistItemServiceImpl wishlistItemService;
 
     private WishlistItem wishlistItem;
     private Wishlist wishlist;

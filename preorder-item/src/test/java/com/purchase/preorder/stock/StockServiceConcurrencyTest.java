@@ -1,10 +1,11 @@
 package com.purchase.preorder.stock;
 
-import com.purchase.preorder.common.RedisCacheKey;
-import com.purchase.preorder.common.RedisService;
 import com.purchase.preorder.config.RedisEmbeddedConfig;
 import com.purchase.preorder.item.Item;
 import com.purchase.preorder.item.ItemRepository;
+import com.purchase.preorder.item_service_common.util.RedisCacheKey;
+import com.purchase.preorder.item_service_common.util.RedisService;
+import com.purchase.preorder.stock_service.stock.service.StockService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

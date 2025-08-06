@@ -1,6 +1,6 @@
 package com.purchase.preorder.wishlist_item;
 
-import com.purchase.preorder.config.JpaConfig;
+import com.purchase.preorder.user_service_common.config.JpaConfig;
 import com.purchase.preorder.wishlist.Wishlist;
 import com.purchase.preorder.wishlist.WishlistRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,8 +12,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @Import(JpaConfig.class)

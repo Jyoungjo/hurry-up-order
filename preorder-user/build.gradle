@@ -15,20 +15,24 @@ repositories {
 }
 
 dependencies {
-    implementation project(":preorder-core")
+    implementation project(":core")
+    implementation project(":domain-common")
+    implementation project(":kafka-common")
+    implementation project(":event-common")
+    implementation project(":web-common")
+
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.kafka:spring-kafka'
     runtimeOnly 'org.postgresql:postgresql'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.kafka:spring-kafka-test'
 
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testRuntimeOnly 'com.h2database:h2'
 
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.kafka:spring-kafka'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
 
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     testImplementation 'com.github.codemonstur:embedded-redis:1.4.3'
@@ -40,12 +44,17 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.2'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
     implementation "io.github.resilience4j:resilience4j-spring-boot3"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-aop"
+
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.6'
+    implementation "org.springframework.boot:spring-boot-starter-cache"
 }
 
 dependencyManagement {

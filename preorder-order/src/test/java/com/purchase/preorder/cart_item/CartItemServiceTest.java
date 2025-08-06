@@ -1,10 +1,11 @@
 package com.purchase.preorder.cart_item;
 
 import com.purchase.preorder.cart.Cart;
-import com.purchase.preorder.cart.dto.ReqCartDto;
-import com.purchase.preorder.client.ItemClient;
-import com.purchase.preorder.client.response.ItemResponse;
+import com.purchase.preorder.cart_service.cart.dto.ReqCartDto;
+import com.purchase.preorder.cart_service.cart_item.CartItemService;
 import com.purchase.preorder.exception.BusinessException;
+import com.purchase.preorder.order_service.api.internal.ItemClient;
+import com.purchase.preorder.order_service.api.internal.dto.ItemResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

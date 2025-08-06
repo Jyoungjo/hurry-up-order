@@ -1,9 +1,11 @@
 package com.purchase.preorder.cart;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.purchase.preorder.cart.dto.ReqCartDto;
-import com.purchase.preorder.cart.dto.ResCartDto;
-import com.purchase.preorder.cart.dto.ResCartItemDto;
+import com.purchase.preorder.cart_service.cart.controller.CartController;
+import com.purchase.preorder.cart_service.cart.dto.ReqCartDto;
+import com.purchase.preorder.cart_service.cart.dto.ResCartDto;
+import com.purchase.preorder.cart_service.cart.dto.ResCartItemDto;
+import com.purchase.preorder.cart_service.cart.service.CartService;
 import com.purchase.preorder.exception.BusinessException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;

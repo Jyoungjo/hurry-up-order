@@ -1,6 +1,6 @@
 package com.purchase.preorder.shipment;
 
-import com.purchase.preorder.config.JpaConfig;
+import com.purchase.preorder.order_service_common.config.JpaConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,6 @@ import org.springframework.test.context.ActiveProfiles;
 import java.time.LocalDateTime;
 
 import static com.purchase.preorder.shipment.ShipmentStatus.READY;
-import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
 @Import(JpaConfig.class)

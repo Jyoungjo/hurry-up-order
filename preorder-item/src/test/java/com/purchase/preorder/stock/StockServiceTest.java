@@ -1,8 +1,9 @@
 package com.purchase.preorder.stock;
 
-import com.purchase.preorder.common.RedisService;
 import com.purchase.preorder.exception.BusinessException;
 import com.purchase.preorder.item.Item;
+import com.purchase.preorder.item_service_common.util.RedisService;
+import com.purchase.preorder.stock_service.stock.service.StockServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,7 @@ import java.util.Optional;
 
 import static com.purchase.preorder.exception.ExceptionCode.NOT_ENOUGH_STOCK;
 import static com.purchase.preorder.exception.ExceptionCode.NOT_FOUND_STOCK;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
