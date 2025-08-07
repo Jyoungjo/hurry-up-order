@@ -39,24 +39,26 @@ resilience4j:
   retry:
     instances:
       confirmPayment:
-        maxAttempts: 3  # 최대 3번 재시도
-        waitDuration: 700ms  # 재시도 사이의 대기 시간
+        maxAttempts: 4  # 최대 3번 재시도
+        waitDuration: 500ms  # 재시도 사이의 대기 시간
         retry-exceptions:
           - java.io.IOException
           - org.springframework.web.client.ResourceAccessException
         ignore-exceptions:
           - com.common.web.exception.BusinessException
           - com.fasterxml.jackson.core.JsonProcessingException
+        exponentialBackoffMultiplier: 2 # 지수 백오프: 0.5s → 1s → 2s → 4s
+        enableRandomizedWait: true
 
   circuitbreaker:
     instances:
       confirmPayment:
-        slidingWindowType: COUNT_BASED
-        slidingWindowSize: 10
-        minimumNumberOfCalls: 100
-        failureRateThreshold: 50
-        waitDurationInOpenState: 30s
-        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowType: TIME_BASED
+        slidingWindowSize: 30s
+        minimumNumberOfCalls: 20
+        failureRateThreshold: 30
+        waitDurationInOpenState: 60s
+        permittedNumberOfCallsInHalfOpenState: 5
         automaticTransitionFromOpenToHalfOpenEnabled: true
         ignore-exceptions:
           - com.common.web.exception.BusinessException
@@ -85,11 +87,11 @@ feign:
   client:
     config:
       tossPaymentsClient:
-        connect-timeout: 1000
-        read-timeout: 1500
+        connect-timeout: 500
+        read-timeout: 1200
       nicePaymentsClient:
-        connect-timeout: 1000
-        read-timeout: 1500
+        connect-timeout: 500
+        read-timeout: 1200
       tossSettlementClient:
         connect-timeout: 60000
         read-timeout: 60000
