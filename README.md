@@ -112,7 +112,7 @@ API 명세의 경우 [📗API 명세서](https://htmlpreview.github.io/?https://
 ![image](https://github.com/user-attachments/assets/a1a792ce-546e-470e-b88d-0f4414eae526)
 
 ### 프로젝트 아키텍처
-![Image](https://github.com/user-attachments/assets/b838ee47-aed0-4c95-8b42-dd3aa0a6d8e6)
+![Image](https://github.com/user-attachments/assets/b0e87f84-1341-4f1a-b46f-3210af63a436)
 
 ### CI/CD Flow
 ![Image](https://github.com/user-attachments/assets/31c3d673-d6b8-46ed-9fa1-9bcbcc5acfcb)
@@ -147,7 +147,8 @@ API 명세의 경우 [📗API 명세서](https://htmlpreview.github.io/?https://
 
 ✅ 테스트
 - 각 레이어별 Unit Test (Coverage 75%)
-- 동시성 테스트 코드로 **[재고 제어 유효성 입증](https://www.notion.so/Docs-b52e69594faf418e8be2e900024e8419?pvs=4#8b002fe0ca9f497984b09b1f7bb92cf0)**
+- 동시성 테스트 코드로 **[재고 제어 유효성 입증](https://leather-hole-ee3.notion.site/248c7d579b078073b344f96dd80ebed3)**
+- **[TOSS 결제 API Timeout 최적화](https://leather-hole-ee3.notion.site/Toss-API-248c7d579b0780ad8df3c76cc6f81359)**, **[비동기 호출에 대한 Executor 설정 최적화](https://leather-hole-ee3.notion.site/Executor-Thread-Pool-248c7d579b0780f08559ce22d6155866)** 진행
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -163,7 +164,7 @@ API 명세의 경우 [📗API 명세서](https://htmlpreview.github.io/?https://
 |         로그인         |        로컬 Cache + Interface Projection         | 1.3s  |  8ms  | ✅ 약 162배 향상 / 99.4% 감소  |
 | 주문 생성 (상품 1000건 기준) | Batch INSERT + 외부 API 병렬 호출(CompletableFuture) | 5.3s  | 1.23s | ✅ 약 4.3배 향상 / 76.8% 감소  |
 
-[🔗 📄 성능 개선 상세 보기](https://www.notion.so/Docs-b52e69594faf418e8be2e900024e8419?pvs=4#4514b232e6f3435392fcc62ca5723fc5)
+[🔗 📄 성능 개선 상세 보기](https://leather-hole-ee3.notion.site/248c7d579b078069ac2de998314e87ec)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -181,7 +182,7 @@ API 명세의 경우 [📗API 명세서](https://htmlpreview.github.io/?https://
 |       Kafka 이벤트 소비 누락       |   중복/장애 시 이벤트 재처리 불가   | ProcessedEvent 테이블 + DLQ 처리  |       ✅ 데이터 정합성 확보        |
 |          주문 롤백 불가           |   결제 실패 시 재고가 복구 안됨    |     SAGA 패턴 + 보상 이벤트 도입      |      ✅ 전체 흐름 복원력 강화       |
 
-[🔗 📄 트러블 슈팅 상세 보기](https://www.notion.so/Docs-b52e69594faf418e8be2e900024e8419?pvs=4#3873982447e94b3281cf12f2cf48af9e)
+[🔗 📄 트러블 슈팅 상세 보기](https://leather-hole-ee3.notion.site/248c7d579b0780da9cfbf9b0765547b0)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -208,7 +209,7 @@ API 명세의 경우 [📗API 명세서](https://htmlpreview.github.io/?https://
 - **Circuit Breaker** → 외부 결제 API 장애 전파 방지
 - **Redis Sentinel + Docker** → 자동 Failover 구성으로 고가용성 확보
 
-[✅ 기술 의사결정 상세 보기](https://www.notion.so/Docs-b52e69594faf418e8be2e900024e8419?pvs=4#6249be082a524b159d9e1d69d1028edb)
+[✅ 기술 의사결정 상세 보기](https://leather-hole-ee3.notion.site/248c7d579b078027afdee52ad2561e8f)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
