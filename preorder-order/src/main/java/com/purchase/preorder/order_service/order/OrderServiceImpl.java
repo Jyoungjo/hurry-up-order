@@ -36,7 +36,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.common.core.exception.ExceptionCode.*;
@@ -52,6 +51,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDomainEventMapper mapper;
     private final DomainEventPublisher publisher;
     private final Executor executor;
+    private final OrderWriter orderWriter;
 
     // TODO 배송 서비스 분리할 경우 삭제
     private final ShipmentService shipmentService;
@@ -63,6 +63,7 @@ public class OrderServiceImpl implements OrderService {
                             OrderDomainEventMapper mapper,
                             @Qualifier("orderDomainEventPublisher") DomainEventPublisher publisher,
                             @Qualifier("feignClientTaskExecutor") Executor executor,
+                            OrderWriter orderWriter,
                             ShipmentService shipmentService) {
         this.itemClient = itemClient;
         this.orderRepository = orderRepository;
@@ -71,6 +72,7 @@ public class OrderServiceImpl implements OrderService {
         this.mapper = mapper;
         this.publisher = publisher;
         this.executor = executor;
+        this.orderWriter = orderWriter;
         this.shipmentService = shipmentService;
     }
 
@@ -112,7 +114,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // 6. DB 저장 및 리턴
-        return saveOrderTransactionally(req, userId, items);
+        return orderWriter.saveOrderTransactionally(req, userId, items);
     }
 
     @Override
@@ -314,21 +316,5 @@ public class OrderServiceImpl implements OrderService {
     private Long getUserIdOfAuthenticatedUser(HttpServletRequest request) {
         String accessToken = jwtUtils.resolveToken(request.getHeader(JwtUtils.AUTHORIZATION));
         return JwtParser.getUserId(accessToken);
-    }
-
-    @Transactional
-    public ResOrderDto saveOrderTransactionally(ReqOrderDto req, Long userId, List<ItemResponse> items) {
-        Map<Long, ItemResponse> itemMap = items.stream()
-                .collect(Collectors.toMap(ItemResponse::getId, Function.identity()));
-        int totalPrice = req.getOrderItemList().stream()
-                .mapToInt(oi -> itemMap.get(oi.getItemId()).getPrice() * oi.getItemCount())
-                .sum();
-
-        Order order = orderRepository.save(Order.of(userId, totalPrice));
-
-        List<OrderItem> orderItems = orderItemService.createOrderItems(order, req.getOrderItemList(), itemMap);
-        order.addAllOrderItems(orderItems);
-
-        return ResOrderDto.fromEntity(order);
     }
 }

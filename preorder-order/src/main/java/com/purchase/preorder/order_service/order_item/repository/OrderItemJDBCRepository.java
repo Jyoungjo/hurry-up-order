@@ -4,7 +4,6 @@ import com.common.domain.entity.order.OrderItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
 import java.sql.Types;
@@ -17,7 +16,6 @@ public class OrderItemJDBCRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    @Transactional
     public List<OrderItem> saveAll(List<OrderItem> orderItems) {
         String sql = """
             INSERT INTO tb_order_item
